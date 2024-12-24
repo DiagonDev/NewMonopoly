@@ -1,0 +1,5 @@
+# Ignora i file di backup generati per .vpp
+*.vpp.bak_*
+
+# Ignora altri file temporanei o inutili se necessario
+~*
