@@ -1,0 +1,203 @@
+[33mcommit 69ef7a9eedbadc6ba6036d7469dcdfac35c0dd02[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: francescatentori <f.tentori4@campus.unimib.it>
+Date:   Fri Jan 3 15:43:18 2025 +0100
+
+    aggiunta uml database
+
+[33mcommit 83c65e72a8d237738d966f24a0ad2a2507a8d12b[m
+Author: francescatentori <f.tentori4@campus.unimib.it>
+Date:   Fri Jan 3 11:52:09 2025 +0100
+
+    modifica del gantt
+
+[33mcommit 01ec16f60ae2b7eab2bc69944f50b1bcbc50c2d6[m
+Author: francescatentori <f.tentori4@campus.unimib.it>
+Date:   Thu Jan 2 18:18:57 2025 +0100
+
+    Svolto da Tentori e Ronchi.
+    
+    Aggiunto SM Partita e refactoring delle altre due macchine a stati
+
+[33mcommit 8182c33b4332e1336ec956c005877845c01437fb[m
+Author: AlessandroMessa <a.messa7@campus.unimib.it>
+Date:   Thu Jan 2 18:00:13 2025 +0100
+
+    Added Partita SM
+
+[33mcommit 2ca668dafbed3ad98c4bf9cf45879d63de7323ec[m
+Author: MatteoRonchi02 <m.ronchi38@campus.unimib.it>
+Date:   Thu Jan 2 16:26:26 2025 +0100
+
+    Creazione Connessione Partita AD e Connessione Partita MSD
+
+[33mcommit 7597758c14496a1c25b00054586782380b0c6c3c[m
+Author: AlessandroMessa <a.messa7@campus.unimib.it>
+Date:   Thu Jan 2 12:46:03 2025 +0100
+
+    Added a first version of Lascia Prigione AD
+    
+    Changed also Lascia Prigione SSD
+
+[33mcommit dc8bf3551693a6935dd76de1be88355296006c96[m
+Author: francescatentori <f.tentori4@campus.unimib.it>
+Date:   Sun Dec 29 16:31:58 2024 +0100
+
+    Aggiunta Diagramma attività e diagramma macchine a stato di creaPartita
+
+[33mcommit 6a335bce968d7a9fb49d36c175e50994df0cea36[m
+Author: MatteoRonchi02 <m.ronchi38@campus.unimib.it>
+Date:   Sat Dec 28 17:58:42 2024 +0100
+
+    Svolto da Ronchi e Tentori. Creazione SD Scegli Difficoltà e Randomizza Caselle
+
+[33mcommit 06a5190e42a7be59f91ad39aef5b8632a9d91730[m
+Author: AlessandroMessa <a.messa7@campus.unimib.it>
+Date:   Sat Dec 28 16:21:34 2024 +0100
+
+    added CreaPartita SD
+
+[33mcommit 0f5eef36af5e88bba3c6d72621d87e80fadffa1c[m
+Author: AlessandroMessa <a.messa7@campus.unimib.it>
+Date:   Sat Dec 28 15:42:51 2024 +0100
+
+    Added AstaProprietà SSD
+    
+    For Teo & Fra:
+    Added a method assegnaProprietà() in
+    acquistaProprietà and scambiaProprietà SSD
+
+[33mcommit 3518d2cdaa9bccf177df013a341d67d14a253bd6[m
+Author: francescatentori <f.tentori4@campus.unimib.it>
+Date:   Fri Dec 27 18:25:57 2024 +0100
+
+    Svolto da Tentori e Ronchi. Aggiornamento Diagramma casi d'uso, Modello di dominio, GestisciProprietà, SpostaPedina, AcquistaProprietà e ScambiaProprietà. Manca SSD AstaProprietà.
+
+[33mcommit 8c490d799c40f3be2e3614c87c762253ee01ecd1[m
+Author: MatteoRonchi02 <m.ronchi38@campus.unimib.it>
+Date:   Fri Dec 27 10:33:17 2024 +0100
+
+    Aggiornamento modello di dominio, svolto da Ronchi Tentori Messa Teruzzi
+
+[33mcommit 383ee0e269d1742b29fa25e17e519ba21d6180f7[m
+Author: LucaTeruUNIMIB <l.teruzzi@campus.unimib.it>
+Date:   Fri Dec 27 00:40:44 2024 +0100
+
+    Creation of Gestisci Proprieta SSD
+    
+    Creation of Gestisci Proprieta SSD
+
+[33mcommit 02bb29d5d0697f99286a0b9f2f19dd36d339fb2b[m
+Author: francescatentori <f.tentori4@campus.unimib.it>
+Date:   Thu Dec 26 18:12:31 2024 +0100
+
+    modifica SSD ScegliePedina e ConnessionePartita
+
+[33mcommit fbe30169661c0677668e0b91f842e44c45dc9d8a[m
+Author: AlessandroMessa <a.messa7@campus.unimib.it>
+Date:   Thu Dec 26 17:32:23 2024 +0100
+
+    Update pkg Diagram
+
+[33mcommit be5ea0d031a0c5e4bbcb8595f411473c2406929c[m
+Author: MatteoRonchi02 <m.ronchi38@campus.unimib.it>
+Date:   Thu Dec 26 11:45:52 2024 +0100
+
+    aggiornamento SSD EffettuaTurno
+
+[33mcommit 20f0a14a5172354e809ba0a9b94ca66988b82052[m
+Author: MatteoRonchi02 <m.ronchi38@campus.unimib.it>
+Date:   Thu Dec 26 11:29:06 2024 +0100
+
+    Aggiornamento SSD SpostaPedina, Completamento SSD EffettaTurno
+
+[33mcommit 6922067db8bddd3ff0e7b3fdd272660ab9200f9f[m
+Author: AlessandroMessa <a.messa7@campus.unimib.it>
+Date:   Wed Dec 25 21:18:24 2024 +0100
+
+    changed AbbandonaPartita Requirement
+    
+    Forgot to push in the last commit
+
+[33mcommit ac0b98eda90ece9e5e63bab7b9ab56a82b3d5586[m
+Author: AlessandroMessa <a.messa7@campus.unimib.it>
+Date:   Wed Dec 25 21:16:31 2024 +0100
+
+    Added more SSD
+    
+    Added : LasciaPrigione, AbbandonaPartita.
+    Changed: EffettuaTurno.
+    Some changes also in Use Case diagram
+
+[33mcommit 4c934a002a97a1f3b08b8b34d9dd7755d8848a46[m
+Author: francescatentori <f.tentori4@campus.unimib.it>
+Date:   Wed Dec 25 14:13:22 2024 +0100
+
+    SSD connessionePartita e ScegliePartita
+
+[33mcommit bf9eaae3e28f9c9ee92f5a3198f0506111469230[m
+Author: MatteoRonchi02 <m.ronchi38@campus.unimib.it>
+Date:   Tue Dec 24 19:03:57 2024 +0100
+
+    Modifica vpp
+
+[33mcommit ffead623c97ffc73adb0616e3e772671382711a4[m
+Author: MatteoRonchi02 <m.ronchi38@campus.unimib.it>
+Date:   Tue Dec 24 19:01:26 2024 +0100
+
+    aggiunta SSD LanciaDadi, SpostaPedina, PassaDalVia
+
+[33mcommit 132a59e1a477aa911af3a241ed1f3bc6c6586af2[m
+Author: MatteoRonchi02 <m.ronchi38@campus.unimib.it>
+Date:   Tue Dec 24 15:57:10 2024 +0100
+
+    aggiunta .gitignore
+
+[33mcommit 0d74dada520661f4f58a619aeed30e02a1c3123d[m
+Author: AlessandroMessa <a.messa7@campus.unimib.it>
+Date:   Tue Dec 24 15:54:05 2024 +0100
+
+    trash
+
+[33mcommit e18bede4845f72f037b3c4ccc139190da243bc47[m
+Author: AlessandroMessa <a.messa7@campus.unimib.it>
+Date:   Tue Dec 24 15:52:39 2024 +0100
+
+    Update NewMonopoly.vpp
+    
+    Corrected a problem in CreaPartitaSSD and started pkg diagram
+
+[33mcommit 9f12ec2f1ebfc60c9160278921b41535f81e5927[m
+Author: AlessandroMessa <a.messa7@campus.unimib.it>
+Date:   Tue Dec 24 15:40:01 2024 +0100
+
+    CreaPartita SSD done
+
+[33mcommit b2e3414db11496612f7a955d83fff311ab7bb724[m
+Author: LucaTeruUNIMIB <l.teruzzi@campus.unimib.it>
+Date:   Tue Dec 24 11:58:29 2024 +0100
+
+    Create model domain
+
+[33mcommit dd5e32b4514fa78a3418a1af909f346f367fcb42[m
+Author: AlessandroMessa <a.messa7@campus.unimib.it>
+Date:   Mon Dec 23 20:09:50 2024 +0100
+
+    Create NewMonopoly.vpp and a Use Case File
+
+[33mcommit 0be2c6c49b32ebaefbf9b8d95e52e3b150c35222[m
+Author: francescatentori <f.tentori4@campus.unimib.it>
+Date:   Mon Dec 23 19:24:25 2024 +0100
+
+    Analisi dei requisiti e diagramma di gantt. Svolto da Tentori e Ronchi
+
+[33mcommit 89e6afa1a76dc78a5f91a5e46744fff6d0d19456[m
+Author: github-classroom[bot] <66690702+github-classroom[bot]@users.noreply.github.com>
+Date:   Mon Dec 23 15:03:45 2024 +0000
+
+    Setting up GitHub Classroom Feedback
+
+[33mcommit 2a1dd513f30262ef8a08da07828a9e89b8fe592a[m[33m ([m[1;31morigin/feedback[m[33m)[m
+Author: github-classroom[bot] <66690702+github-classroom[bot]@users.noreply.github.com>
+Date:   Mon Dec 23 15:03:45 2024 +0000
+
+    GitHub Classroom Feedback
