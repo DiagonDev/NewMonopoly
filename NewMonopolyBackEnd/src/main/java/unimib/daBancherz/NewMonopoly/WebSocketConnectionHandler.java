@@ -23,9 +23,18 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
         // Decodifica il messaggio ricevuto
         String payload = message.getPayload().toString();
 
-        // Se il messaggio è del tipo "register:playerName", estrai il nome del giocatore
-        if (payload.startsWith("register:")) {
-            String playerName = payload.substring(9);  // Estrai il nome del giocatore dopo "register:"
+        // Se il messaggio è del tipo "Create:playerName:+difficulty:randomization", estrai il nome del giocatore
+        if (payload.startsWith("Create:")) {
+
+            String[] parts = payload.split(":");
+            // Assegna i parametri alle variabili corrispondenti
+            String playerName = parts[1];
+            System.out.println(playerName);
+            String difficulty = parts[2];
+            System.out.println(difficulty);
+            String randomization = parts[3];
+            System.out.println(randomization);
+
 
             // Verifica se il giocatore è già connesso
             if (playerSessions.containsKey(playerName)) {
@@ -44,6 +53,8 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
             // Salva la nuova sessione del giocatore
             playerSessions.put(playerName, session);
             System.out.println("Giocatore connesso: " + playerName);
+        } else if (payload.startsWith("Partecipa:")) {
+            
         }
     }
 
