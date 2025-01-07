@@ -1,6 +1,7 @@
 import { Routes, Route, Link } from 'react-router-dom';
 import CreateGamePage from './pages/CreateGamePage';
 import JoinGamePage from './pages/JoinGamePage';
+import GameBoard from './GameBoard';
 import './App.css';
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
       <Routes>
         <Route path="/create" element={<CreateGamePage />} />
         <Route path="/join" element={<JoinGamePage />} />
+        <Route path="/game/:gameId" element={<GameBoard />} />
       </Routes>
     </>
   );

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const CreateGamePage = () => {
   // Stato per i campi del form
@@ -7,12 +8,14 @@ const CreateGamePage = () => {
   const [randomization, setRandomization] = useState('');
   const [connected, setConnected] = useState(false);
   const [socket, setSocket] = useState(null);
-   const [serverMessage, setServerMessage] = useState('');
+  const [serverMessage, setServerMessage] = useState('');
+  const navigate = useNavigate(); // Per navigare alle altre pagine
+
 
   // Crea una connessione WebSocket quando il componente viene montato
   useEffect(() => {
-    //const ws = new WebSocket("ws://localhost:8080/ws/connection");
-    const ws = new WebSocket("https://89d1-84-33-176-173.ngrok-free.app/ws/connection");
+    const ws = new WebSocket("ws://localhost:8080/ws/connection");
+    //const ws = new WebSocket("https://89d1-84-33-176-173.ngrok-free.app/ws/connection");
     ws.onopen = () => {
       setSocket(ws);
       setConnected(true);
@@ -22,6 +25,13 @@ const CreateGamePage = () => {
     // Gestore per ricevere i messaggi
     ws.onmessage = (event) => {
       console.log(event.data)
+      // Supponendo che il backend invii l'ID della partita come messaggio
+      
+      const gameId = event.data; // Adatta questo in base al messaggio ricevuto
+      if (gameId) {
+        // Naviga alla pagina della board passando l'ID
+        navigate(`/game/${gameId}`);
+      }
       // Imposta il messaggio ricevuto dallo server nello stato
       setServerMessage(event.data);
     };
