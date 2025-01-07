@@ -1,9 +1,6 @@
 package unimib.daBancherz.NewMonopoly.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Imprevisto {
@@ -13,5 +10,19 @@ public class Imprevisto {
 
     private String descrizione;
 
+    public Integer getIdImprevisto() {
+        return idImprevisto;
+    }
 
+    public void setIdImprevisto(Integer idImprevisto) {
+        this.idImprevisto = idImprevisto;
+    }
+
+    public String getDescrizione() {
+        return descrizione;
+    }
+
+    public void setDescrizione(String descrizione) {
+        this.descrizione = descrizione;
+    }
 }

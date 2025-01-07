@@ -1,15 +1,15 @@
 package unimib.daBancherz.NewMonopoly.Entity;
 
 import jakarta.persistence.*;
+
 @Entity
-public class Partita_Imprevisto {
+public class Partita_Probabilita {
     @Id
     @ManyToOne
     private Partita PartitaidPartita;
 
-    @Id
-    @ManyToOne
-    private Imprevisto ImprevistoidImprevisto;
+    @Id @ManyToOne
+    private Probabilita probabilitaidProbabilita;
 
     public Partita getPartitaidPartita() {
         return PartitaidPartita;
@@ -19,11 +19,11 @@ public class Partita_Imprevisto {
         PartitaidPartita = partitaidPartita;
     }
 
-    public Imprevisto getImprevistoidImprevisto() {
-        return ImprevistoidImprevisto;
+    public Probabilita getProbabilitaidProbabilita() {
+        return probabilitaidProbabilita;
     }
 
-    public void setImprevistoidImprevisto(Imprevisto imprevistoidImprevisto) {
-        ImprevistoidImprevisto = imprevistoidImprevisto;
+    public void setProbabilitaidProbabilita(Probabilita probabilitaidProbabilita) {
+        this.probabilitaidProbabilita = probabilitaidProbabilita;
     }
 }

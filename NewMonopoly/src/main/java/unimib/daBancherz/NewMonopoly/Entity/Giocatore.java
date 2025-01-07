@@ -2,6 +2,11 @@ package unimib.daBancherz.NewMonopoly.Entity;
 
 import jakarta.persistence.*;
 
+@Table(
+        uniqueConstraints = @UniqueConstraint(columnNames = {"PartitaidPartita", "PedinaidPedina"})
+)
+/*  definisce che la combinazione di queste due colonne (PartitaidPartita e PedinaidPedina)
+    deve essere unica nella tabella corrispondente al database. */
 @Entity
 public class Giocatore {
     @Id
@@ -10,10 +15,10 @@ public class Giocatore {
 
     private String nome;
     private Integer saldo;
-    private Integer puntiFedeltà;
+    private Integer puntiFedelta;
     private String tipo;
 
-    @OneToOne
+    @ManyToOne
     private Pedina PedinaidPedina;
 
     @ManyToOne
@@ -43,12 +48,12 @@ public class Giocatore {
         this.saldo = saldo;
     }
 
-    public Integer getPuntiFedeltà() {
-        return puntiFedeltà;
+    public Integer getPuntiFedelta() {
+        return puntiFedelta;
     }
 
-    public void setPuntiFedeltà(Integer puntiFedeltà) {
-        this.puntiFedeltà = puntiFedeltà;
+    public void setPuntiFedelta(Integer puntiFedeltà) {
+        this.puntiFedelta = puntiFedeltà;
     }
 
     public String getTipo() {

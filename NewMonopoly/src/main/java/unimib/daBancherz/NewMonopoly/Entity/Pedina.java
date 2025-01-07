@@ -29,6 +29,5 @@ public class Pedina {
         this.nome = nome;
     }
 
-    // Getters e Setters
 }
 

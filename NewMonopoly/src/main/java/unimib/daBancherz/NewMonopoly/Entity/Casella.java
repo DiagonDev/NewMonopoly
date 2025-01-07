@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 public class Casella {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idCasella;
 
     private String nome;
@@ -15,14 +14,8 @@ public class Casella {
     private String tipo;
     private Integer prezzo;
 
-    @ManyToOne
-    private Partita PartitaidPartita;
-
     @OneToOne
-    private PrezzoProprietà PrezzoProprietàidPrezzoProprietà;
-
-    @ManyToOne
-    private Banca BancaidBanca;
+    private PrezzoProprieta prezzoProprietaidPrezzoProprieta;
 
     @ManyToOne
     private Giocatore GiocatoreidGiocatore;
@@ -83,28 +76,12 @@ public class Casella {
         this.prezzo = prezzo;
     }
 
-    public Partita getPartitaidPartita() {
-        return PartitaidPartita;
+    public PrezzoProprieta getPrezzoProprietaidPrezzoProprieta() {
+        return prezzoProprietaidPrezzoProprieta;
     }
 
-    public void setPartitaidPartita(Partita partitaidPartita) {
-        PartitaidPartita = partitaidPartita;
-    }
-
-    public PrezzoProprietà getPrezzoProprietàidPrezzoProprietà() {
-        return PrezzoProprietàidPrezzoProprietà;
-    }
-
-    public void setPrezzoProprietàidPrezzoProprietà(PrezzoProprietà prezzoProprietàidPrezzoProprietà) {
-        PrezzoProprietàidPrezzoProprietà = prezzoProprietàidPrezzoProprietà;
-    }
-
-    public Banca getBancaidBanca() {
-        return BancaidBanca;
-    }
-
-    public void setBancaidBanca(Banca bancaidBanca) {
-        BancaidBanca = bancaidBanca;
+    public void setPrezzoProprietaidPrezzoProprieta(PrezzoProprieta prezzoProprietàidPrezzoProprieta) {
+        this.prezzoProprietaidPrezzoProprieta = prezzoProprietàidPrezzoProprieta;
     }
 
     public Giocatore getGiocatoreidGiocatore() {
