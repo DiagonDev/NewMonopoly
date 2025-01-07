@@ -4,6 +4,9 @@ import lombok.Getter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,6 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketConnectionHandler implements WebSocketHandler {
 
     private final Map<String, WebSocketSession> playerSessions = new ConcurrentHashMap<>();
+    private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>(); // l'insieme delle partite con i suoi giocatori
+
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -23,7 +28,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
         // Decodifica il messaggio ricevuto
         String payload = message.getPayload().toString();
 
-        // Se il messaggio è del tipo "Create:playerName:+difficulty:randomization", estrai il nome del giocatore
+        // Se il messaggio è del tipo "Create:playerName:difficulty:randomization", estrai il nome del giocatore
         if (payload.startsWith("Create:")) {
 
             String[] parts = payload.split(":");
@@ -34,9 +39,10 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
             System.out.println(difficulty);
             String randomization = parts[3];
             System.out.println(randomization);
+            String gameId = generateGameId(); // genera l'ID della partita
+            System.out.println("ID partita generato: " + gameId);
 
-
-            // Verifica se il giocatore è già connesso
+            /*
             if (playerSessions.containsKey(playerName)) {
                 WebSocketSession existingSession = playerSessions.get(playerName);
                 if (existingSession.isOpen()) {
@@ -50,18 +56,47 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                 }
             }
 
-            // Salva la nuova sessione del giocatore
             playerSessions.put(playerName, session);
             System.out.println("Giocatore connesso: " + playerName);
+            */
 
-            // Genera l'ID della partita (può essere un ID unico, ad esempio un UUID)
-            String gameId = generateGameId();
-            System.out.println("ID partita generato: " + gameId);
+            // Associa il giocatore alla partita
+            gameSessions.putIfAbsent(gameId, new ArrayList<>());
+            gameSessions.get(gameId).add(session);
+
 
             // Invia il messaggio di ID partita a tutti i giocatori connessi
             broadcastGameId(gameId);
         } else if (payload.startsWith("Partecipa:")) {
-            
+            // Decodifica il messaggio
+            String[] parts = payload.split(":");
+            String playerName = parts[1];  // Nome del giocatore
+            String gameId = parts[2];      // Codice partita fornito
+
+            // Controlla se la partita esiste
+            if (!gameSessions.containsKey(gameId)) {
+                session.sendMessage(new TextMessage("Errore: la partita con ID " + gameId + " non esiste."));
+                return;
+            }
+
+            List<WebSocketSession> playersInGame = gameSessions.get(gameId);
+            /*
+            // Verifica se il giocatore è già nella partita
+            boolean alreadyInGame = playersInGame.stream()
+                    .anyMatch(s -> extractPlayerName(s).equals(playerName));
+
+            if (alreadyInGame) {
+                session.sendMessage(new TextMessage("Errore: sei già connesso a questa partita!"));
+                return;
+            }
+            */
+
+            // Aggiungi la sessione del giocatore alla partita
+            playersInGame.add(session);
+            session.sendMessage(new TextMessage("Ti sei unito alla partita con ID " + gameId + " con successo!"));
+
+
+            //System.out.println("Giocatore " + playerName + " si è unito alla partita con ID " + gameId);
         }
     }
 
@@ -98,6 +133,14 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                 playerSession.sendMessage(new TextMessage("ID partita: " + gameId));
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    private void broadcastPlayerParticipate(String playerName, List<WebSocketSession> playersInGame, WebSocketSession session) throws IOException {
+        for (WebSocketSession playerSession : playersInGame) {
+            if (!playerSession.equals(session)) {
+                playerSession.sendMessage(new TextMessage(playerName + " si è unito alla partita!"));
             }
         }
     }

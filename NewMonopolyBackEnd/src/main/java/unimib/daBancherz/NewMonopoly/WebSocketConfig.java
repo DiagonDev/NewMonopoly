@@ -22,6 +22,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
         //registry.addHandler(webSocketChatHandler, "/ws/chatLog")
         // .setAllowedOrigins("*");  // Specifica che l'origine di connessione è consentita da tutte le origini
         registry.addHandler(webSocketConnectionHandler, "/ws/connection")
-                .setAllowedOrigins("*");
+                .setAllowedOrigins("http://localhost:5174");
     }
 }
