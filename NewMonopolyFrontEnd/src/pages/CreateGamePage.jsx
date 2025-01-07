@@ -7,17 +7,24 @@ const CreateGamePage = () => {
   const [randomization, setRandomization] = useState('');
   const [connected, setConnected] = useState(false);
   const [socket, setSocket] = useState(null);
+   const [serverMessage, setServerMessage] = useState('');
 
   // Crea una connessione WebSocket quando il componente viene montato
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080/ws/connection");
-
+    //const ws = new WebSocket("ws://localhost:8080/ws/connection");
+    const ws = new WebSocket("https://89d1-84-33-176-173.ngrok-free.app/ws/connection");
     ws.onopen = () => {
       setSocket(ws);
       setConnected(true);
       console.log("Connessione WebSocket stabilita");
     };
 
+    // Gestore per ricevere i messaggi
+    ws.onmessage = (event) => {
+      console.log(event.data)
+      // Imposta il messaggio ricevuto dallo server nello stato
+      setServerMessage(event.data);
+    };
     ws.onerror = (error) => {
       console.error("Errore WebSocket:", error);
     };
@@ -85,6 +92,7 @@ const CreateGamePage = () => {
         <br />
         <button type="submit">Crea</button>
       </form>
+      {serverMessage && <p>Messaggio dal server: {serverMessage}</p>}
     </div>
   );
 };

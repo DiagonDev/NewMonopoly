@@ -11,7 +11,8 @@ const JoinGamePage = () => {
   // Crea una connessione WebSocket quando il componente viene montato
     useEffect(() => {
       const ws = new WebSocket("ws://localhost:8080/ws/connection");
-  
+      //const ws = new WebSocket("https://89d1-84-33-176-173.ngrok-free.app/ws/connection");
+      
       ws.onopen = () => {
         setSocket(ws);
         setConnected(true);
@@ -19,7 +20,7 @@ const JoinGamePage = () => {
       };
       // Gestore per ricevere i messaggi
       ws.onmessage = (event) => {
-        console.log("GameId: "+ event.data)
+        console.log(event.data)
         // Imposta il messaggio ricevuto dallo server nello stato
         setServerMessage(event.data);
       };
@@ -44,7 +45,6 @@ const JoinGamePage = () => {
         socket.send(`Partecipa:${name}:${gameId}`);
         console.log('Nome:', name);
         console.log('ID Partita:', gameId);
-        socket.onmessage
         // Reset dei campi dopo il submit (opzionale)
         setName('');
         setGameId('');
