@@ -6,6 +6,7 @@ const JoinGamePage = () => {
   const [gameId, setGameId] = useState('');
   const [connected, setConnected] = useState(false);
   const [socket, setSocket] = useState(null);
+  const [serverMessage, setServerMessage] = useState('');
   
   // Crea una connessione WebSocket quando il componente viene montato
     useEffect(() => {
@@ -16,7 +17,13 @@ const JoinGamePage = () => {
         setConnected(true);
         console.log("Connessione WebSocket stabilita");
       };
-  
+      // Gestore per ricevere i messaggi
+      ws.onmessage = (event) => {
+        console.log("GameId: "+ event.data)
+        // Imposta il messaggio ricevuto dallo server nello stato
+        setServerMessage(event.data);
+      };
+
       ws.onerror = (error) => {
         console.error("Errore WebSocket:", error);
       };
@@ -34,10 +41,10 @@ const JoinGamePage = () => {
     e.preventDefault();
     // Se la connessione WebSocket è aperta, invia il messaggio
     if (socket && connected) {
-        socket.send(`Create:${name}:${gameId}`);
+        socket.send(`Partecipa:${name}:${gameId}`);
         console.log('Nome:', name);
         console.log('ID Partita:', gameId);
-  
+        socket.onmessage
         // Reset dei campi dopo il submit (opzionale)
         setName('');
         setGameId('');
@@ -73,6 +80,8 @@ const JoinGamePage = () => {
         <br />
         <button type="submit">Partecipa</button>
       </form>
+      {/* Mostra il messaggio ricevuto dal server */}
+      {serverMessage && <p>Messaggio dal server: {serverMessage}</p>}
     </div>
   );
 };
