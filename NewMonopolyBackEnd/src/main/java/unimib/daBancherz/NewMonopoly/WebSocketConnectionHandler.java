@@ -53,6 +53,13 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
             // Salva la nuova sessione del giocatore
             playerSessions.put(playerName, session);
             System.out.println("Giocatore connesso: " + playerName);
+
+            // Genera l'ID della partita (può essere un ID unico, ad esempio un UUID)
+            String gameId = generateGameId();
+            System.out.println("ID partita generato: " + gameId);
+
+            // Invia il messaggio di ID partita a tutti i giocatori connessi
+            broadcastGameId(gameId);
         } else if (payload.startsWith("Partecipa:")) {
             
         }
@@ -82,6 +89,22 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
     private String extractPlayerName(WebSocketSession session) {
         // Questo metodo può essere usato per estrarre il nome del giocatore dalla sessione, ma in questo caso il nome viene passato nel messaggio
         return session.getId();  // Una soluzione temporanea, ma può essere migliorata
+    }
+
+    private void broadcastGameId(String gameId) {
+        // Invia l'ID della partita a tutte le sessioni dei giocatori connessi
+        for (WebSocketSession playerSession : playerSessions.values()) {
+            try {
+                playerSession.sendMessage(new TextMessage("ID partita: " + gameId));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private String generateGameId() {
+        // Qui puoi generare un ID partita unico (ad esempio con UUID)
+        return "game-" + java.util.UUID.randomUUID().toString();
     }
 
 }
