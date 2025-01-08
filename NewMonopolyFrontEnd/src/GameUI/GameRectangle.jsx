@@ -8,7 +8,7 @@ const GameRectangle = () => {
         <div className="game-rectangle">
             <div>
                 <div>
-                    <p>ID Partita: {serverMessage}</p>
+                    <p>ID Partita: {'Va cambiatooo'}</p>
                 </div>
                 <div>
                     <GameChat />

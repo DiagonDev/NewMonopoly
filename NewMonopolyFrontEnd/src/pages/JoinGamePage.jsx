@@ -1,11 +1,14 @@
 import React, { useState, useContext } from 'react';
 import { WebSocketContext } from "../WebSocketContext";
+import { useNavigate } from 'react-router-dom';
 
 const JoinGamePage = () => {
   const { socket, connected, serverMessage } = useContext(WebSocketContext);
   // Stato per i campi del form
   const [name, setName] = useState('');
   const [gameId, setGameId] = useState('');
+  const navigate = useNavigate();
+
 
   // Gestore per il submit del form
   const handleSubmit = (e) => {
@@ -18,6 +21,7 @@ const JoinGamePage = () => {
       // Reset dei campi dopo il submit (opzionale)
       setName('');
       setGameId('');
+      navigate('/play')
     } else {
       console.error("Connessione WebSocket non stabilita!");
     }
