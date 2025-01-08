@@ -1,0 +1,28 @@
+/* Stile per il contenitore esterno */
+.game-outside-rectangle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Altezza dell'intero schermo */
+  background-color: #f5f5f5; /* Colore di sfondo */
+}
+
+/* Stile per il contenitore interno */
+.game-rectangle {
+  width: 70%; /* Occupa il 70% della larghezza */
+  height: 70%; /* Occupa il 70% dell'altezza */
+  background-color: #e0e0e0; /* Colore di sfondo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombra */
+  border-radius: 8px; /* Angoli arrotondati */
+}
+
+/* Stile per la Board */
+.game-board {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 20px;
+  flex: 1;
+}

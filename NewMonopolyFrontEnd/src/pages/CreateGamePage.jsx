@@ -1,11 +1,14 @@
 import React, { useState, useContext } from 'react';
 import { WebSocketContext } from "../WebSocketContext";
+import { useNavigate } from 'react-router-dom';
+
 
 const CreateGamePage = () => {
-   const { socket, connected, serverMessage } = useContext(WebSocketContext);
+  const { socket, connected, serverMessage } = useContext(WebSocketContext);
   const [userName, setUserName] = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [randomization, setRandomization] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -17,6 +20,7 @@ const CreateGamePage = () => {
       setUserName('');
       setDifficulty('');
       setRandomization('');
+      navigate('/play')
     } else {
       console.error("Connessione WebSocket non stabilita!");
     }

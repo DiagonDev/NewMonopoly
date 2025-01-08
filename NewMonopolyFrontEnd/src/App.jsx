@@ -3,27 +3,28 @@ import WelcomePage from './pages/WelcomePage'; // Importa il componente WelcomeP
 import CreateGamePage from './pages/CreateGamePage';
 import JoinGamePage from './pages/JoinGamePage';
 import './App.css';
-import React, { useState, useEffect } from 'react';
 import { WebSocketProvider } from "./WebSocketContext";
+import GameBoard from './GameUI/GameBoard';
 
 
 function App() {
 
   return (
     <WebSocketProvider>
-    <>
-       {/* Titolo in alto a destra */}
-       <h1 className="titolo">NewMonopolyGame</h1>
-      {/* Contenitore principale */}
-      <div className="main-container">
-        {/* Configura le rotte */}
-        <Routes>
-          <Route path="*" element={<WelcomePage />} /> {/* WelcomePage come rotta predefinita */}
-          <Route path="/create" element={<CreateGamePage  />}/> 
-          <Route path="/join" element = {<JoinGamePage />}/>
-        </Routes>
-      </div>
-    </>
+      <>
+        {/* Titolo in alto a destra */}
+        <h1 className="titolo">NewMonopolyGame</h1>
+        {/* Contenitore principale */}
+        <div className="main-container">
+          {/* Configura le rotte */}
+          <Routes>
+            <Route path="*" element={<WelcomePage />} /> {/* WelcomePage come rotta predefinita */}
+            <Route path="/create" element={<CreateGamePage />} />
+            <Route path="/join" element={<JoinGamePage />} />
+            <Route path="/play" element={<GameBoard />} />
+          </Routes>
+        </div>
+      </>
     </WebSocketProvider>
   );
 }

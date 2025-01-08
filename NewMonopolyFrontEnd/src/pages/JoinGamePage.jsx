@@ -6,22 +6,22 @@ const JoinGamePage = () => {
   // Stato per i campi del form
   const [name, setName] = useState('');
   const [gameId, setGameId] = useState('');
-  
+
   // Gestore per il submit del form
   const handleSubmit = (e) => {
     e.preventDefault();
     // Se la connessione WebSocket è aperta, invia il messaggio
     if (socket && connected) {
-        socket.send(`Partecipa:${name}:${gameId}`);
-        console.log('Nome:', name);
-        console.log('ID Partita:', gameId);
-        // Reset dei campi dopo il submit (opzionale)
-        setName('');
-        setGameId('');
-      } else {
-        console.error("Connessione WebSocket non stabilita!");
-      }
-    
+      socket.send(`Partecipa:${name}:${gameId}`);
+      console.log('Nome:', name);
+      console.log('ID Partita:', gameId);
+      // Reset dei campi dopo il submit (opzionale)
+      setName('');
+      setGameId('');
+    } else {
+      console.error("Connessione WebSocket non stabilita!");
+    }
+
   };
 
   return (
