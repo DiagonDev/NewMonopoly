@@ -9,16 +9,16 @@ import jakarta.persistence.Id;
 public class Pedina {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idPedina;
+    private Integer id_pedina;
 
     private String nome;
 
-    public Integer getIdPedina() {
-        return idPedina;
+    public Integer getId_pedina() {
+        return id_pedina;
     }
 
-    public void setIdPedina(Integer idPedina) {
-        this.idPedina = idPedina;
+    public void setId_pedina(Integer id_pedina) {
+        this.id_pedina = id_pedina;
     }
 
     public String getNome() {
@@ -28,6 +28,5 @@ public class Pedina {
     public void setNome(String nome) {
         this.nome = nome;
     }
-
 }
 

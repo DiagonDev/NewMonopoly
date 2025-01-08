@@ -6,24 +6,24 @@ import jakarta.persistence.*;
 public class Partita_Probabilita {
     @Id
     @ManyToOne
-    private Partita PartitaidPartita;
+    private Partita idpartita;
 
     @Id @ManyToOne
-    private Probabilita probabilitaidProbabilita;
+    private Probabilita idprobabilita;
 
-    public Partita getPartitaidPartita() {
-        return PartitaidPartita;
+    public Partita getIdpartita() {
+        return idpartita;
     }
 
-    public void setPartitaidPartita(Partita partitaidPartita) {
-        PartitaidPartita = partitaidPartita;
+    public void setIdpartita(Partita idpartita) {
+        this.idpartita = idpartita;
     }
 
-    public Probabilita getProbabilitaidProbabilita() {
-        return probabilitaidProbabilita;
+    public Probabilita getIdprobabilita() {
+        return idprobabilita;
     }
 
-    public void setProbabilitaidProbabilita(Probabilita probabilitaidProbabilita) {
-        this.probabilitaidProbabilita = probabilitaidProbabilita;
+    public void setIdprobabilita(Probabilita idprobabilita) {
+        this.idprobabilita = idprobabilita;
     }
 }

@@ -1,15 +1,20 @@
 package unimib.daBancherz.NewMonopoly.Entity;
 
 import jakarta.persistence.*;
+
 @Entity
-public class Partita_Imprevisto {
+public class Partita_Casella_Prezzoproprieta {
     @Id
     @ManyToOne
     private Partita idpartita;
 
     @Id
     @ManyToOne
-    private Imprevisto idimprevisto;
+    private Casella idcasella;
+
+    @Id
+    @ManyToOne
+    private Prezzoproprieta idprezzoproprieta;
 
     public Partita getIdpartita() {
         return idpartita;
@@ -19,11 +24,11 @@ public class Partita_Imprevisto {
         this.idpartita = idpartita;
     }
 
-    public Imprevisto getIdimprevisto() {
-        return idimprevisto;
+    public Casella getIdcasella() {
+        return idcasella;
     }
 
-    public void setIdimprevisto(Imprevisto idimprevisto) {
-        this.idimprevisto = idimprevisto;
+    public void setIdcasella(Casella idcasella) {
+        this.idcasella = idcasella;
     }
 }

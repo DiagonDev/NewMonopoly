@@ -6,22 +6,22 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class PrezzoProprieta {
+public class Prezzoproprieta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idPrezzoProprieta;
+    private Integer id_prezzoproprieta;
 
     private Integer affitto;
     private Integer ipoteca;
     private Integer casa;
-    private Integer hotel;
+    private Integer albergo;
 
-    public Integer getIdPrezzoProprieta() {
-        return idPrezzoProprieta;
+    public Integer getId_prezzoproprieta() {
+        return id_prezzoproprieta;
     }
 
-    public void setIdPrezzoProprieta(Integer idPrezzoProprieta) {
-        this.idPrezzoProprieta = idPrezzoProprieta;
+    public void setId_prezzoproprieta(Integer id_prezzoproprieta) {
+        this.id_prezzoproprieta = id_prezzoproprieta;
     }
 
     public Integer getAffitto() {
@@ -48,11 +48,11 @@ public class PrezzoProprieta {
         this.casa = casa;
     }
 
-    public Integer getHotel() {
-        return hotel;
+    public Integer getAlbergo() {
+        return albergo;
     }
 
-    public void setHotel(Integer hotel) {
-        this.hotel = hotel;
+    public void setAlbergo(Integer albergo) {
+        this.albergo = albergo;
     }
 }

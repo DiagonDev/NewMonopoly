@@ -5,27 +5,24 @@ import jakarta.persistence.*;
 @Entity
 public class Casella {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idCasella;
+    private Integer id_casella;
 
     private String nome;
-    private Integer numCase;
-    private Boolean numAlbergo;
+    private Integer num_casa;
+    private Boolean num_albergo;
     private String colore;
     private String tipo;
     private Integer prezzo;
 
-    @OneToOne
-    private PrezzoProprieta prezzoProprietaidPrezzoProprieta;
-
     @ManyToOne
-    private Giocatore GiocatoreidGiocatore;
+    private Giocatore idgiocatore;
 
-    public Integer getIdCasella() {
-        return idCasella;
+    public Integer getId_casella() {
+        return id_casella;
     }
 
-    public void setIdCasella(Integer idCasella) {
-        this.idCasella = idCasella;
+    public void setId_casella(Integer id_casella) {
+        this.id_casella = id_casella;
     }
 
     public String getNome() {
@@ -36,20 +33,20 @@ public class Casella {
         this.nome = nome;
     }
 
-    public Integer getNumCase() {
-        return numCase;
+    public Integer getNum_casa() {
+        return num_casa;
     }
 
-    public void setNumCase(Integer numCase) {
-        this.numCase = numCase;
+    public void setNum_casa(Integer num_casa) {
+        this.num_casa = num_casa;
     }
 
-    public Boolean getNumAlbergo() {
-        return numAlbergo;
+    public Boolean getNum_albergo() {
+        return num_albergo;
     }
 
-    public void setNumAlbergo(Boolean numAlbergo) {
-        this.numAlbergo = numAlbergo;
+    public void setNum_albergo(Boolean num_albergo) {
+        this.num_albergo = num_albergo;
     }
 
     public String getColore() {
@@ -76,20 +73,12 @@ public class Casella {
         this.prezzo = prezzo;
     }
 
-    public PrezzoProprieta getPrezzoProprietaidPrezzoProprieta() {
-        return prezzoProprietaidPrezzoProprieta;
+    public Giocatore getIdgiocatore() {
+        return idgiocatore;
     }
 
-    public void setPrezzoProprietaidPrezzoProprieta(PrezzoProprieta prezzoProprietàidPrezzoProprieta) {
-        this.prezzoProprietaidPrezzoProprieta = prezzoProprietàidPrezzoProprieta;
-    }
-
-    public Giocatore getGiocatoreidGiocatore() {
-        return GiocatoreidGiocatore;
-    }
-
-    public void setGiocatoreidGiocatore(Giocatore giocatoreidGiocatore) {
-        GiocatoreidGiocatore = giocatoreidGiocatore;
+    public void setIdgiocatore(Giocatore idgiocatore) {
+        this.idgiocatore = idgiocatore;
     }
 }
 

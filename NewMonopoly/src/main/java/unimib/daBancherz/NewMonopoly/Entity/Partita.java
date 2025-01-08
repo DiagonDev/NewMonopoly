@@ -6,35 +6,35 @@ import jakarta.persistence.*;
 public class Partita {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idPartita;
+    private Integer id_partita;
 
-    private Integer livelloDifficolta;
-    private String codiceInvito;
+    private Integer livello_difficolta;
+    private String codice_invito;
     private Integer stato;
     private Boolean randomizzazione;
 
-    public Integer getIdPartita() {
-        return idPartita;
+    public Integer getId_partita() {
+        return id_partita;
     }
 
-    public void setIdPartita(Integer idPartita) {
-        this.idPartita = idPartita;
+    public void setId_partita(Integer id_partita) {
+        this.id_partita = id_partita;
     }
 
-    public Integer getLivelloDifficolta() {
-        return livelloDifficolta;
+    public Integer getLivello_difficolta() {
+        return livello_difficolta;
     }
 
-    public void setLivelloDifficolta(Integer livelloDifficolta) {
-        this.livelloDifficolta = livelloDifficolta;
+    public void setLivello_difficolta(Integer livello_difficolta) {
+        this.livello_difficolta = livello_difficolta;
     }
 
-    public String getCodiceInvito() {
-        return codiceInvito;
+    public String getCodice_invito() {
+        return codice_invito;
     }
 
-    public void setCodiceInvito(String codiceInvito) {
-        this.codiceInvito = codiceInvito;
+    public void setCodice_invito(String codice_invito) {
+        this.codice_invito = codice_invito;
     }
 
     public Integer getStato() {
