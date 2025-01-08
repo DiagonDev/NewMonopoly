@@ -4,8 +4,9 @@ import { WebSocketContext } from "../WebSocketContext";
 
 
 const GameChat = () => {
-    const { socket, connected, serverMessage } = useContext(WebSocketContext);
+    const { socket, connected, serverMessage, userMessages } = useContext(WebSocketContext);
     const [userMessage, setUserMessage] = useState('');
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -23,7 +24,7 @@ const GameChat = () => {
     return (
         <div>
             <textarea
-                value={serverMessage}
+                value={Array.isArray(userMessages) ? userMessages.join("\n") : ""}
                 readOnly
                 rows={10}
                 cols={10}

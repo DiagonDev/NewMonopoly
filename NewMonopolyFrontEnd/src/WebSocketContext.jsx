@@ -5,7 +5,8 @@ export const WebSocketContext = createContext();
 export const WebSocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [connected, setConnected] = useState(false);
-   const [serverMessage, setServerMessage] = useState('');
+  const [serverMessage, setServerMessage] = useState('');
+  const [userMessages, setUserMessages] = useState([]);
 
   useEffect(() => {
     const ws = new WebSocket("wss://f957-84-33-176-173.ngrok-free.app/ws/connection");
@@ -17,7 +18,15 @@ export const WebSocketProvider = ({ children }) => {
 
     ws.onmessage = (event) => {
       console.log("Messaggio dal server:", event.data);
-      setServerMessage(event.data);
+      if (event.data.includes('!')) {
+        setUserMessages((prevMessages) => {
+          const updatedMessages = [...prevMessages, event.data];
+          console.log("Messaggi aggiornati:", updatedMessages);
+          return updatedMessages;
+      });
+      }
+      else
+        setServerMessage(event.data);
     };
 
     ws.onerror = (error) => {
@@ -36,7 +45,7 @@ export const WebSocketProvider = ({ children }) => {
   }, []);
 
   return (
-    <WebSocketContext.Provider value={{ socket, connected, serverMessage }}>
+    <WebSocketContext.Provider value={{ socket, connected, serverMessage, userMessages }}>
       {children}
     </WebSocketContext.Provider>
   );
