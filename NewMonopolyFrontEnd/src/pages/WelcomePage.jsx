@@ -1,7 +1,6 @@
 import { Routes, Route, Link } from 'react-router-dom';
 import CreateGamePage from './CreateGamePage';
 import JoinGamePage from './JoinGamePage';
-import React, { useState, useEffect } from 'react';
 import './WelcomePage.css';
 
 function WelcomePage() {

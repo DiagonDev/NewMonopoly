@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { WebSocketContext } from "../WebSocketContext";
 
-const CreateGamePage = ({ socket, connected }) => {
+const CreateGamePage = () => {
+   const { socket, connected, serverMessage } = useContext(WebSocketContext);
   const [userName, setUserName] = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [randomization, setRandomization] = useState('');
@@ -56,6 +58,8 @@ const CreateGamePage = ({ socket, connected }) => {
         <br />
         <button type="submit">Crea</button>
       </form>
+      {/* Mostra il messaggio ricevuto dal server */}
+      {serverMessage && <p>Messaggio dal server: {serverMessage}</p>}
     </div>
   );
 };

@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
+import { WebSocketContext } from "../WebSocketContext";
 
-const JoinGamePage = ({ socket, connected }) => {
+const JoinGamePage = () => {
+  const { socket, connected, serverMessage } = useContext(WebSocketContext);
   // Stato per i campi del form
   const [name, setName] = useState('');
   const [gameId, setGameId] = useState('');
@@ -48,6 +50,8 @@ const JoinGamePage = ({ socket, connected }) => {
         <br />
         <button type="submit">Partecipa</button>
       </form>
+      {/* Mostra il messaggio ricevuto dal server */}
+      {serverMessage && <p>Messaggio dal server: {serverMessage}</p>}
     </div>
   );
 };

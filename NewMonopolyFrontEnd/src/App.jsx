@@ -4,46 +4,13 @@ import CreateGamePage from './pages/CreateGamePage';
 import JoinGamePage from './pages/JoinGamePage';
 import './App.css';
 import React, { useState, useEffect } from 'react';
+import { WebSocketProvider } from "./WebSocketContext";
 
 
 function App() {
 
-  const [connected, setConnected] = useState(false);
-  const [socket, setSocket] = useState(null);
-  const [serverMessage, setServerMessage] = useState('');
-
-// Crea una connessione WebSocket quando il componente viene montato
-useEffect(() => {
-  const ws = new WebSocket("wss://f957-84-33-176-173.ngrok-free.app/ws/connection");
-
-  ws.onopen = () => {
-    setSocket(ws);
-    setConnected(true);
-    console.log("Connessione WebSocket stabilita");
-  };
-
-  ws.onmessage = (event) => {
-    console.log("Messaggio dal server:", event.data);
-    setServerMessage(event.data);
-  };
-
-  ws.onerror = (error) => {
-    console.error("Errore WebSocket:", error);
-  };
-
-  ws.onclose = (event) => {
-    console.warn("Connessione WebSocket chiusa:", event);
-    setConnected(false); // Segna che la connessione è chiusa
-  };
-
-  return () => {
-    if (ws.readyState === WebSocket.OPEN) {
-      ws.close();
-    }
-  };
-}, []);
-
   return (
+    <WebSocketProvider>
     <>
        {/* Titolo in alto a destra */}
        <h1 className="titolo">NewMonopolyGame</h1>
@@ -52,14 +19,12 @@ useEffect(() => {
         {/* Configura le rotte */}
         <Routes>
           <Route path="*" element={<WelcomePage />} /> {/* WelcomePage come rotta predefinita */}
-          {/* Passa socket e connected come props */}
-          <Route path="/create" element={<CreateGamePage socket={socket} connected={connected} />}/> 
-          <Route path="/join" element = {<JoinGamePage socket= {socket} connected ={connected} />}/>
+          <Route path="/create" element={<CreateGamePage  />}/> 
+          <Route path="/join" element = {<JoinGamePage />}/>
         </Routes>
-        {/* Mostra il messaggio ricevuto dal server */}
-      {serverMessage && <p>Messaggio dal server: {serverMessage}</p>}
       </div>
     </>
+    </WebSocketProvider>
   );
 }
 
