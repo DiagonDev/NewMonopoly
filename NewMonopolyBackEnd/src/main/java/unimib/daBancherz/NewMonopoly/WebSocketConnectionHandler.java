@@ -1,6 +1,7 @@
 package unimib.daBancherz.NewMonopoly;
 
 import lombok.Getter;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
@@ -34,7 +35,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
             String[] parts = payload.split(":");
             // Assegna i parametri alle variabili corrispondenti
             String playerName = parts[1];
-            System.out.println(playerName);
+            System.out.println(playerName + " ,id player: " + extractPlayerName(session));
             String difficulty = parts[2];
             System.out.println(difficulty);
             String randomization = parts[3];
@@ -42,12 +43,13 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
             String gameId = generateGameId(); // genera l'ID della partita
             System.out.println("ID partita generato: " + gameId);
 
-            /*
+
             if (playerSessions.containsKey(playerName)) {
                 WebSocketSession existingSession = playerSessions.get(playerName);
                 if (existingSession.isOpen()) {
                     // Se il giocatore è già connesso, invia un messaggio di errore e chiudi la connessione
                     session.sendMessage(new TextMessage("Sei già connesso alla partita!"));
+                    System.out.println("Chiudo connessione");
                     session.close();  // Chiudiamo la nuova connessione
                     return;
                 } else {
@@ -58,7 +60,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
 
             playerSessions.put(playerName, session);
             System.out.println("Giocatore connesso: " + playerName);
-            */
+
 
             // Associa il giocatore alla partita
             gameSessions.putIfAbsent(gameId, new ArrayList<>());
@@ -72,6 +74,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
             String[] parts = payload.split(":");
             String playerName = parts[1];  // Nome del giocatore
             String gameId = parts[2];      // Codice partita fornito
+            System.out.println("il gameId fornito è: "+ gameId);
 
             // Controlla se la partita esiste
             if (!gameSessions.containsKey(gameId)) {
@@ -94,7 +97,11 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
             // Aggiungi la sessione del giocatore alla partita
             playersInGame.add(session);
             session.sendMessage(new TextMessage("Ti sei unito alla partita con ID " + gameId + " con successo!"));
-
+            for (WebSocketSession playerSession : playersInGame) {
+                // Se hai un metodo per ottenere il nome del giocatore
+                String name = extractPlayerName(playerSession); // Esempio
+                System.out.println(" - " + name);
+            }
 
             //System.out.println("Giocatore " + playerName + " si è unito alla partita con ID " + gameId);
         }
@@ -114,6 +121,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
         String playerName = extractPlayerName(session);
         playerSessions.remove(playerName);
         System.out.println("Giocatore disconnesso: " + playerName);
+        System.out.println("Server WebSocket closed: " + status.getCode() + " - " + status.getReason());
     }
 
     @Override
@@ -130,7 +138,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
         // Invia l'ID della partita a tutte le sessioni dei giocatori connessi
         for (WebSocketSession playerSession : playerSessions.values()) {
             try {
-                playerSession.sendMessage(new TextMessage("ID partita: " + gameId));
+                playerSession.sendMessage(new TextMessage(gameId));
             } catch (Exception e) {
                 e.printStackTrace();
             }

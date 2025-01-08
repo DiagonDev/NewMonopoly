@@ -28,6 +28,11 @@ const JoinGamePage = () => {
       ws.onerror = (error) => {
         console.error("Errore WebSocket:", error);
       };
+
+      ws.onclose = (event) => {
+        console.log("Client WebSocket closed:", event.code, event.reason);
+    };
+    
   
       // Pulizia della connessione quando il componente viene smontato
       return () => {
