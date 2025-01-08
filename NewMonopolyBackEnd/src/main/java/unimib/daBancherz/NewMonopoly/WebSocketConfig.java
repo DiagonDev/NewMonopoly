@@ -1,4 +1,5 @@
 package unimib.daBancherz.NewMonopoly;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -9,16 +10,17 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    // Iniezione dei WebSocketHandler tramite Spring
-    //@Autowired
-    //private WebSocketChatHandler webSocketChatHandler;
+    @Autowired
+    private WebSocketConnectionHandler connectionHandler;
 
     @Autowired
-    private WebSocketConnectionHandler webSocketConnectionHandler;
+    private GameHandler gameHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(webSocketConnectionHandler, "/ws/connection")
+        registry.addHandler(connectionHandler, "/ws/connection")
                 .setAllowedOrigins("http://localhost:5173");
+
+        // Aggiungere un altro handler per i messaggi di gioco se necessario
     }
 }
