@@ -1,54 +1,28 @@
-h1 {
-  text-align: center;
-}
-/* Centra tutto il contenuto del body */
+/* Struttura base del body */
 body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh; /* Imposta l'altezza della finestra per centrare verticalmente */
-  margin: 0; /* Rimuove margini di default */
+  margin: 0;
   font-family: Arial, sans-serif;
-}
-
-/* Centra i contenuti all'interno del div */
-div {
-  text-align: center;
-  max-width: 600px; /* Limita la larghezza per non far espandere troppo il contenuto */
-  width: 100%;
-}
-
-/* Se vuoi centrare solo il form, aggiungi questa regola */
-form {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 20px; /* Distanza tra gli elementi del form */
+  height: 100vh; /* Imposta l'altezza della pagina per occupare tutto lo schermo */
 }
 
-.sections {
+/* Contenitore principale */
+.main-container {
+  flex: 1; /* Permette al componente di occupare tutto lo spazio disponibile */
   display: flex;
-  justify-content: space-around;
-  margin: 20px;
-}
-
-.section {
-  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  width: 300px;
 }
 
-button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
+/* Stile per il titolo */
+.titolo {
+  position: absolute; /* Posizionamento assoluto */
+  top: 10px; /* Spazio dal bordo superiore */
+  left: 20px; /* Spazio dal bordo destro */
+  margin: 0;
+  font-size: 30px; /* Dimensione del testo */
+  color: #333;
 }

@@ -1,47 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
-const JoinGamePage = () => {
+const JoinGamePage = ({ socket, connected }) => {
   // Stato per i campi del form
   const [name, setName] = useState('');
   const [gameId, setGameId] = useState('');
-  const [connected, setConnected] = useState(false);
-  const [socket, setSocket] = useState(null);
-  const [serverMessage, setServerMessage] = useState('');
   
-  // Crea una connessione WebSocket quando il componente viene montato
-    useEffect(() => {
-      const ws = new WebSocket("ws://localhost:8080/ws/connection");
-      //const ws = new WebSocket("https://89d1-84-33-176-173.ngrok-free.app/ws/connection");
-      
-      ws.onopen = () => {
-        setSocket(ws);
-        setConnected(true);
-        console.log("Connessione WebSocket stabilita");
-      };
-      // Gestore per ricevere i messaggi
-      ws.onmessage = (event) => {
-        console.log(event.data)
-        // Imposta il messaggio ricevuto dallo server nello stato
-        setServerMessage(event.data);
-      };
-
-      ws.onerror = (error) => {
-        console.error("Errore WebSocket:", error);
-      };
-
-      ws.onclose = (event) => {
-        console.log("Client WebSocket closed:", event.code, event.reason);
-    };
-    
-  
-      // Pulizia della connessione quando il componente viene smontato
-      return () => {
-        if (ws) {
-          ws.close();
-        }
-      };
-    }, []); // Solo al primo montaggio del componente
-
   // Gestore per il submit del form
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -85,8 +48,6 @@ const JoinGamePage = () => {
         <br />
         <button type="submit">Partecipa</button>
       </form>
-      {/* Mostra il messaggio ricevuto dal server */}
-      {serverMessage && <p>Messaggio dal server: {serverMessage}</p>}
     </div>
   );
 };

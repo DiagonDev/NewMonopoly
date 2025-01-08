@@ -1,63 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 
-const CreateGamePage = () => {
-  // Stato per i campi del form
+const CreateGamePage = ({ socket, connected }) => {
   const [userName, setUserName] = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [randomization, setRandomization] = useState('');
-  const [connected, setConnected] = useState(false);
-  const [socket, setSocket] = useState(null);
-  const [serverMessage, setServerMessage] = useState('');
-  const navigate = useNavigate(); // Per navigare alle altre pagine
 
-
-  // Crea una connessione WebSocket quando il componente viene montato
-  useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080/ws/connection");
-    //const ws = new WebSocket("https://89d1-84-33-176-173.ngrok-free.app/ws/connection");
-    ws.onopen = () => {
-      setSocket(ws);
-      setConnected(true);
-      console.log("Connessione WebSocket stabilita");
-    };
-
-    // Gestore per ricevere i messaggi
-    ws.onmessage = (event) => {
-      console.log(event.data)
-      // Supponendo che il backend invii l'ID della partita come messaggio
-      
-      const gameId = event.data; // Adatta questo in base al messaggio ricevuto
-      if (gameId) {
-        // Naviga alla pagina della board passando l'ID
-        navigate(`/game/${gameId}`);
-      }
-      // Imposta il messaggio ricevuto dallo server nello stato
-      setServerMessage(event.data);
-    };
-    ws.onerror = (error) => {
-      console.error("Errore WebSocket:", error);
-    };
-
-    // Pulizia della connessione quando il componente viene smontato
-    return () => {
-      if (ws) {
-        ws.close();
-      }
-    };
-  }, []); // Solo al primo montaggio del componente
-
-  // Gestore per il submit del form
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Se la connessione WebSocket è aperta, invia il messaggio
     if (socket && connected) {
       socket.send(`Create:${userName}:${difficulty}:${randomization}`);
-      console.log('Difficoltà:', difficulty);
-      console.log('Randomizzazione:', randomization);
+      console.log('Dati inviati al server:', { userName, difficulty, randomization });
 
-      // Reset dei campi dopo il submit (opzionale)
       setUserName('');
       setDifficulty('');
       setRandomization('');
@@ -102,7 +56,6 @@ const CreateGamePage = () => {
         <br />
         <button type="submit">Crea</button>
       </form>
-      {serverMessage && <p>Messaggio dal server: {serverMessage}</p>}
     </div>
   );
 };
