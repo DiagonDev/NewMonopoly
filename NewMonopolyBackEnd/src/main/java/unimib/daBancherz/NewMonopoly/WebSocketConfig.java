@@ -19,7 +19,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(connectionHandler, "/ws/connection")
-                .setAllowedOrigins("http://localhost:5173");
+                .setAllowedOrigins("*");
 
         // Aggiungere un altro handler per i messaggi di gioco se necessario
     }

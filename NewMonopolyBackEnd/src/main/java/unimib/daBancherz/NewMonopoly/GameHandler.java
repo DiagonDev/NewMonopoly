@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,12 +48,16 @@ public class GameHandler {
         System.out.println("Partita creata. ID: " + gameId);
 
         gameSessions.putIfAbsent(gameId, new ArrayList<>());
-        gameSessions.get(gameId).add(session);
+        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
+
+        if (!playersInGame.contains(session)) {
+            playersInGame.add(0, session); // Aggiungi la sessione all'inizio della lista
+        }
 
         String message = "#" + gameId;
         sendSystemMessage(gameId, message, session);
-        //session.sendMessage(new TextMessage(gameId));
     }
+
 
     private void joinGame(String playerName, String gameId, WebSocketSession session) throws Exception {
         if (!gameSessions.containsKey(gameId)) {
@@ -68,6 +73,11 @@ public class GameHandler {
         //session.sendMessage(new TextMessage("Ti sei unito alla partita con ID " + gameId + " con successo!"));
         String content2 = playerName + " si è unito alla partita!";
         sendSystemMessage(gameId, content2, session);
+
+        //prende l'admin della partita a cui si sta connettendo
+        WebSocketSession admin = playersInGame.get(0);
+        //invia un messaggio all'admin per dire che il giocatore si è connesso
+        sendJoinMassage(playerName, gameId, admin);
 
         // Stampa tutti i partecipanti della partita
         System.out.println("Partecipanti della partita con ID " + gameId + ":");
@@ -145,6 +155,19 @@ public class GameHandler {
             session.sendMessage(new TextMessage(systemMessage));
         }
     }
+
+    private void sendJoinMassage(String playerName, String gameId, WebSocketSession admin) throws IOException {
+
+        //crea il messaggio di tipo join che contiene il nome del giocatore
+        String joinMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "join",
+                "content", playerName
+        ));
+
+        // Invia il messaggio solo all'admin
+        admin.sendMessage(new TextMessage(joinMessage));
+    }
+
 
     //serve a creare un messaggio in Json per far si che il forntend riesca a capire chè per la game chat
     private void sendChatMessage(String gameId, String content) throws Exception {
