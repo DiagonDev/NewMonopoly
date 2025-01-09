@@ -54,8 +54,10 @@ public class GameHandler {
             playersInGame.add(0, session); // Aggiungi la sessione all'inizio della lista
         }
 
-        String message = "#" + gameId;
-        sendSystemMessage(gameId, message, session);
+        String message = "#" + gameId; //crea il game Id della partita
+        sendSystemMessage(gameId, message, session); //serve per inviare i messaggi da mostrare nella gameconsole
+        sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
+        sendTypePlayer("ADMIN", session);
     }
 
 
@@ -74,10 +76,10 @@ public class GameHandler {
         String content2 = playerName + " si è unito alla partita!";
         sendSystemMessage(gameId, content2, session);
 
-        //prende l'admin della partita a cui si sta connettendo
-        WebSocketSession admin = playersInGame.get(0);
-        //invia un messaggio all'admin per dire che il giocatore si è connesso
-        sendJoinMassage(playerName, gameId, admin);
+
+        WebSocketSession admin = playersInGame.get(0); //prende l'admin della partita a cui si sta connettendo
+        sendJoinMassage(playerName, gameId, admin); //invia un messaggio all'admin per dire che il giocatore si è connesso
+        sendTypePlayer("PLAYER", session); //invia al server il tipo di giocatore che si è connesso
 
         // Stampa tutti i partecipanti della partita
         System.out.println("Partecipanti della partita con ID " + gameId + ":");
@@ -185,6 +187,26 @@ public class GameHandler {
         for (WebSocketSession session : playersInGame) {
             session.sendMessage(new TextMessage(chatMessage));
         }
+    }
+
+    private void sendGameId(String gameId, WebSocketSession session) throws Exception {
+
+        String gameMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "gameId",
+                "content", gameId
+        ));
+
+        session.sendMessage(new TextMessage(gameMessage));
+    }
+
+    private void sendTypePlayer(String paleyrType, WebSocketSession session) throws Exception {
+
+        String typePlayerMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "user",
+                "content", paleyrType
+        ));
+
+        session.sendMessage(new TextMessage(typePlayerMessage));
     }
 
     private String generateGameId() {
