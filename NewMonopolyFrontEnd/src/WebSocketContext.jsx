@@ -9,7 +9,7 @@ export const WebSocketProvider = ({ children }) => {
   const [userMessages, setUserMessages] = useState([]);
 
   useEffect(() => {
-    const ws = new WebSocket("wss://f957-84-33-176-173.ngrok-free.app/ws/connection");
+    const ws = new WebSocket("https://c3cb-84-33-176-173.ngrok-free.app/ws/connection");
 
     ws.onopen = () => {
       setSocket(ws);
@@ -18,7 +18,7 @@ export const WebSocketProvider = ({ children }) => {
 
     ws.onmessage = (event) => {
       console.log("Messaggio dal server:", event.data);
-      if (event.data.includes('!')) {
+      if (event.data.startsWith('!')) {
         setUserMessages((prevMessages) => {
           const updatedMessages = [...prevMessages, event.data];
           console.log("Messaggi aggiornati:", updatedMessages);

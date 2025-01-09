@@ -39,8 +39,9 @@ const GameChat = () => {
                         value={userMessage}
                         onChange={(e) => setUserMessage(e.target.value)}
                     />
+                    <button type="submit">Invia</button>
                 </label>
-                <button type="submit">Invia</button>
+                
             </form>
         </div>
     );

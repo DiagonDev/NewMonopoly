@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
 import { WebSocketContext } from "../WebSocketContext";
 import GameChat from './GameChat';
+import PlayersStatsRectangle from './PlayersStatsRectangle';
+
 
 const GameRectangle = () => {
     const { socket, connected, serverMessage } = useContext(WebSocketContext);
@@ -20,7 +22,7 @@ const GameRectangle = () => {
                     <p>alto destra</p>
                 </div>
                 <div>
-                    <p>basso destra</p>
+                    <PlayersStatsRectangle />
                 </div>
             </div>
 
