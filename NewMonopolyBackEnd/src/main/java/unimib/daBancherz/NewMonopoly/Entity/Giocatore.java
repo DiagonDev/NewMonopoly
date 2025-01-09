@@ -14,9 +14,11 @@ public class Giocatore {
     private String tipo;
 
     @ManyToOne
+    @JoinColumn(name = "idpedina")
     private Pedina idpedina;
 
     @ManyToOne
+    @JoinColumn(name = "idpartita")
     private Partita idpartita;
 
     public Integer getId_giocatore() {

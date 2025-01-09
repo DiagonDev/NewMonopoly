@@ -1,10 +1,9 @@
-package unimib.daBancherz.NewMonopoly.DAO;
+package unimib.daBancherz.NewMonopoly.Repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import unimib.daBancherz.NewMonopoly.Entity.Casella;
 
-// DAO per l'entità Casella
 @Repository
-public interface CasellaDAO extends JpaRepository<Casella, Long> {
+public interface CasellaRepository extends JpaRepository<Casella, Long> {
 }

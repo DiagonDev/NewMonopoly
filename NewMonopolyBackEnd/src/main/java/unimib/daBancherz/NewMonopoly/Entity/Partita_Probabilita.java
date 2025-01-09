@@ -6,9 +6,11 @@ import jakarta.persistence.*;
 public class Partita_Probabilita {
     @Id
     @ManyToOne
+    @JoinColumn(name = "idpartita")
     private Partita idpartita;
 
     @Id @ManyToOne
+    @JoinColumn(name = "idprobabilita")
     private Probabilita idprobabilita;
 
     public Partita getIdpartita() {

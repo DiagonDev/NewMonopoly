@@ -1,5 +1,6 @@
 package unimib.daBancherz.NewMonopoly;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
@@ -10,7 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketConnectionHandler implements WebSocketHandler {
 
     private final Map<String, WebSocketSession> playerSessions = new ConcurrentHashMap<>();
+    @Autowired
     private GameHandler gameHandler = new GameHandler();
+
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {

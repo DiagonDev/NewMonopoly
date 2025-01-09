@@ -15,6 +15,7 @@ public class Casella {
     private Integer prezzo;
 
     @ManyToOne
+    @JoinColumn(name = "idgiocatore")
     private Giocatore idgiocatore;
 
     public Integer getId_casella() {

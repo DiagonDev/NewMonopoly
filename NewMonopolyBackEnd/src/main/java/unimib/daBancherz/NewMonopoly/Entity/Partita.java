@@ -5,29 +5,11 @@ import jakarta.persistence.*;
 @Entity
 public class Partita {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_partita;
-
-    private Integer livello_difficolta;
     private String codice_invito;
-    private Integer stato;
+
+    private String livello_difficolta;
+    private String stato;
     private Boolean randomizzazione;
-
-    public Integer getId_partita() {
-        return id_partita;
-    }
-
-    public void setId_partita(Integer id_partita) {
-        this.id_partita = id_partita;
-    }
-
-    public Integer getLivello_difficolta() {
-        return livello_difficolta;
-    }
-
-    public void setLivello_difficolta(Integer livello_difficolta) {
-        this.livello_difficolta = livello_difficolta;
-    }
 
     public String getCodice_invito() {
         return codice_invito;
@@ -37,11 +19,19 @@ public class Partita {
         this.codice_invito = codice_invito;
     }
 
-    public Integer getStato() {
+    public String getLivello_difficolta() {
+        return livello_difficolta;
+    }
+
+    public void setLivello_difficolta(String livello_difficolta) {
+        this.livello_difficolta = livello_difficolta;
+    }
+
+    public String getStato() {
         return stato;
     }
 
-    public void setStato(Integer stato) {
+    public void setStato(String stato) {
         this.stato = stato;
     }
 

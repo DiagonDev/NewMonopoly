@@ -6,14 +6,17 @@ import jakarta.persistence.*;
 public class Partita_Casella_Prezzoproprieta {
     @Id
     @ManyToOne
+    @JoinColumn(name = "idpartita")
     private Partita idpartita;
 
     @Id
     @ManyToOne
+    @JoinColumn(name = "idcasella")
     private Casella idcasella;
 
     @Id
     @ManyToOne
+    @JoinColumn(name = "idprezzoproprieta")
     private Prezzoproprieta idprezzoproprieta;
 
     public Partita getIdpartita() {
@@ -30,5 +33,13 @@ public class Partita_Casella_Prezzoproprieta {
 
     public void setIdcasella(Casella idcasella) {
         this.idcasella = idcasella;
+    }
+
+    public Prezzoproprieta getIdprezzoproprieta() {
+        return idprezzoproprieta;
+    }
+
+    public void setIdprezzoproprieta(Prezzoproprieta idprezzoproprieta) {
+        this.idprezzoproprieta = idprezzoproprieta;
     }
 }

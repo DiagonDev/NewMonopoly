@@ -1,11 +1,13 @@
 package unimib.daBancherz.NewMonopoly;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.daBancherz.NewMonopoly.Repository.GiocatoreRepository;
+import unimib.daBancherz.NewMonopoly.Service.GameService;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +20,11 @@ public class GameHandler {
     private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
     private static AtomicLong idCounter = new AtomicLong();
+    @Autowired
+    private GameService gameService;
 
+    @Autowired
+    private GiocatoreRepository giocatoreRepository;
 
     public void handleGameMessage(String payload, WebSocketSession session) throws Exception {
         if (payload.startsWith("Create:")) {
@@ -26,10 +32,14 @@ public class GameHandler {
             String[] parts = payload.split(":");
             String playerName = parts[1];
             String difficulty = parts[2];
-            String randomization = parts[3];
+            String randomization = parts[3];        //deve essere un boolean
+
+
+            createGame(playerName, difficulty, randomization, session);
+            String gameId = getGameIdBySession(session);
+            gameService.createGameAndPlayer(playerName,difficulty, gameId);
 
             playerNameList.put(playerName, session);
-            createGame(playerName, difficulty, randomization, session);
 
         } else if (payload.startsWith("Partecipa:")) {
             // Decodifica i dati per partecipare a una partita
@@ -37,6 +47,10 @@ public class GameHandler {
             String playerName = parts[1];
             String gameId = parts[2];
 
+            if (giocatoreRepository.existsByNomeAndIdpartita_Codice_invito(playerName, gameId)) {
+                session.sendMessage(new TextMessage("Errore: Il nome del giocatore è già presente in questa partita."));
+                return; // Esce dalla funzione senza aggiungere il giocatore
+            }
             playerNameList.put(playerName, session);
             joinGame(playerName, gameId, session);
         }
@@ -49,7 +63,7 @@ public class GameHandler {
         gameSessions.putIfAbsent(gameId, new ArrayList<>());
         gameSessions.get(gameId).add(session);
 
-        String message = "#" + gameId;
+        String message = "#" + gameId;      //codice invito
         sendSystemMessage(gameId, message, session);
         //session.sendMessage(new TextMessage(gameId));
     }
@@ -62,7 +76,7 @@ public class GameHandler {
 
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         playersInGame.add(session);
-
+        gameService.addPlayer(playerName, gameId);
         String content1 = "Ti sei unito alla partita con ID " + gameId + " con successo!";
         sendSystemMessage(gameId, content1, session);
         //session.sendMessage(new TextMessage("Ti sei unito alla partita con ID " + gameId + " con successo!"));

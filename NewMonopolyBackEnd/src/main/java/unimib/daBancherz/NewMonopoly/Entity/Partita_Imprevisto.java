@@ -5,10 +5,12 @@ import jakarta.persistence.*;
 public class Partita_Imprevisto {
     @Id
     @ManyToOne
+    @JoinColumn(name = "idpartita")
     private Partita idpartita;
 
     @Id
     @ManyToOne
+    @JoinColumn(name = "idimprevisto")
     private Imprevisto idimprevisto;
 
     public Partita getIdpartita() {
