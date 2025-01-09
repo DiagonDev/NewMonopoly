@@ -70,7 +70,7 @@ public class GameHandler {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         playersInGame.add(session);
 
-        String content1 = "Ti sei unito alla partita con ID " + gameId + " con successo!";
+        String content1 = "Ti sei unito alla partita con ID: " + gameId + ", con successo!";
         sendSystemMessage(gameId, content1, session);
         //session.sendMessage(new TextMessage("Ti sei unito alla partita con ID " + gameId + " con successo!"));
         String content2 = playerName + " si è unito alla partita!";
@@ -79,7 +79,7 @@ public class GameHandler {
 
         WebSocketSession admin = playersInGame.get(0); //prende l'admin della partita a cui si sta connettendo
         sendJoinMassage(playerName, gameId, admin); //invia un messaggio all'admin per dire che il giocatore si è connesso
-        sendTypePlayer("PLAYER", session); //invia al server il tipo di giocatore che si è connesso
+        sendTypePlayer("giocatore", session); //invia al server il tipo di giocatore che si è connesso
 
         // Stampa tutti i partecipanti della partita
         System.out.println("Partecipanti della partita con ID " + gameId + ":");
