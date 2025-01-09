@@ -5,7 +5,7 @@ export const WebSocketContext = createContext();
 export const WebSocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [connected, setConnected] = useState(false);
-  const [serverMessage, setServerMessage] = useState('');
+  const [serverMessages, setServerMessages] = useState([]);
   const [userMessages, setUserMessages] = useState([]);
 
   useEffect(() => {
@@ -18,15 +18,24 @@ export const WebSocketProvider = ({ children }) => {
 
     ws.onmessage = (event) => {
       console.log("Messaggio dal server:", event.data);
-      if (event.data.startsWith('!')) {
+      const message = JSON.parse(event.data);
+      /**
+       *  Ricevo dal back end un json con:
+       *  type: chat / system
+       *  content: "messaggio effettivo"
+       */
+      if (message.type === 'chat') {
         setUserMessages((prevMessages) => {
-          const updatedMessages = [...prevMessages, event.data];
-          console.log("Messaggi aggiornati:", updatedMessages);
+          const updatedMessages = [...prevMessages, message.content];
           return updatedMessages;
-      });
+        });
       }
-      else
-        setServerMessage(event.data);
+      else if (message.type === 'system'){
+        setServerMessages((prevMessages) => {
+          const updatedServerMessages = [...prevMessages, message.content];
+          return updatedServerMessages;
+        });
+      }
     };
 
     ws.onerror = (error) => {
@@ -45,7 +54,7 @@ export const WebSocketProvider = ({ children }) => {
   }, []);
 
   return (
-    <WebSocketContext.Provider value={{ socket, connected, serverMessage, userMessages }}>
+    <WebSocketContext.Provider value={{ socket, connected, serverMessages, userMessages }}>
       {children}
     </WebSocketContext.Provider>
   );

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { WebSocketContext } from "../WebSocketContext";
-import GameChat from './GameChat';
 import PlayersStatsRectangle from './PlayersStatsRectangle';
+import ChatFather from './ChatFather';
 
 
 const GameRectangle = () => {
@@ -13,7 +13,7 @@ const GameRectangle = () => {
                     <p>ID Partita: {'Va cambiatooo'}</p>
                 </div>
                 <div>
-                    <GameChat />
+                    <ChatFather />
                 </div>
             </div>
             <br />
