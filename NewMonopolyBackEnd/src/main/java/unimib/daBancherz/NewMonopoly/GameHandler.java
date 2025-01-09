@@ -1,9 +1,11 @@
 package unimib.daBancherz.NewMonopoly;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +49,9 @@ public class GameHandler {
         gameSessions.putIfAbsent(gameId, new ArrayList<>());
         gameSessions.get(gameId).add(session);
 
-        session.sendMessage(new TextMessage(gameId));
+        String message = "#" + gameId;
+        sendSystemMessage(gameId, message, session);
+        //session.sendMessage(new TextMessage(gameId));
     }
 
     private void joinGame(String playerName, String gameId, WebSocketSession session) throws Exception {
@@ -59,14 +63,17 @@ public class GameHandler {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         playersInGame.add(session);
 
-        session.sendMessage(new TextMessage("Ti sei unito alla partita con ID " + gameId + " con successo!"));
-        broadcastPlayerJoined(playerName, playersInGame);
+        String content1 = "Ti sei unito alla partita con ID " + gameId + " con successo!";
+        sendSystemMessage(gameId, content1, session);
+        //session.sendMessage(new TextMessage("Ti sei unito alla partita con ID " + gameId + " con successo!"));
+        String content2 = playerName + " si è unito alla partita!";
+        sendSystemMessage(gameId, content2, session);
 
         // Stampa tutti i partecipanti della partita
         System.out.println("Partecipanti della partita con ID " + gameId + ":");
         for (WebSocketSession playerSession : playersInGame) {
-            String sessionId = playerSession.getId(); // Per ora stampiamo l'ID della sessione
-            System.out.println(" - ID sessione: " + sessionId);
+            String nomeGiocatore = getPlayerNameBySession(playerSession); // Stampiamo il nome del giocatore della sessione
+            System.out.println(" - ID sessione: " + nomeGiocatore);
         }
 
     }
@@ -75,8 +82,11 @@ public class GameHandler {
         String[] parts = payload.split(":");
         String chatMessage = parts[1];
         String gameId = getGameIdBySession(session);
+        String nameChat = getPlayerNameBySession(session);
 
-        broadcastChatMessage(gameId, session, chatMessage);
+        //invia il messaggio a tutti gli utenti collegati allo stesso gameID sotto forma di messaggioChat
+        sendChatMessage(gameId,nameChat+ ": " + chatMessage);
+        //broadcastChatMessage(gameId, session, chatMessage);
     }
 
     private String getGameIdBySession(WebSocketSession session) {
@@ -114,30 +124,43 @@ public class GameHandler {
         return null;
     }
 
-
-    private void broadcastChatMessage(String gameId, WebSocketSession sender, String message) throws Exception {
-
-
-        if (!gameSessions.containsKey(gameId)) {
-            sender.sendMessage(new TextMessage("Errore: La partita con ID " + gameId + " non esiste."));
-            return;
-        }
-
+    //serve per creare un messaggio di sistema in Json così che il forntend lo metta nella game console
+    private void sendSystemMessage(String gameId, String content, WebSocketSession session) throws Exception {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
-        String nameChat = getPlayerNameBySession(sender);
+        if (playersInGame == null) return;
 
-        for (WebSocketSession session : playersInGame) {
-            if (session.isOpen()) {
+        // Crea un messaggio di sistema come JSON
+        String systemMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "system",
+                "content", content
+                //"timestamp", Instant.now().toString()
+        ));
 
-                //TODO: mettere il metodo per rendere il nome
-                session.sendMessage(new TextMessage("!" + nameChat + ": " + message));
+        //l'if serve perchè i due messaggi che inziano con... devono essere inviati solo al giocatore che crea la parita
+        if(!(content.startsWith("Ti sei unito alla partita con ID ") || content.startsWith("#"))) {// Invia il messaggio a tutti i giocatori della partita
+            for (WebSocketSession sessions : playersInGame) {
+                sessions.sendMessage(new TextMessage(systemMessage));
             }
+        }else{
+            session.sendMessage(new TextMessage(systemMessage));
         }
     }
 
-    private void broadcastPlayerJoined(String playerName, List<WebSocketSession> playersInGame) throws Exception {
+    //serve a creare un messaggio in Json per far si che il forntend riesca a capire chè per la game chat
+    private void sendChatMessage(String gameId, String content) throws Exception {
+        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
+        if (playersInGame == null) return;
+
+        // Crea un messaggio di chat come JSON
+        String chatMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "chat",
+                "content", content
+                //"timestamp", Instant.now().toString()
+        ));
+
+        // Invia il messaggio a tutti i giocatori della partita
         for (WebSocketSession session : playersInGame) {
-            session.sendMessage(new TextMessage(playerName + " si è unito alla partita!"));
+            session.sendMessage(new TextMessage(chatMessage));
         }
     }
 
@@ -145,10 +168,5 @@ public class GameHandler {
         return "game-" + String.valueOf(idCounter.getAndIncrement());
     }
 
-    private String extractPlayerName(WebSocketSession session) {
-        // Supponiamo che il nome del giocatore sia salvato negli attributi della sessione
-        //TODO: da implementare quando il database avrà salvato i nomi dei giocatori
-        return (String) session.getAttributes().get("playerName");
-    }
 
 }
