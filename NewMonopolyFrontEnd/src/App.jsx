@@ -14,16 +14,22 @@ function App() {
       <>
         {/* Titolo in alto a destra */}
         <h1 className="titolo">NewMonopolyGame</h1>
-        {/* Contenitore principale */}
-        <div className="main-container">
-          {/* Configura le rotte */}
-          <Routes>
-            <Route path="*" element={<WelcomePage />} /> {/* WelcomePage come rotta predefinita */}
-            <Route path="/create" element={<CreateGamePage />} />
-            <Route path="/join" element={<JoinGamePage />} />
-            <Route path="/play" element={<GameBoard />} />
-          </Routes>
-        </div>
+          
+        
+        
+         
+          {/* Contenitore principale */}
+          <div className="main-container">
+            {/* Configura le rotte */}
+            <Routes>
+              <Route path="*" element={<WelcomePage />} /> {/* WelcomePage come rotta predefinita */}
+              <Route path="/create" element={<CreateGamePage />} />
+              <Route path="/join" element={<JoinGamePage />} />
+              <Route path="/play" element={<GameBoard />} />
+            </Routes>
+          </div>
+        
+       
       </>
     </WebSocketProvider>
   );

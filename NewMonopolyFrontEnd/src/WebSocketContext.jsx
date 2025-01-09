@@ -9,8 +9,8 @@ export const WebSocketProvider = ({ children }) => {
   const [userMessages, setUserMessages] = useState([]);
 
   useEffect(() => {
-    const ws = new WebSocket("https://c3cb-84-33-176-173.ngrok-free.app/ws/connection");
-
+    //const ws = new WebSocket("https://c3cb-84-33-176-173.ngrok-free.app/ws/connection");
+    const ws = new WebSocket("ws://localhost:8080/ws/connection");
     ws.onopen = () => {
       setSocket(ws);
       setConnected(true);

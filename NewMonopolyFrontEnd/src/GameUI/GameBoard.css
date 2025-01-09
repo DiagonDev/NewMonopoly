@@ -3,6 +3,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
   height: 100vh; /* Altezza dell'intero schermo */
   background-color: #f5f5f5; /* Colore di sfondo */
 }
@@ -12,17 +13,80 @@
   width: 70%; /* Occupa il 70% della larghezza */
   height: 70%; /* Occupa il 70% dell'altezza */
   background-color: #e0e0e0; /* Colore di sfondo */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombra */
   border-radius: 8px; /* Angoli arrotondati */
+  display: grid; /* Attiva il Grid Layout */
+
+  gap: 10px; /* Spaziatura tra le celle */
+  background-color: lightgray; /* Sfondo per il contenitore */
+  padding: 10px;
+  box-sizing: border-box;
+  grid-template-columns: 1fr 1fr; /* Due colonne di dimensioni uguali */
+  grid-template-rows: 1fr 1fr; /* Due righe di dimensioni uguali */
+  gap: 10px; /* Spazio tra le caselle */
+ 
 }
 
 /* Stile per la Board */
 .game-board {
+  
   font-family: Arial, sans-serif;
   text-align: center;
   padding: 20px;
   flex: 1;
 }
+
+
+.grid-item {
+  display: flex;
+  justify-content: center; /* Centra il contenuto orizzontalmente */
+  align-items: center; /* Centra il contenuto verticalmente */
+  color: navy;
+  font-size: 10px;
+  font-weight: bold;
+
+  /* Mantieni le dimensioni fisse */
+  width: 100%;
+  height: 100%;
+
+  /* Wrapping del testo */
+  overflow: hidden; /* Nascondi solo lo spazio in eccesso */
+  white-space: normal; /* Permette il testo a capo */
+  word-wrap: break-word; /* Spezza le parole troppo lunghe */
+  text-align: center; /* Allinea il testo al centro (opzionale) */
+}
+
+.player-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Due colonne uguali */
+  grid-template-rows: 1fr 1fr 1fr; /* Tre righe uguali */
+  gap: 10px; /* Spaziatura tra le celle */
+ 
+   /* Altezza dinamica */
+  background-color: lightgray; /* Sfondo della griglia */
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* Elementi della griglia */
+.player {
+  display: flex;
+  justify-content: center; /* Centra il contenuto orizzontalmente */
+  align-items: center; /* Centra il contenuto verticalmente */
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.player:nth-child(1) { background-color: green; }
+.player:nth-child(2) { background-color: yellow; }
+.player:nth-child(3) { background-color: blue; }
+.player:nth-child(4) { background-color: red; }
+.player:nth-child(5) { background-color: purple; }
+.player:nth-child(6) { background-color: orange; }
+
+.grid-item:nth-child(1) { background-color: green; }
+.grid-item:nth-child(2) { background-color: yellow; }
+.grid-item:nth-child(3) { background-color: blue; }
+.grid-item:nth-child(4) { background-color: red; }
