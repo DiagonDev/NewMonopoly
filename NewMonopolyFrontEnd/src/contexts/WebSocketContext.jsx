@@ -7,6 +7,9 @@ export const WebSocketProvider = ({ children }) => {
   const [connected, setConnected] = useState(false);
   const [serverMessages, setServerMessages] = useState([]);
   const [userMessages, setUserMessages] = useState([]);
+  const [joinMessage, setJoinMessage] = useState('');
+  const [gameId, setGameId] = useState('');
+  const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
     const ws = new WebSocket("https://c3cb-84-33-176-173.ngrok-free.app/ws/connection");
@@ -36,6 +39,15 @@ export const WebSocketProvider = ({ children }) => {
           return updatedServerMessages;
         });
       }
+      else if (message.type === 'join'){
+        setJoinMessage(message.content);
+      }
+      else if (message.type === 'gameId'){
+        setGameId(message.content);
+      }
+      else if (message.type === 'user'){
+        setUserRole(message.content);
+      }
     };
 
     ws.onerror = (error) => {
@@ -54,7 +66,7 @@ export const WebSocketProvider = ({ children }) => {
   }, []);
 
   return (
-    <WebSocketContext.Provider value={{ socket, connected, serverMessages, userMessages }}>
+    <WebSocketContext.Provider value={{ socket, connected, serverMessages, userMessages, joinMessage, gameId, userRole}}>
       {children}
     </WebSocketContext.Provider>
   );

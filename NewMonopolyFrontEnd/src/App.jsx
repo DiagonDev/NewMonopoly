@@ -3,7 +3,7 @@ import WelcomePage from './pages/WelcomePage'; // Importa il componente WelcomeP
 import CreateGamePage from './pages/CreateGamePage';
 import JoinGamePage from './pages/JoinGamePage';
 import './App.css';
-import { WebSocketProvider } from "./WebSocketContext";
+import { WebSocketProvider } from "./contexts/WebSocketContext";
 import GameBoard from './GameUI/GameBoard';
 
 

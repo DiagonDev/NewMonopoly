@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { WebSocketContext } from "../WebSocketContext";
+import { WebSocketContext } from "../contexts/WebSocketContext";
 import { useNavigate } from 'react-router-dom';
 
 const JoinGamePage = () => {
