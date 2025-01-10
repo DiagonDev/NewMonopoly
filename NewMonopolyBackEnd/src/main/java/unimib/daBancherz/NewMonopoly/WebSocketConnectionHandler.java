@@ -1,7 +1,10 @@
 package unimib.daBancherz.NewMonopoly;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
+import unimib.daBancherz.NewMonopoly.Handler.ChatHandler;
+import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,8 +13,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketConnectionHandler implements WebSocketHandler {
 
     private final Map<String, WebSocketSession> playerSessions = new ConcurrentHashMap<>();
-    private GameHandler gameHandler = new GameHandler();
+    private final GameHandler gameHandler;
+    private final ChatHandler chatHandler;
 
+    // Iniezione di GameHandler e ChatHandler tramite il costruttore
+    @Autowired
+    public WebSocketConnectionHandler(GameHandler gameHandler, ChatHandler chatHandler) {
+        this.gameHandler = gameHandler;
+        this.chatHandler = chatHandler;
+    }
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         System.out.println("Nuova connessione stabilita. ID sessione: " + session.getId());
@@ -27,7 +37,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                 gameHandler.handleGameMessage(parts, session);
                 break;
             case "MessaggioUtente":
-                gameHandler.chatHandler(parts, session);
+                chatHandler.chatHandler(parts, session);
                 break;
             default:
                 throw new IllegalArgumentException("Tipo di messaggio non supportato: " + parts[0]);

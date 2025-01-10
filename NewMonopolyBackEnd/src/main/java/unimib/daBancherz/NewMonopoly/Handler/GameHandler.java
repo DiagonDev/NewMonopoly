@@ -1,4 +1,4 @@
-package unimib.daBancherz.NewMonopoly;
+package unimib.daBancherz.NewMonopoly.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
@@ -6,7 +6,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,9 +15,11 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 public class GameHandler {
 
+
     private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
     private static AtomicLong idCounter = new AtomicLong();
+
 
 
     public void handleGameMessage(String[] messageParts, WebSocketSession session) throws Exception {
@@ -87,17 +88,6 @@ public class GameHandler {
             System.out.println(" - ID sessione: " + nomeGiocatore);
         }
 
-    }
-
-    public void chatHandler (String[] messageParts, WebSocketSession session) throws Exception {
-
-        String chatMessage = messageParts[1];
-        String gameId = getGameIdBySession(session);
-        String nameChat = getPlayerNameBySession(session);
-
-        //invia il messaggio a tutti gli utenti collegati allo stesso gameID sotto forma di messaggioChat
-        sendChatMessage(gameId,nameChat+ ": " + chatMessage);
-        //broadcastChatMessage(gameId, session, chatMessage);
     }
 
     public String getGameIdBySession(WebSocketSession session) {
@@ -169,25 +159,6 @@ public class GameHandler {
         admin.sendMessage(new TextMessage(joinMessage));
     }
 
-
-    //serve a creare un messaggio in Json per far si che il forntend riesca a capire chè per la game chat
-    private void sendChatMessage(String gameId, String content) throws Exception {
-        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
-        if (playersInGame == null) return;
-
-        // Crea un messaggio di chat come JSON
-        String chatMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "chat",
-                "content", content
-                //"timestamp", Instant.now().toString()
-        ));
-
-        // Invia il messaggio a tutti i giocatori della partita
-        for (WebSocketSession session : playersInGame) {
-            session.sendMessage(new TextMessage(chatMessage));
-        }
-    }
-
     private void sendGameId(String gameId, WebSocketSession session) throws Exception {
 
         String gameMessage = new ObjectMapper().writeValueAsString(Map.of(
@@ -248,6 +219,8 @@ public class GameHandler {
         System.out.println("Giocatore " + playerName + " disconnesso dalla partita con ID " + gameId + ".");
     }
 
-
+    public Map<String, List<WebSocketSession>> getGameSessions() {
+        return gameSessions;
+    }
 
 }
