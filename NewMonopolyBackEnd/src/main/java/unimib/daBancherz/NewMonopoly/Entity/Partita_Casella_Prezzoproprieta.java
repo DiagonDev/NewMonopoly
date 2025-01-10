@@ -1,8 +1,10 @@
 package unimib.daBancherz.NewMonopoly.Entity;
 
 import jakarta.persistence.*;
+import unimib.daBancherz.NewMonopoly.Entity.IdClass.Partita_Casella_PrezzoproprietaId;
 
 @Entity
+@IdClass(Partita_Casella_PrezzoproprietaId.class)
 public class Partita_Casella_Prezzoproprieta {
     @Id
     @ManyToOne
@@ -14,7 +16,7 @@ public class Partita_Casella_Prezzoproprieta {
     @JoinColumn(name = "idcasella")
     private Casella idcasella;
 
-    @Id
+
     @ManyToOne
     @JoinColumn(name = "idprezzoproprieta")
     private Prezzoproprieta idprezzoproprieta;

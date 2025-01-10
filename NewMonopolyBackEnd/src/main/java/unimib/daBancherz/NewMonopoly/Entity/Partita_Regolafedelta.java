@@ -24,7 +24,7 @@ public class Partita_Regolafedelta {
     public void setIdpartita(Partita idpartita) {
         this.idpartita = idpartita;
     }
-
+df
     public Regolafedelta getIdregolafedelta() {
         return idregolafedelta;
     }
