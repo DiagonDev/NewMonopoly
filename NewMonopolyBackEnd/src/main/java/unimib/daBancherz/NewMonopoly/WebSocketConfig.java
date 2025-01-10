@@ -18,7 +18,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(connectionHandler, "/ws/connection")
+        registry.addHandler(connectionHandler, "/ws/gameNewMonopoly")
                 .setAllowedOrigins("*");
 
         // Aggiungere un altro handler per i messaggi di gioco se necessario

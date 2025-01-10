@@ -21,22 +21,21 @@ public class GameHandler {
     private static AtomicLong idCounter = new AtomicLong();
 
 
-    public void handleGameMessage(String payload, WebSocketSession session) throws Exception {
-        if (payload.startsWith("Create:")) {
+    public void handleGameMessage(String[] messageParts, WebSocketSession session) throws Exception {
+        if (messageParts[0].equals("Create")) {
             // Decodifica i dati per creare una partita
-            String[] parts = payload.split(":");
-            String playerName = parts[1];
-            String difficulty = parts[2];
-            String randomization = parts[3];
+
+            String playerName = messageParts[1];
+            String difficulty = messageParts[2];
+            String randomization = messageParts[3];
 
             playerNameList.put(playerName, session);
             createGame(playerName, difficulty, randomization, session);
 
-        } else if (payload.startsWith("Partecipa:")) {
+        } else if (messageParts[0].equals("Partecipa")) {
             // Decodifica i dati per partecipare a una partita
-            String[] parts = payload.split(":");
-            String playerName = parts[1];
-            String gameId = parts[2];
+            String playerName = messageParts[1];
+            String gameId = messageParts[2];
 
             playerNameList.put(playerName, session);
             joinGame(playerName, gameId, session);
@@ -90,9 +89,9 @@ public class GameHandler {
 
     }
 
-    public void chatHandler (String payload, WebSocketSession session) throws Exception {
-        String[] parts = payload.split(":");
-        String chatMessage = parts[1];
+    public void chatHandler (String[] messageParts, WebSocketSession session) throws Exception {
+
+        String chatMessage = messageParts[1];
         String gameId = getGameIdBySession(session);
         String nameChat = getPlayerNameBySession(session);
 
@@ -101,7 +100,7 @@ public class GameHandler {
         //broadcastChatMessage(gameId, session, chatMessage);
     }
 
-    private String getGameIdBySession(WebSocketSession session) {
+    public String getGameIdBySession(WebSocketSession session) {
         // Scorre tutte le partite nella mappa
         for (Map.Entry<String, List<WebSocketSession>> entry : gameSessions.entrySet()) {
             String gameId = entry.getKey();  // gameId
@@ -120,7 +119,7 @@ public class GameHandler {
         return null;
     }
 
-    private String getPlayerNameBySession(WebSocketSession session) {
+    public String getPlayerNameBySession(WebSocketSession session) {
         // Scorre la mappa playerNameList per trovare la sessione corrispondente
         for (Map.Entry<String, WebSocketSession> entry : playerNameList.entrySet()) {
             String playerName = entry.getKey();  // Nome del giocatore
@@ -212,6 +211,43 @@ public class GameHandler {
     private String generateGameId() {
         return "game-" + String.valueOf(idCounter.getAndIncrement());
     }
+
+    public void removePlayerFromGame(String gameId, WebSocketSession session) {
+        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
+
+        if (playersInGame != null) {
+            playersInGame.remove(session); // Rimuove la sessione dalla lista dei giocatori
+
+            // Se non ci sono più giocatori nella partita, rimuovi completamente la partita
+            if (playersInGame.isEmpty()) {
+                gameSessions.remove(gameId);
+                System.out.println("Partita con ID " + gameId + " rimossa poiché non ci sono più giocatori.");
+            }
+        }
+
+        // Rimuove il giocatore dalla mappa dei nomi
+        playerNameList.values().removeIf(existingSession -> existingSession.equals(session));
+    }
+
+    public void notifyPlayerDisconnected(String gameId, String playerName) throws Exception {
+        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
+
+        if (playersInGame == null) return;
+
+        // Crea un messaggio di notifica come JSON
+        String disconnectMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "system",
+                "content", playerName + " si è disconnesso dalla partita."
+        ));
+
+        // Invia il messaggio a tutti i giocatori rimanenti nella partita
+        for (WebSocketSession session : playersInGame) {
+            session.sendMessage(new TextMessage(disconnectMessage));
+        }
+
+        System.out.println("Giocatore " + playerName + " disconnesso dalla partita con ID " + gameId + ".");
+    }
+
 
 
 }

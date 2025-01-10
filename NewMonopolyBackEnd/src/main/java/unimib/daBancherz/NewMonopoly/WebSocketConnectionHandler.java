@@ -20,15 +20,19 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-        // Non gestisce i messaggi qui, solo connessioni
-        //System.out.println("Messaggio ricevuto nella gestione connessioni: " + message.getPayload());
-        String payload = message.getPayload().toString();
-        if(payload.startsWith("Partecipa:") || payload.startsWith("Create:")) {
-            gameHandler.handleGameMessage(payload, session);
+
+        String[] parts = (message.getPayload().toString()).split(":");
+        switch (parts[0]) {
+            case "Create", "Partecipa":
+                gameHandler.handleGameMessage(parts, session);
+                break;
+            case "MessaggioUtente":
+                gameHandler.chatHandler(parts, session);
+                break;
+            default:
+                throw new IllegalArgumentException("Tipo di messaggio non supportato: " + parts[0]);
         }
-        else if(payload.startsWith("MessaggioUtente:")) {
-            gameHandler.chatHandler(payload, session);
-        }
+
     }
 
     @Override
@@ -41,14 +45,26 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         System.out.println("Connessione chiusa. ID sessione: " + session.getId());
         playerSessions.remove(session.getId());
+
+        // Determina il nome del giocatore e il gameId associato alla sessione chiusa
+        String playerName = gameHandler.getPlayerNameBySession(session);
+        String gameId = gameHandler.getGameIdBySession(session);
+
+        if (gameId != null) {
+            // Rimuove il giocatore dalla partita
+            gameHandler.removePlayerFromGame(gameId, session);
+
+            // Notifica agli altri giocatori della partita
+            try {
+                gameHandler.notifyPlayerDisconnected(gameId, playerName);
+            } catch (Exception e) {
+                System.err.println("Errore durante la notifica della disconnessione del giocatore: " + e.getMessage());
+            }
+        }
     }
 
     @Override
     public boolean supportsPartialMessages() {
         return false;
-    }
-
-    public WebSocketSession getSession(String sessionId) {
-        return playerSessions.get(sessionId);
     }
 }
