@@ -1,11 +1,10 @@
 package unimib.daBancherz.NewMonopoly.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+import unimib.daBancherz.NewMonopoly.Entity.IdClass.Partita_RegolafedeltaId;
 
 @Entity
+@IdClass(Partita_RegolafedeltaId.class) // Definisce la chiave primaria composta
 public class Partita_Regolafedelta {
     @Id
     @ManyToOne
@@ -24,7 +23,7 @@ public class Partita_Regolafedelta {
     public void setIdpartita(Partita idpartita) {
         this.idpartita = idpartita;
     }
-df
+
     public Regolafedelta getIdregolafedelta() {
         return idregolafedelta;
     }

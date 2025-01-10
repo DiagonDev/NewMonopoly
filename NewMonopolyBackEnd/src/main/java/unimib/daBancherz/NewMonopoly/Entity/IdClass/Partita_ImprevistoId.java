@@ -3,11 +3,10 @@ package unimib.daBancherz.NewMonopoly.Entity.IdClass;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class Partita_Casella_PrezzoproprietaId implements Serializable {
+public class Partita_ImprevistoId implements Serializable {
 
     private String idpartita;
-    private Integer idcasella;
-
+    private Integer idimprevisto;
 
     public String getIdpartita() {
         return idpartita;
@@ -17,25 +16,25 @@ public class Partita_Casella_PrezzoproprietaId implements Serializable {
         this.idpartita = idpartita;
     }
 
-    public Integer getIdcasella() {
-        return idcasella;
+    public Integer getIdimprevisto() {
+        return idimprevisto;
     }
 
-    public void setIdcasella(Integer idcasella) {
-        this.idcasella = idcasella;
+    public void setIdimprevisto(Integer idimprevisto) {
+        this.idimprevisto = idimprevisto;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Partita_Casella_PrezzoproprietaId that = (Partita_Casella_PrezzoproprietaId) o;
+        Partita_ImprevistoId that = (Partita_ImprevistoId) o;
         return Objects.equals(idpartita, that.idpartita) &&
-               Objects.equals(idcasella, that.idcasella);
+                Objects.equals(idimprevisto, that.idimprevisto);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idpartita, idcasella);
+        return Objects.hash(idpartita, idimprevisto);
     }
 }

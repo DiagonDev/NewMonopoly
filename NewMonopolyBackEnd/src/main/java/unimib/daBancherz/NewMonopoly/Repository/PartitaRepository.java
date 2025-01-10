@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import unimib.daBancherz.NewMonopoly.Entity.Partita;
 
 @Repository
-public interface PartitaRepository extends JpaRepository<Partita, Long> {
+public interface PartitaRepository extends JpaRepository<Partita, String> {
     Partita findByCodiceInvito(String codiceInvito);
 }
