@@ -9,5 +9,6 @@ import java.util.List;
 
 @Repository
 public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
-    boolean existsByNomeAndIdpartita_Codice_invito(String nome, String idpartita);
+    boolean existsByNomeAndIdpartita_CodiceInvito(String nome, String codiceInvito);
 }
+

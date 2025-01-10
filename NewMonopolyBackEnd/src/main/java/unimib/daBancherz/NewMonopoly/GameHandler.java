@@ -47,7 +47,7 @@ public class GameHandler {
             String playerName = parts[1];
             String gameId = parts[2];
 
-            if (giocatoreRepository.existsByNomeAndIdpartita_Codice_invito(playerName, gameId)) {
+            if (giocatoreRepository.existsByNomeAndIdpartita_CodiceInvito(playerName, gameId)) {
                 session.sendMessage(new TextMessage("Errore: Il nome del giocatore è già presente in questa partita."));
                 return; // Esce dalla funzione senza aggiungere il giocatore
             }

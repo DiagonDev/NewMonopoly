@@ -6,11 +6,13 @@ import jakarta.persistence.*;
 public class Giocatore {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_giocatore;
+    @Column(name = "id_giocatore")
+    private Integer idGiocatore;
 
     private String nome;
     private Integer saldo;
-    private Integer punti_fedelta;
+    @Column(name = "punti_fedelta")
+    private Integer puntiFedelta;
     private String tipo;
 
     @ManyToOne
@@ -21,12 +23,20 @@ public class Giocatore {
     @JoinColumn(name = "idpartita")
     private Partita idpartita;
 
-    public Integer getId_giocatore() {
-        return id_giocatore;
+    public Integer getIdGiocatore() {
+        return idGiocatore;
     }
 
-    public void setId_giocatore(Integer id_giocatore) {
-        this.id_giocatore = id_giocatore;
+    public void setIdGiocatore(Integer idGiocatore) {
+        this.idGiocatore = idGiocatore;
+    }
+
+    public Integer getPuntiFedelta() {
+        return puntiFedelta;
+    }
+
+    public void setPuntiFedelta(Integer puntiFedelta) {
+        this.puntiFedelta = puntiFedelta;
     }
 
     public String getNome() {
@@ -43,14 +53,6 @@ public class Giocatore {
 
     public void setSaldo(Integer saldo) {
         this.saldo = saldo;
-    }
-
-    public Integer getPunti_fedelta() {
-        return punti_fedelta;
-    }
-
-    public void setPunti_fedelta(Integer punti_fedelta) {
-        this.punti_fedelta = punti_fedelta;
     }
 
     public String getTipo() {

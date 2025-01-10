@@ -4,27 +4,28 @@ import jakarta.persistence.*;
 
 @Entity
 public class Partita {
-    @Id
-    private String codice_invito;
+    @Id @Column(name = "codice_invito")
+    private String codiceInvito;
 
-    private String livello_difficolta;
+    @Column(name = "livello_difficolta")
+    private String livelloDifficolta;
     private String stato;
     private Boolean randomizzazione;
 
-    public String getCodice_invito() {
-        return codice_invito;
+    public String getCodiceInvito() {
+        return codiceInvito;
     }
 
-    public void setCodice_invito(String codice_invito) {
-        this.codice_invito = codice_invito;
+    public void setCodiceInvito(String codiceInvito) {
+        this.codiceInvito = codiceInvito;
     }
 
-    public String getLivello_difficolta() {
-        return livello_difficolta;
+    public String getLivelloDifficolta() {
+        return livelloDifficolta;
     }
 
-    public void setLivello_difficolta(String livello_difficolta) {
-        this.livello_difficolta = livello_difficolta;
+    public void setLivelloDifficolta(String livelloDifficolta) {
+        this.livelloDifficolta = livelloDifficolta;
     }
 
     public String getStato() {

@@ -1,16 +1,15 @@
 package unimib.daBancherz.NewMonopoly.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Regolafedelta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_regolafedelta;
+    @Column(name = "id_regolafedelta")
+    private Integer idRegolafedelta;
     private String descrizione;
-    private String tipo_azione;
+    @Column(name = "tipo_azione")
+    private String tipoAzione;
     private String parametro; // Trattiamo come string il parametro json
 }

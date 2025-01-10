@@ -1,27 +1,34 @@
 package unimib.daBancherz.NewMonopoly.Entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import unimib.daBancherz.NewMonopoly.Entity.ClassiParametri.*;
 
 @Entity
 public class Probabilita {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_probabilita;
+    @Column(name = "id_probabilita")
+    private Integer idProbabilita;
     private String descrizione;
-    private String tipo_azione;
+    @Column(name = "tipo_azione")
+    private String tipoAzione;
     private String parametro; // Trattiamo come string il parametro json
 
-    public Integer getId_probabilita() {
-        return id_probabilita;
+    public Integer getIdProbabilita() {
+        return idProbabilita;
     }
 
-    public void setId_probabilita(Integer id_probabilita) {
-        this.id_probabilita = id_probabilita;
+    public void setIdProbabilita(Integer idProbabilita) {
+        this.idProbabilita = idProbabilita;
+    }
+
+    public String getTipoAzione() {
+        return tipoAzione;
+    }
+
+    public void setTipoAzione(String tipoAzione) {
+        this.tipoAzione = tipoAzione;
     }
 
     public String getDescrizione() {
@@ -30,14 +37,6 @@ public class Probabilita {
 
     public void setDescrizione(String descrizione) {
         this.descrizione = descrizione;
-    }
-
-    public String getTipo_azione() {
-        return tipo_azione;
-    }
-
-    public void setTipo_azione(String tipo_azione) {
-        this.tipo_azione = tipo_azione;
     }
 
     public String getParametro() {
@@ -51,7 +50,7 @@ public class Probabilita {
     public Object getParametroDeserializzato() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        switch (tipo_azione) {
+        switch (tipoAzione) {
             case "esci_prigione":
                 return null;
 

@@ -22,10 +22,10 @@ public class GameService {
     public void createGameAndPlayer(String playerName, String difficulty, String gameId) {
         // Crea la partita
         Partita nuovaPartita = new Partita();
-        nuovaPartita.setLivello_difficolta(difficulty);
+        nuovaPartita.setLivelloDifficolta(difficulty);
         nuovaPartita.setStato("nonIniziata");
         nuovaPartita.setRandomizzazione(false);
-        nuovaPartita.setCodice_invito(gameId);
+        nuovaPartita.setCodiceInvito(gameId);
 
         // Salva la partita nel database
         partitaRepository.save(nuovaPartita);
@@ -36,7 +36,7 @@ public class GameService {
         nuovoGiocatore.setNome(playerName);
         nuovoGiocatore.setSaldo(100);
         nuovoGiocatore.setTipo("admin");
-        nuovoGiocatore.setPunti_fedelta(0);
+        nuovoGiocatore.setPuntiFedelta(0);
 
         // Salva il giocatore nel database
         giocatoreRepository.save(nuovoGiocatore);
@@ -54,7 +54,7 @@ public class GameService {
         nuovoGiocatore.setNome(playerName);
         nuovoGiocatore.setSaldo(100);
         nuovoGiocatore.setTipo("giocatore");
-        nuovoGiocatore.setPunti_fedelta(0);
+        nuovoGiocatore.setPuntiFedelta(0);
 
         // Salva il giocatore nel database
         giocatoreRepository.save(nuovoGiocatore);

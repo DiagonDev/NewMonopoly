@@ -8,18 +8,28 @@ import unimib.daBancherz.NewMonopoly.Entity.ClassiParametri.*;
 public class Imprevisto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_imprevisto;
+    @Column(name = "id_imprevisto")
+    private Integer idImprevisto;
 
     private String descrizione;
-    private String tipo_azione;
+    @Column(name = "tipo_azione")
+    private String tipoAzione;
     private String parametro; // Trattiamo come string il parametro json
 
-    public Integer getId_imprevisto() {
-        return id_imprevisto;
+    public Integer getIdImprevisto() {
+        return idImprevisto;
     }
 
-    public void setId_imprevisto(Integer id_imprevisto) {
-        this.id_imprevisto = id_imprevisto;
+    public void setIdImprevisto(Integer idImprevisto) {
+        this.idImprevisto = idImprevisto;
+    }
+
+    public String getTipoAzione() {
+        return tipoAzione;
+    }
+
+    public void setTipoAzione(String tipoAzione) {
+        this.tipoAzione = tipoAzione;
     }
 
     public String getDescrizione() {
@@ -28,14 +38,6 @@ public class Imprevisto {
 
     public void setDescrizione(String descrizione) {
         this.descrizione = descrizione;
-    }
-
-    public String getTipo_azione() {
-        return tipo_azione;
-    }
-
-    public void setTipo_azione(String tipo_azione) {
-        this.tipo_azione = tipo_azione;
     }
 
     public String getParametro() {
@@ -49,7 +51,7 @@ public class Imprevisto {
     public Object getParametroDeserializzato() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        switch (tipo_azione) {
+        switch (tipoAzione) {
             case "esci_prigione":
                 return null;
 

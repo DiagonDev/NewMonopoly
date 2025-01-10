@@ -1,24 +1,22 @@
 package unimib.daBancherz.NewMonopoly.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Pedina {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_pedina;
+    @Column(name = "id_pedina")
+    private Integer idPedina;
 
     private String nome;
 
-    public Integer getId_pedina() {
-        return id_pedina;
+    public Integer getIdPedina() {
+        return idPedina;
     }
 
-    public void setId_pedina(Integer id_pedina) {
-        this.id_pedina = id_pedina;
+    public void setIdPedina(Integer idPedina) {
+        this.idPedina = idPedina;
     }
 
     public String getNome() {

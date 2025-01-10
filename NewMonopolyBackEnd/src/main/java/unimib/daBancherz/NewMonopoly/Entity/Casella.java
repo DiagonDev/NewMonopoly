@@ -5,11 +5,14 @@ import jakarta.persistence.*;
 @Entity
 public class Casella {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_casella;
+    @Column(name = "id_casella")
+    private Integer idCasella;
 
     private String nome;
-    private Integer num_casa;
-    private Boolean num_albergo;
+    @Column(name = "num_casa")
+    private Integer numCasa;
+    @Column(name = "num_albergo")
+    private Boolean numAlbergo;
     private String colore;
     private String tipo;
     private Integer prezzo;
@@ -18,12 +21,12 @@ public class Casella {
     @JoinColumn(name = "idgiocatore")
     private Giocatore idgiocatore;
 
-    public Integer getId_casella() {
-        return id_casella;
+    public Integer getIdCasella() {
+        return idCasella;
     }
 
-    public void setId_casella(Integer id_casella) {
-        this.id_casella = id_casella;
+    public void setIdCasella(Integer idCasella) {
+        this.idCasella = idCasella;
     }
 
     public String getNome() {
@@ -34,20 +37,20 @@ public class Casella {
         this.nome = nome;
     }
 
-    public Integer getNum_casa() {
-        return num_casa;
+    public Integer getNumCasa() {
+        return numCasa;
     }
 
-    public void setNum_casa(Integer num_casa) {
-        this.num_casa = num_casa;
+    public void setNumCasa(Integer numCasa) {
+        this.numCasa = numCasa;
     }
 
-    public Boolean getNum_albergo() {
-        return num_albergo;
+    public Boolean getNumAlbergo() {
+        return numAlbergo;
     }
 
-    public void setNum_albergo(Boolean num_albergo) {
-        this.num_albergo = num_albergo;
+    public void setNumAlbergo(Boolean numAlbergo) {
+        this.numAlbergo = numAlbergo;
     }
 
     public String getColore() {

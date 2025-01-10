@@ -1,27 +1,25 @@
 package unimib.daBancherz.NewMonopoly.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Prezzoproprieta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_prezzoproprieta;
+    @Column(name = "id_prezzoproprieta")
+    private Integer idPrezzoproprieta;
 
     private Integer affitto;
     private Integer ipoteca;
     private Integer casa;
     private Integer albergo;
 
-    public Integer getId_prezzoproprieta() {
-        return id_prezzoproprieta;
+    public Integer getIdPrezzoproprieta() {
+        return idPrezzoproprieta;
     }
 
-    public void setId_prezzoproprieta(Integer id_prezzoproprieta) {
-        this.id_prezzoproprieta = id_prezzoproprieta;
+    public void setIdPrezzoproprieta(Integer idPrezzoproprieta) {
+        this.idPrezzoproprieta = idPrezzoproprieta;
     }
 
     public Integer getAffitto() {
