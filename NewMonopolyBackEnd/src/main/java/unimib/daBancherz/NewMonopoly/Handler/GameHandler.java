@@ -51,6 +51,12 @@ public class GameHandler {
         if (!playersInGame.contains(session)) {
             playersInGame.add(0, session); // Aggiungi la sessione all'inizio della lista
         }
+        /*
+        Ale - ho bisogno che il join venga mandato a tutti, non solo all'admin
+        perchè tutti devono aggiornare la propria views quando entra qualcuno
+        allo stesso modo ho bisogno che quando l'admin crea il game allo stesso tempo lo joini
+         */
+        messageHandler.sendJoinMessage(playerName, session);
 
         messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella gameconsole
         messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi

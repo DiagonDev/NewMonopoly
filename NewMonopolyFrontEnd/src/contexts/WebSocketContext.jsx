@@ -1,73 +1,91 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, {createContext, useEffect, useState} from "react";
 
 export const WebSocketContext = createContext();
 
-export const WebSocketProvider = ({ children }) => {
-  const [socket, setSocket] = useState(null);
-  const [connected, setConnected] = useState(false);
-  const [serverMessages, setServerMessages] = useState([]);
-  const [userMessages, setUserMessages] = useState([]);
-  const [joinMessage, setJoinMessage] = useState('');
-  const [gameId, setGameId] = useState('');
-  const [userRole, setUserRole] = useState('');
+export const WebSocketProvider = ({children}) => {
+    const [socket, setSocket] = useState(null);
+    const [connected, setConnected] = useState(false);
+    const [serverMessages, setServerMessages] = useState([]);
+    const [userMessages, setUserMessages] = useState([]);
+    const [joinMessage, setJoinMessage] = useState('');
+    const [gameId, setGameId] = useState('');
+    const [userRole, setUserRole] = useState('');
+    const [playerBalance, setPlayerBalance] = useState({
+        player: '',
+        balance: 0,
+    });
 
-  useEffect(() => {
-    //const ws = new WebSocket("https://c3cb-84-33-176-173.ngrok-free.app/ws/connection");
-    const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
-    ws.onopen = () => {
-      setSocket(ws);
-      setConnected(true);
-    };
+    useEffect(() => {
+        //const ws = new WebSocket("https://c3cb-84-33-176-173.ngrok-free.app/ws/connection");
+        const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
+        ws.onopen = () => {
+            setSocket(ws);
+            setConnected(true);
+        };
 
-    ws.onmessage = (event) => {
-      console.log("Messaggio dal server:", event.data);
-      const message = JSON.parse(event.data);
-      /**
-       *  Ricevo dal back end un json con:
-       *  type: chat / system
-       *  content: "messaggio effettivo"
-       */
-      if (message.type === 'chat') {
-        setUserMessages((prevMessages) => {
-          const updatedMessages = [...prevMessages, message.content];
-          return updatedMessages;
-        });
-      }
-      else if (message.type === 'system'){
-        setServerMessages((prevMessages) => {
-          const updatedServerMessages = [...prevMessages, message.content];
-          return updatedServerMessages;
-        });
-      }
-      else if (message.type === 'join'){
-        setJoinMessage(message.content);
-      }
-      else if (message.type === 'gameId'){
-        setGameId(message.content);
-      }
-      else if (message.type === 'user'){
-        setUserRole(message.content);
-      }
-    };
+        ws.onmessage = (event) => {
+            //console.log("Messaggio dal server:", event.data);
+            const message = JSON.parse(event.data);
+            /**
+             *  Ricevo dal back end un json con:
+             *  type: chat / system
+             *  content: "messaggio effettivo"
+             */
+            if (message.type === 'chat') {
+                setUserMessages((prevMessages) => {
+                    const updatedMessages = [...prevMessages, message.content];
+                    return updatedMessages;
+                });
+            } else if (message.type === 'system') {
+                setServerMessages((prevMessages) => {
+                    const updatedServerMessages = [...prevMessages, message.content];
+                    return updatedServerMessages;
+                });
+            }
+            /**
+             * type: join
+             * content:playerName
+             */
+            else if (message.type === 'join') {
+                console.log("Messaggio dal server:", event.data);
+                setJoinMessage(message.content);
+            } else if (message.type === 'gameId') {
+                setGameId(message.content);
+            } else if (message.type === 'user') {
+                setUserRole(message.content);
+            }
+            /**
+             * type: balance
+             * content: newBalance (int/long)
+             */
+            else if (message.type === 'balance') {
+                setPlayerBalance((prevState) => ({
+                    ...prevState, // Mantieni le altre proprietà, se esistono
+                    player: message.playerName, // Aggiorna il nome del giocatore
+                    balance: message.balance, // Aggiorna il bilancio
+                }));
+            }
+        };
 
-    ws.onerror = (error) => {
-      console.error("Errore WebSocket:", error);
-    };
+        ws.onerror = (error) => {
+            console.error("Errore WebSocket:", error);
+        };
 
-    ws.onclose = () => {
-      setConnected(false);
-    };
+        ws.onclose = () => {
+            setConnected(false);
+        };
 
-    return () => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.close();
-      }
-    };
-  }, []);
+        return () => {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.close();
+            }
+        };
+    }, []);
 
-  return (
-    <WebSocketContext.Provider value={{ socket, connected, serverMessages, userMessages, joinMessage, gameId, userRole}}>
-      {children}
-    </WebSocketContext.Provider>
-  );
+    return (
+        <WebSocketContext.Provider
+            value={{socket, connected, serverMessages, userMessages, joinMessage, gameId, userRole, playerBalance}}>
+            {children}
+        </WebSocketContext.Provider>
+    );
 };
