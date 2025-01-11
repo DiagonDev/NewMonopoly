@@ -3,6 +3,7 @@ package unimib.daBancherz.NewMonopoly;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
+import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

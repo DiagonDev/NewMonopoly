@@ -1,4 +1,4 @@
-package unimib.daBancherz.NewMonopoly;
+package unimib.daBancherz.NewMonopoly.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
