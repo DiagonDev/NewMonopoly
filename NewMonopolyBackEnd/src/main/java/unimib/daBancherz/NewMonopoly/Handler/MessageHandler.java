@@ -34,16 +34,19 @@ public class MessageHandler {
         }
     }
 
-    public void sendJoinMessage(String playerName, WebSocketSession admin) throws IOException {
+    public void sendJoinMessage(String playerName, Map<String, List<WebSocketSession>> gameSessions, String role, String gameId) throws IOException {
 
+        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         //crea il messaggio di tipo join che contiene il nome del giocatore
         String joinMessage = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "join",
-                "content", playerName
+                "playerName", playerName,
+                "userRole", role
         ));
 
-        // Invia il messaggio solo all'admin
-        admin.sendMessage(new TextMessage(joinMessage));
+        for (WebSocketSession sessions : playersInGame) {
+            sessions.sendMessage(new TextMessage(joinMessage));
+        }
     }
 
     public void sendGameId(String gameId, WebSocketSession session) throws Exception {
@@ -66,21 +69,22 @@ public class MessageHandler {
         session.sendMessage(new TextMessage(typePlayerMessage));
     }
 
-    public void notifyPlayerJoin(String gameId, String playerName, WebSocketSession session, List<WebSocketSession> playersInGame, Map<String, List<WebSocketSession>> gameSessions) throws Exception {
+    public void notifyPlayerJoin(String gameId, String playerName, WebSocketSession session, Map<String, List<WebSocketSession>> gameSessions, String role) throws Exception {
 
         // Messaggi per il giocatore che si è unito e per tutti i partecipanti
         sendSystemMessage(gameId, "Ti sei unito alla partita con ID: " + gameId + " con successo!", gameSessions, session);
         sendSystemMessage(gameId, playerName + " si è unito alla partita!", gameSessions, session);
 
-        // Notifica all'admin della partita
+        /*// Notifica all'admin della partita
         WebSocketSession admin = playersInGame.get(0);
         sendJoinMessage(playerName, admin);
+        sendTypePlayer("giocatore", admin);*/
 
         /*
          Ale - Stesso discorso qua, ho bisogno che il join arrivi a tutti
          */
-        sendJoinMessage(playerName, session);
-        //
-        sendTypePlayer("giocatore", session);
+        sendJoinMessage(playerName, gameSessions, role, gameId);
+        //sendTypePlayer("giocatore", session);
+
     }
 }

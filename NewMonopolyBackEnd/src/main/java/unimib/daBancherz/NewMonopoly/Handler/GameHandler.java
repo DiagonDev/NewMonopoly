@@ -24,6 +24,7 @@ public class GameHandler {
     private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
     private static final AtomicLong idCounter = new AtomicLong();
+
     @Autowired
     private GameService gameService;
     @Autowired
@@ -59,39 +60,39 @@ public class GameHandler {
 
     private void createGame(String playerName, String difficulty, String randomization, WebSocketSession session) throws Exception {
 
-        String gameId = generateGameId();
+        String gameId = generateGameId();//crea l'ID del game
 
-        gameSessions.putIfAbsent(gameId, new ArrayList<>());
-        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
 
-        if (!playersInGame.contains(session)) {
-            playersInGame.add(0, session); // Aggiungi la sessione all'inizio della lista
+        gameSessions.putIfAbsent(gameId, new ArrayList<>()); // aggiunge il gameId alla lista delle partite
+        List<WebSocketSession> playersInGame = gameSessions.get(gameId); //prende la lista delle sessioni dei giocatori di una determinata partita
+
+        if (!playersInGame.contains(session)) { // controlla che la sessione non sia già in quella partita
+            playersInGame.add(0, session); // Aggiungi la sessione all'inizio della lista,
+                                                 //per fa si che la prima sessione sia quella dell'ADMIN
         }
-        /*
-        Ale - ho bisogno che il join venga mandato a tutti, non solo all'admin
-        perchè tutti devono aggiornare la propria views quando entra qualcuno
-        allo stesso modo ho bisogno che quando l'admin crea il game allo stesso tempo lo joini
-         */
-        messageHandler.sendJoinMessage(playerName, session);
+
+        //invia a tutti i giocatori i messaggi di partecipazione alla partita
+        messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "ADMIN");
 
         messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella gameconsole
         messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
-        messageHandler.sendTypePlayer("ADMIN", session);
-        gameService.createGameAndPlayer(playerName,difficulty, gameId); //aggiungi randomizzazione
-        //session.sendMessage(new TextMessage(gameId));
+        messageHandler.sendTypePlayer("ADMIN", session);//invia all'admin il tipo di giocatore che è
+        gameService.createGameAndPlayer(playerName,difficulty, gameId);//crea la parita nel database, più informazioni in GameService
+                                                                       //TODO: aggiungi randomizzazione
     }
 
 
     private void joinGame(String playerName, String gameId, WebSocketSession session) throws Exception {
+        //TODO: aggiornare il messaggio in formato Json, e gestire il messaggio in frontEnd
         if (!gameSessions.containsKey(gameId)) {
             session.sendMessage(new TextMessage("Errore: La partita con ID " + gameId + " non esiste."));
             return;
         }
 
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
-        playersInGame.add(session);
-        gameService.addPlayer(playerName, gameId);
-        messageHandler.notifyPlayerJoin(gameId, playerName, session, playersInGame, gameSessions);
+        playersInGame.add(session);//aggiunge la sessione del giocatore alla lista di sessioni della partita a cuoi vuole partecipare
+        gameService.addPlayer(playerName, gameId);//aggiunge il giocatore nel databesa alla partita assegnata
+        messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "giocatore");//invia a tutti i giocatori i messaggi di partecipazione alla partita
     }
 
     public String getGameIdBySession(WebSocketSession session) {
