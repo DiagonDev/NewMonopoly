@@ -3,32 +3,42 @@ import { WebSocketContext } from "../contexts/WebSocketContext";
 import PlayersStatsRectangle from './PlayersStatsRectangle';
 import ChatFather from './ChatFather';
 
-
 const GameRectangle = () => {
     const { serverMessages, joinMessage, gameId, userRole } = useContext(WebSocketContext);
     const [isPlayerJoined, setIsPlayerJoined] = useState(false);
+
     useEffect(() => {
-        // Simula l'ascolto di un messaggio WebSocket che indica l'ingresso di un giocatore
+        // Aggiorna lo stato quando un giocatore entra
         if (joinMessage !== "") {
-            setIsPlayerJoined(true); // Aggiorna lo stato quando un giocatore entra
+            setIsPlayerJoined(true);
         }
     }, [joinMessage]);
+
     return (
         <div className="game-rectangle">
-            <div class="grid-item">
-                <p>ID Partita: {'Va cambiatooo'}</p>
-            </div>
-            <div class="grid-item">
-                <p>alto destra</p>
-            </div>
-            <div class="grid-item">
-                <ChatFather />
-            </div>
-            <div class="grid-item">
-                <PlayersStatsRectangle />
-            </div>
-            
-
+            {userRole === "giocatore" || isPlayerJoined ? (
+                <>
+                    <div className="grid-item">
+                        <p>ID Partita: {gameId}</p>
+                    </div>
+                    <div className="grid-item">
+                        <p>alto destra</p>
+                    </div>
+                    <div className="grid-item">
+                        <ChatFather />
+                    </div>
+                    <div className="grid-item">
+                        <PlayersStatsRectangle />
+                    </div>
+                </>
+            ) : (
+                <div className="shimmer-effect">
+                    {/* Effetto shimmer o messaggio di attesa */}
+                    <p>ID Partita: {gameId}</p>
+                    <br />
+                    <p>In attesa di un giocatore...</p>
+                </div>
+            )}
         </div>
     );
 };
