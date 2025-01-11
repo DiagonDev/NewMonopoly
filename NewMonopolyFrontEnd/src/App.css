@@ -16,6 +16,13 @@ body {
   align-items: center;
   padding: 20px;
 }
+.main{
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+}
 
 /* Stile per il titolo */
 .titolo {

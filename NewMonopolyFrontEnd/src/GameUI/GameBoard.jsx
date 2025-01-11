@@ -3,7 +3,7 @@ import './GameBoard.css';
 import GameOutsideRectangle from './GameOutsideRectangle';
 const GameBoard = () => {
   return (
-    <div>
+    <div id='gameBoardDiv'>
       <GameOutsideRectangle />
     </div>
   );

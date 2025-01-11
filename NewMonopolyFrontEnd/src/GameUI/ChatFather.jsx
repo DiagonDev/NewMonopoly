@@ -6,9 +6,9 @@ const ChatFather = () => {
     const [activeComponent, setActiveComponent] = useState("GameChat"); // Stato per gestire il componente attivo
 
     return (
-        <div>
+        <div className="chatFatherDiv">
             {/* Bottoni per cambiare componente */}
-            <div>
+            <div className="chatFatherBtnDiv">
                 <button onClick={() => setActiveComponent("GameChat")}>
                     Mostra Game Chat
                 </button>
