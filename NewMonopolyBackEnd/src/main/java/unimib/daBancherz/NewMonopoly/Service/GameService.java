@@ -1,5 +1,6 @@
 package unimib.daBancherz.NewMonopoly.Service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unimib.daBancherz.NewMonopoly.Entity.*;
@@ -134,5 +135,11 @@ public class GameService {
             partitaImprevisto.setIdgiocatore(null);  // Impostiamo "idgiocatore" a null
             partitaImprevistoRepository.save(partitaImprevisto);
         }
+    }
+
+    @Transactional
+    public void deletePlayer(String gameId, String nomeGiocatore){
+        Integer idGiocatore = giocatoreRepository.findIdByNomeAndPartitaCodiceInvito(nomeGiocatore, gameId);
+        giocatoreRepository.deleteByIdGiocatore(idGiocatore);
     }
 }

@@ -1,11 +1,13 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.Repository.GiocatoreRepository;
+import unimib.daBancherz.NewMonopoly.Repository.PartitaRepository;
 import unimib.daBancherz.NewMonopoly.Service.GameService;
 
 import java.util.ArrayList;
@@ -22,11 +24,12 @@ public class GameHandler {
     private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
     private static final AtomicLong idCounter = new AtomicLong();
-    private static AtomicLong idCounter = new AtomicLong();
     @Autowired
     private GameService gameService;
     @Autowired
     private GiocatoreRepository giocatoreRepository;
+    @Autowired
+    private PartitaRepository partitaRepository;
 
     public void handleGameMessage(String[] messageParts, WebSocketSession session) throws Exception {
         if (messageParts[0].equals("Create")) {
@@ -135,14 +138,18 @@ public class GameHandler {
         return "game-" + String.valueOf(idCounter.getAndIncrement());
     }
 
+    @Transactional
     public void removePlayerFromGame(String gameId, WebSocketSession session) {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
 
         if (playersInGame != null) {
+            String player = getPlayerNameBySession(session);
+            gameService.deletePlayer(gameId, player);
             playersInGame.remove(session); // Rimuove la sessione dalla lista dei giocatori
 
             // Se non ci sono più giocatori nella partita, rimuovi completamente la partita
             if (playersInGame.isEmpty()) {
+                partitaRepository.deleteByCodiceInvito(gameId);
                 gameSessions.remove(gameId);
                 System.out.println("Partita con ID " + gameId + " rimossa poiché non ci sono più giocatori.");
             }
@@ -151,6 +158,7 @@ public class GameHandler {
         // Rimuove il giocatore dalla mappa dei nomi
         playerNameList.values().removeIf(existingSession -> existingSession.equals(session));
     }
+
 
     public void notifyPlayerDisconnected(String gameId, String playerName) throws Exception {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);

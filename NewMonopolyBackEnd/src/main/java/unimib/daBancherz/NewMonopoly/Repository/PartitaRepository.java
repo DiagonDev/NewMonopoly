@@ -8,4 +8,5 @@ import unimib.daBancherz.NewMonopoly.Entity.Partita;
 @Repository
 public interface PartitaRepository extends JpaRepository<Partita, String> {
     Partita findByCodiceInvito(String codiceInvito);
+    void deleteByCodiceInvito(String codiceInvito);
 }
