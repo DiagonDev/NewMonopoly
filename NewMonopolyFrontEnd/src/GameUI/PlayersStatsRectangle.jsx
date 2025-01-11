@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { WebSocketContext } from "../../contexts/WebSocketContext";
+
 let nextId = 0;
 const PlayersStatsRectangle = () => {
     const [playersName, setplayersName] = useState([]);
