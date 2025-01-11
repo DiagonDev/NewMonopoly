@@ -51,7 +51,7 @@ public class GameService {
         Giocatore nuovoGiocatore = new Giocatore();
         nuovoGiocatore.setIdpartita(nuovaPartita);
         nuovoGiocatore.setNome(playerName);
-        nuovoGiocatore.setSaldo(100);
+        nuovoGiocatore.setSaldo(1500);
         nuovoGiocatore.setTipo("admin");
         nuovoGiocatore.setPuntiFedelta(0);
         giocatoreRepository.save(nuovoGiocatore);   // Salva il giocatore nel database
@@ -70,7 +70,7 @@ public class GameService {
 
         nuovoGiocatore.setIdpartita(partita);
         nuovoGiocatore.setNome(playerName);
-        nuovoGiocatore.setSaldo(100);
+        nuovoGiocatore.setSaldo(1500);
         nuovoGiocatore.setTipo("giocatore");
         nuovoGiocatore.setPuntiFedelta(0);
         giocatoreRepository.save(nuovoGiocatore);

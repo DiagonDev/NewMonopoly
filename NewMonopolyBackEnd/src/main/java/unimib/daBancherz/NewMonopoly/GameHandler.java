@@ -34,11 +34,7 @@ public class GameHandler {
             String difficulty = parts[2];
             String randomization = parts[3];        //deve essere un boolean
 
-
             createGame(playerName, difficulty, randomization, session);
-            String gameId = getGameIdBySession(session);
-            gameService.createGameAndPlayer(playerName,difficulty, gameId);
-
             playerNameList.put(playerName, session);
 
         } else if (payload.startsWith("Partecipa:")) {
@@ -48,6 +44,7 @@ public class GameHandler {
             String gameId = parts[2];
 
             if (giocatoreRepository.existsByNomeAndIdpartita_CodiceInvito(playerName, gameId)) {
+                // TODO: Gestire il messaggio frontend per non mandarlo all'altra pagina
                 session.sendMessage(new TextMessage("Errore: Il nome del giocatore è già presente in questa partita."));
                 return; // Esce dalla funzione senza aggiungere il giocatore
             }
@@ -65,6 +62,8 @@ public class GameHandler {
 
         String message = "#" + gameId;      //codice invito
         sendSystemMessage(gameId, message, session);
+
+        gameService.createGameAndPlayer(playerName,difficulty, gameId); //aggiungi randomizzazione
         //session.sendMessage(new TextMessage(gameId));
     }
 
