@@ -1,0 +1,22 @@
+.proprieta{
+    display: flex;
+    justify-content:space-around; /* Centra il contenuto orizzontalmente */
+    align-items:center; /* Centra il contenuto verticalmente */
+    color: white;
+    border: 1px solid black; /* Aggiunge un bordo nero di 1px di spessore */
+    font-weight: bold;  
+  }
+
+  .listaProprieta {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Due colonne uguali */
+    
+    gap: 10px; /* Spaziatura tra le celle */
+  
+    /* Altezza dinamica */
+    
+    padding: 10px;
+    box-sizing: border-box;
+    
+  }
+  

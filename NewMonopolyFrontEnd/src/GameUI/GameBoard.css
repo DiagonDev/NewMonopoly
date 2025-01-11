@@ -83,6 +83,15 @@
   font-weight: bold;
 }
 
+.propieta{
+  display: flex;
+  justify-content:space-around; /* Centra il contenuto orizzontalmente */
+  align-items:center; /* Centra il contenuto verticalmente */
+  color: white;
+  border: 1px solid black; /* Aggiunge un bordo nero di 1px di spessore */
+  font-weight: bold;
+}
+
 .chatFatherBtnDiv{
   display: flex;
   flex-direction: row;
