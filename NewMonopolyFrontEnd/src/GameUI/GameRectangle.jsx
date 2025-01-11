@@ -4,19 +4,18 @@ import PlayersStatsRectangle from './PlayersStatsRectangle';
 import ChatFather from './ChatFather';
 
 const GameRectangle = () => {
-    const { joinMessage, gameId, userRole } = useContext(WebSocketContext);
+    const { playerJoin, gameId } = useContext(WebSocketContext);
     const [isPlayerJoined, setIsPlayerJoined] = useState(false);
-
     useEffect(() => {
         // Aggiorna lo stato quando un giocatore entra
-        if (joinMessage !== "" && userRole === "giocatore") {
+        if (playerJoin.player !== "" && playerJoin.playerRole === "giocatore") {
             setIsPlayerJoined(true);
         }
-    }, [joinMessage]);
+    }, [playerJoin]);
 
     return (
         <div className="game-rectangle">
-            {userRole === "giocatore" || isPlayerJoined ? (
+            {playerJoin.playerRole === "giocatore" || isPlayerJoined ? (
                 <>
                     <div className="grid-item">
                         <p>ID Partita: {gameId}</p>

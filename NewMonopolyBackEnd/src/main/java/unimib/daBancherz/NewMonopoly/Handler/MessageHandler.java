@@ -71,15 +71,16 @@ public class MessageHandler {
         // Messaggi per il giocatore che si è unito e per tutti i partecipanti
         sendSystemMessage(gameId, "Ti sei unito alla partita con ID: " + gameId + " con successo!", gameSessions, session);
         sendSystemMessage(gameId, playerName + " si è unito alla partita!", gameSessions, session);
-        /*
+
         // Notifica all'admin della partita
         WebSocketSession admin = playersInGame.get(0);
         sendJoinMessage(playerName, admin);
-        */
+
         /*
          Ale - Stesso discorso qua, ho bisogno che il join arrivi a tutti
          */
         sendJoinMessage(playerName, session);
+        //
         sendTypePlayer("giocatore", session);
     }
 }

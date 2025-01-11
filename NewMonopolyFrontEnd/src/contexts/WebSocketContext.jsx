@@ -7,17 +7,19 @@ export const WebSocketProvider = ({children}) => {
     const [connected, setConnected] = useState(false);
     const [serverMessages, setServerMessages] = useState([]);
     const [userMessages, setUserMessages] = useState([]);
-    const [joinMessage, setJoinMessage] = useState('');
     const [gameId, setGameId] = useState('');
-    const [userRole, setUserRole] = useState('');
+    const [playerJoin, setPlayerJoin] = useState({
+        player: '',
+        playerRole: '',
+    });
     const [playerBalance, setPlayerBalance] = useState({
         player: '',
         balance: 0,
     });
 
     useEffect(() => {
-        //const ws = new WebSocket("https://c3cb-84-33-176-173.ngrok-free.app/ws/connection");
-        const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
+        const ws = new WebSocket("https://c3cb-84-33-176-173.ngrok-free.app/ws/gameNewMonopoly");
+        //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
         ws.onopen = () => {
             setSocket(ws);
             setConnected(true);
@@ -47,12 +49,14 @@ export const WebSocketProvider = ({children}) => {
              * content:playerName
              */
             else if (message.type === 'join') {
-                console.log("Messaggio dal server:", event.data);
-                setJoinMessage(message.content);
+                console.log("joinevent" + JSON.stringify(message));
+                setPlayerJoin((prevState) => ({
+                    ...prevState, // Mantieni le altre proprietà, se esistono
+                    player: message.playerName, // Aggiorna il nome del giocatore
+                    playerRole: message.userRole, // Aggiorna il bilancio
+                }));
             } else if (message.type === 'gameId') {
                 setGameId(message.content);
-            } else if (message.type === 'user') {
-                setUserRole(message.content);
             }
             /**
              * type: balance
@@ -84,7 +88,7 @@ export const WebSocketProvider = ({children}) => {
 
     return (
         <WebSocketContext.Provider
-            value={{socket, connected, serverMessages, userMessages, joinMessage, gameId, userRole, playerBalance}}>
+            value={{socket, connected, serverMessages, userMessages, gameId, playerBalance, playerJoin}}>
             {children}
         </WebSocketContext.Provider>
     );

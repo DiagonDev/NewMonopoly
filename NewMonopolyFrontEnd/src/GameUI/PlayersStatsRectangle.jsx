@@ -8,16 +8,16 @@ const PlayersStatsRectangle = () => {
     const [players, setPlayers] = useState(
         Array(MAX_PLAYERS).fill({ name: "Player", balance: INITIAL_BALANCE })
     );
-    const { joinMessage, playerBalance } = useContext(WebSocketContext);
-
+    const { playerJoin, playerBalance } = useContext(WebSocketContext);
     // Aggiunge un nuovo giocatore quando arriva un messaggio di join
     useEffect(() => {
-        if (joinMessage) {
+        console.log("Nuovo join:", playerJoin.player);
+        if (playerJoin.player) {
             setPlayers((prevPlayers) => {
                 const nextPlayers = [...prevPlayers];
                 // Verifica se il giocatore è già presente
                 const playerIndex = nextPlayers.findIndex(
-                    (player) => player.name === joinMessage
+                    (player) => player.name === playerJoin.player
                 );
 
                 if (playerIndex === -1) {
@@ -28,7 +28,7 @@ const PlayersStatsRectangle = () => {
 
                     if (emptySlotIndex !== -1) {
                         nextPlayers[emptySlotIndex] = {
-                            name: joinMessage, // Nome del giocatore dal messaggio
+                            name: playerJoin.player, // Nome del giocatore dal messaggio
                             balance: INITIAL_BALANCE,
                         };
                     }
@@ -36,7 +36,7 @@ const PlayersStatsRectangle = () => {
                 return nextPlayers;
             });
         }
-    }, [joinMessage]);
+    }, [playerJoin]);
 
     // Simula la modifica del bilancio quando arriva un messaggio dal server
     useEffect(() => {
