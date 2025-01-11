@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.daBancherz.NewMonopoly.Repository.GiocatoreRepository;
+import unimib.daBancherz.NewMonopoly.Service.GameService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +22,11 @@ public class GameHandler {
     private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
     private static final AtomicLong idCounter = new AtomicLong();
+    private static AtomicLong idCounter = new AtomicLong();
+    @Autowired
+    private GameService gameService;
+    @Autowired
+    private GiocatoreRepository giocatoreRepository;
 
     public void handleGameMessage(String[] messageParts, WebSocketSession session) throws Exception {
         if (messageParts[0].equals("Create")) {
@@ -36,6 +44,11 @@ public class GameHandler {
             String playerName = messageParts[1];
             String gameId = messageParts[2];
 
+            if (giocatoreRepository.existsByNomeAndIdpartita_CodiceInvito(playerName, gameId)) {
+                // TODO: Gestire il messaggio frontend per non mandarlo all'altra pagina
+                session.sendMessage(new TextMessage("Errore: Il nome del giocatore è già presente in questa partita."));
+                return; // Esce dalla funzione senza aggiungere il giocatore
+            }
             playerNameList.put(playerName, session);
             joinGame(playerName, gameId, session);
         }
@@ -61,6 +74,8 @@ public class GameHandler {
         messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella gameconsole
         messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
         messageHandler.sendTypePlayer("ADMIN", session);
+        gameService.createGameAndPlayer(playerName,difficulty, gameId); //aggiungi randomizzazione
+        //session.sendMessage(new TextMessage(gameId));
     }
 
 
@@ -72,7 +87,7 @@ public class GameHandler {
 
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         playersInGame.add(session);
-
+        gameService.addPlayer(playerName, gameId);
         messageHandler.notifyPlayerJoin(gameId, playerName, session, playersInGame, gameSessions);
     }
 
