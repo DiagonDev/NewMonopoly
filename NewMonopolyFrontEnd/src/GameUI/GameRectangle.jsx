@@ -5,7 +5,7 @@ import ChatFather from './ChatFather';
 
 const GameRectangle = () => {
     const { joinMessage, gameId, userRole } = useContext(WebSocketContext);
-    const [isPlayerJoined, setIsPlayerJoined] = useState(false);
+    const [isPlayerJoined, setIsPlayerJoined] = useState(true);
 
     useEffect(() => {
         // Aggiorna lo stato quando un giocatore entra
@@ -20,6 +20,17 @@ const GameRectangle = () => {
                 <>
                     <div className="grid-item">
                         <p>ID Partita: {gameId}</p>
+                        <div className='actionDiv'>
+                            <button >
+                                Roll
+                            </button>
+                            <button>
+                                Scambia
+                            </button>
+                            <button>
+                                Ipoteca
+                            </button>
+                        </div>
                     </div>
                     <div className="grid-item">
                         <p>alto destra</p>
