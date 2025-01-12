@@ -38,7 +38,7 @@ public class GameService {
         Partita nuovaPartita = new Partita();
         nuovaPartita.setLivelloDifficolta(difficulty);
         nuovaPartita.setStato("nonIniziata");
-        nuovaPartita.setRandomizzazione(false);
+        nuovaPartita.setRandomizzazione(true);
         nuovaPartita.setCodiceInvito(gameId);
         partitaRepository.save(nuovaPartita);       // Salva la partita nel database
 
@@ -47,7 +47,7 @@ public class GameService {
             partitaCasellaPrezzoproprietaRepository.populateWithRandomizationTrue(gameId);
         else
             partitaCasellaPrezzoproprietaRepository.populateWithRandomizationFalse(gameId);
-
+        partitaCasellaPrezzoproprietaRepository.updatePrices(gameId);
         // Crea il giocatore
         Giocatore nuovoGiocatore = new Giocatore();
         nuovoGiocatore.setIdpartita(nuovaPartita);

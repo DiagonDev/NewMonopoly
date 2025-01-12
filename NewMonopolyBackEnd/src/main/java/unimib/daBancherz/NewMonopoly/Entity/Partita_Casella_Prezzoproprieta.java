@@ -21,6 +21,12 @@ public class Partita_Casella_Prezzoproprieta {
     @JoinColumn(name = "idprezzoproprieta")
     private Prezzoproprieta idprezzoproprieta;
 
+    @Column(name = "prezzo_corrente")
+    private Integer prezzoCorrente;
+
+    @Column(name = "prezzo_casa_corrente")
+    private Integer prezzoCasaCorrente;
+
     public Partita getIdpartita() {
         return idpartita;
     }
@@ -43,5 +49,21 @@ public class Partita_Casella_Prezzoproprieta {
 
     public void setIdprezzoproprieta(Prezzoproprieta idprezzoproprieta) {
         this.idprezzoproprieta = idprezzoproprieta;
+    }
+
+    public Integer getPrezzoCorrente() {
+        return prezzoCorrente;
+    }
+
+    public void setPrezzoCorrente(Integer prezzoCorrente) {
+        this.prezzoCorrente = prezzoCorrente;
+    }
+
+    public Integer getPrezzoCasaCorrente() {
+        return prezzoCasaCorrente;
+    }
+
+    public void setPrezzoCasaCorrente(Integer prezzoCasaCorrente) {
+        this.prezzoCasaCorrente = prezzoCasaCorrente;
     }
 }

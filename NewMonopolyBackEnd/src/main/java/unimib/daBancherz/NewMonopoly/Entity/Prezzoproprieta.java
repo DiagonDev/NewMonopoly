@@ -12,45 +12,60 @@ public class Prezzoproprieta {
     private Integer affitto;
     private Integer ipoteca;
     private Integer casa;
-    private Integer albergo;
+    @Column(name = "affitto_1casa")
+    private Integer affitto1Casa;
+    @Column(name = "affitto_2case")
+    private Integer affitto2Case;
+    @Column(name = "affitto_3case")
+    private Integer affitto3Case;
+    @Column(name = "affitto_4case")
+    private Integer affitto4Case;
+    @Column(name = "affitto_albergo")
+    private Integer affittoAlbergo;
+    @Column(name = "costo_acquisto")
+    private Integer costoAcquisto;
 
     public Integer getIdPrezzoproprieta() {
         return idPrezzoproprieta;
-    }
-
-    public void setIdPrezzoproprieta(Integer idPrezzoproprieta) {
-        this.idPrezzoproprieta = idPrezzoproprieta;
     }
 
     public Integer getAffitto() {
         return affitto;
     }
 
-    public void setAffitto(Integer affitto) {
-        this.affitto = affitto;
-    }
-
     public Integer getIpoteca() {
         return ipoteca;
-    }
-
-    public void setIpoteca(Integer ipoteca) {
-        this.ipoteca = ipoteca;
     }
 
     public Integer getCasa() {
         return casa;
     }
 
-    public void setCasa(Integer casa) {
-        this.casa = casa;
+    public Integer getAffitto1Casa() {
+        return affitto1Casa;
     }
 
-    public Integer getAlbergo() {
-        return albergo;
+    public Integer getAffitto2Case() {
+        return affitto2Case;
     }
 
-    public void setAlbergo(Integer albergo) {
-        this.albergo = albergo;
+    public Integer getAffitto3Case() {
+        return affitto3Case;
+    }
+
+    public Integer getAffitto4Case() {
+        return affitto4Case;
+    }
+
+    public Integer getAffittoAlbergo() {
+        return affittoAlbergo;
+    }
+
+    public Integer getCostoAcquisto() {
+        return costoAcquisto;
+    }
+
+    public void setCostoAcquisto(Integer costoAcquisto) {
+        this.costoAcquisto = costoAcquisto;
     }
 }
