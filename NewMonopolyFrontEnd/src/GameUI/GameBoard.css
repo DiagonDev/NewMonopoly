@@ -83,6 +83,15 @@
   font-weight: bold;
 }
 
+.propieta{
+  display: flex;
+  justify-content:space-around; /* Centra il contenuto orizzontalmente */
+  align-items:center; /* Centra il contenuto verticalmente */
+  color: white;
+  border: 1px solid black; /* Aggiunge un bordo nero di 1px di spessore */
+  font-weight: bold;
+}
+
 .chatFatherBtnDiv{
   display: flex;
   flex-direction: row;
@@ -100,6 +109,13 @@
 
 }
 
+.actionDiv{
+  display: flex;        /* Attiva il layout Flexbox */
+    flex-direction: column; /* Dispone gli elementi in colonna */
+    align-items: center;   /* Centra gli elementi orizzontalmente */
+    gap: 10px;
+}
+
 .player:nth-child(1) { background-color: green; }
 .player:nth-child(2) { background-color: yellow; }
 .player:nth-child(3) { background-color: blue; }
@@ -107,7 +123,11 @@
 .player:nth-child(5) { background-color: purple; }
 .player:nth-child(6) { background-color: orange; }
 
-.grid-item:nth-child(1) { background-color: green; }
+.grid-item:nth-child(1) {
+  display: flex;
+  flex-direction: column; 
+  background-color: green; 
+}
 .grid-item:nth-child(2) { background-color: yellow; }
 .grid-item:nth-child(3) { background-color: blue; }
 .grid-item:nth-child(4) { background-color: red; }
