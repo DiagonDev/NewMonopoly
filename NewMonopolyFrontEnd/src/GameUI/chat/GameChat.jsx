@@ -23,7 +23,7 @@ const GameChat = () => {
 
     return (
         <div>
-            <textarea
+            <textarea className='chat-window'
                 value={Array.isArray(userMessages) ? userMessages.join("\n") : ""}
                 readOnly
                 rows={10}

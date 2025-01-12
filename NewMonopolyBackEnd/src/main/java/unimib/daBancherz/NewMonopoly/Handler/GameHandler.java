@@ -71,10 +71,10 @@ public class GameHandler {
                                                  //per fa si che la prima sessione sia quella dell'ADMIN
         }
 
+        messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella gameconsole
         //invia a tutti i giocatori i messaggi di partecipazione alla partita
         messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "ADMIN");
-
-        messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella gameconsole
+        
         messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
         messageHandler.sendTypePlayer("ADMIN", session);//invia all'admin il tipo di giocatore che è
         gameService.createGameAndPlayer(playerName,difficulty, gameId);//crea la parita nel database, più informazioni in GameService

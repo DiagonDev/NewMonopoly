@@ -8,7 +8,7 @@ const GameConsole = () => {
 
     return (
         <div>
-            <textarea
+            <textarea className='chat-window'
                 value={Array.isArray(serverMessages) ? serverMessages.join("\n") : ""}
                 readOnly
                 rows={10}

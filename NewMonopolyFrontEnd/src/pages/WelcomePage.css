@@ -10,7 +10,6 @@ body {
   /* Centra i contenuti all'interno del div */
   div {
     text-align: center;
-    max-width: 600px; /* Limita la larghezza per non far espandere troppo il contenuto */
     width: 100%;
   }
   
