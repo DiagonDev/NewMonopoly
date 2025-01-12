@@ -2,6 +2,7 @@ import React, {createContext, useEffect, useState} from "react";
 
 export const WebSocketContext = createContext();
 
+// eslint-disable-next-line react/prop-types
 export const WebSocketProvider = ({children}) => {
     const [socket, setSocket] = useState(null);
     const [connected, setConnected] = useState(false);
