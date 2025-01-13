@@ -2,6 +2,7 @@ package unimib.daBancherz.NewMonopoly.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -23,7 +24,7 @@ public class GameHandler {
     private MessageHandler messageHandler;  // Iniezione del bean MessageSender
     private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
-    private static final AtomicLong idCounter = new AtomicLong();
+
 
     @Autowired
     private GameService gameService;
@@ -140,7 +141,13 @@ public class GameHandler {
     //genera il codice gameID in modo incrementale partendo da game-0
     //TODO: devo controllare dal databese quale game ci sono già e restituire l'ID successivo a l'ultimo presente
     private String generateGameId() {
-        return "game-" + String.valueOf(idCounter.getAndIncrement());
+        int idCounter = 0;
+
+        if(partitaRepository.findLastCodiceInvito() != null) {
+            String[] lastGame = (partitaRepository.findLastCodiceInvito()).split("-");
+            idCounter = Integer.parseInt(lastGame[1]);
+        }
+        return "game-" + ++idCounter;
     }
 
     @Transactional

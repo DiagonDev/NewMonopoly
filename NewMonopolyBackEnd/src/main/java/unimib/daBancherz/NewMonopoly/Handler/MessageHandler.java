@@ -1,6 +1,7 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -11,12 +12,6 @@ import java.util.Map;
 
 @Component
 public class MessageHandler {
-
-    private final GameHandler gameHandler;
-
-    public MessageHandler(GameHandler gameHandler) {
-        this.gameHandler = gameHandler;
-    }
 
     //serve per creare un messaggio di sistema in Json così che il forntend lo metta nella game console
     public void sendSystemMessage(String gameId, String content, Map<String, List<WebSocketSession>> gameSessions, WebSocketSession session) throws Exception {
