@@ -11,7 +11,7 @@ import {WebSocketContext} from "../contexts/WebSocketContext.jsx"; // Assicurati
 const GameBoard = () => {
 
     const {playerJoin, gameId} = useContext(WebSocketContext);
-    const [isPlayerJoined, setIsPlayerJoined] = useState(true);
+    const [isPlayerJoined, setIsPlayerJoined] = useState(false);
     const [activeComponent, setActiveComponent] = useState("BaseRectangle"); // Stato per gestire il componente attivo
     useEffect(() => {
         // Aggiorna lo stato quando un giocatore entra
@@ -27,7 +27,7 @@ const GameBoard = () => {
             {num_squares.map((id) => (
                 <GameSquare id={id} key={id}/>
             ))}
-            <div className="center-square ">
+            <div className="rectangle-top-left ">
                 {playerJoin.playerRole === "giocatore" || isPlayerJoined ? (
                     <>
                         <div className="grid-item">
@@ -44,20 +44,6 @@ const GameBoard = () => {
                                 </button>
                             </div>
                         </div>
-                        <div className="grid-item">
-
-                            {activeComponent === "BaseRectangle" && <BaseRectangle/>}
-                            {activeComponent === "RollDice" && <RollDice/>}
-                            {activeComponent === "Scambia" && <Scambia/>}
-                            {activeComponent === "IpotecaProprieta" && <IpotecaProprieta/>}
-                        </div>
-
-                        <div className="grid-item">
-                            <ChatFather/>
-                        </div>
-                        <div className="grid-item">
-                            <PlayersStatsRectangle/>
-                        </div>
                     </>
                 ) : (
                     <div className="shimmer-effect">
@@ -67,6 +53,31 @@ const GameBoard = () => {
                         <p>In attesa di un giocatore...</p>
                     </div>
                 )}
+            </div>
+            <div className='vertical-line'>
+                <p>provvisiorio</p>
+            </div>
+            <div className='horizontal-line'>
+                <p>provvisiorio</p>
+            </div>
+            <div className="rectangle-top-right ">
+                <div className="grid-item">
+
+                    {activeComponent === "BaseRectangle" && <BaseRectangle/>}
+                    {activeComponent === "RollDice" && <RollDice/>}
+                    {activeComponent === "Scambia" && <Scambia/>}
+                    {activeComponent === "IpotecaProprieta" && <IpotecaProprieta/>}
+                </div>
+            </div>
+            <div className="rectangle-bot-left ">
+                <div className="grid-item">
+                    <ChatFather/>
+                </div>
+            </div>
+            <div className="rectangle-bot-right ">
+                <div className="grid-item">
+                    <PlayersStatsRectangle/>
+                </div>
             </div>
         </div>
     );

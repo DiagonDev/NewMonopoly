@@ -44,12 +44,11 @@ public class GameService {
         partitaRepository.save(nuovaPartita);       // Salva la partita nel database
 
         //inizializzo prezzo caselle
-        if(nuovaPartita.getRandomizzazione())
+        /*if(nuovaPartita.getRandomizzazione())
             partitaCasellaPrezzoproprietaRepository.populateWithRandomizationTrue(gameId);
         else
             partitaCasellaPrezzoproprietaRepository.populateWithRandomizationFalse(gameId);
-        partitaCasellaPrezzoproprietaRepository.updatePrices(gameId);
-
+        partitaCasellaPrezzoproprietaRepository.updatePrices(gameId);*/
         // Crea il giocatore
         Giocatore nuovoGiocatore = new Giocatore();
         nuovoGiocatore.setIdpartita(nuovaPartita);
