@@ -4,7 +4,7 @@ import CreateGamePage from './pages/CreateGamePage';
 import JoinGamePage from './pages/JoinGamePage';
 import './App.css';
 import { WebSocketProvider } from "./contexts/WebSocketContext";
-import GameBoard from './GameUI/GameBoard';
+import GameBoard from "./GameUI/GameBoard.jsx";
 
 
 function App() {
