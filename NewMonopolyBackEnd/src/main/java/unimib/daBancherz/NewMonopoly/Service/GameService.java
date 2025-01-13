@@ -19,10 +19,10 @@ public class GameService {
     private final PartitaProbabilitaRepository partitaProbabilitaRepository;
     private final ImprevistoRepository imprevistoRepository;
     private final PartitaImprevistoRepository partitaImprevistoRepository;
-
+    private final PedinaRepository pedinaRepository;
 
     @Autowired
-    public GameService(PartitaRepository partitaRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository, CasellaRepository casellaRepository, ProbabilitaRepository probabilitaRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, ImprevistoRepository imprevistoRepository, PartitaImprevistoRepository partitaImprevistoRepository) {
+    public GameService(PartitaRepository partitaRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository, CasellaRepository casellaRepository, ProbabilitaRepository probabilitaRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, ImprevistoRepository imprevistoRepository, PartitaImprevistoRepository partitaImprevistoRepository, PedinaRepository pedinaRepository) {
         this.partitaRepository = partitaRepository;
         this.giocatoreRepository = giocatoreRepository;
         this.partitaCasellaPrezzoproprietaRepository = partitaCasellaPrezzoproprietaRepository;
@@ -30,6 +30,7 @@ public class GameService {
         this.partitaProbabilitaRepository = partitaProbabilitaRepository;
         this.imprevistoRepository = imprevistoRepository;
         this.partitaImprevistoRepository = partitaImprevistoRepository;
+        this.pedinaRepository = pedinaRepository;
     }
 
     //Crea la partita, aggiunge l'adim, popola partita_casella_prezzoproprietà in base alla randomizzazione
@@ -48,6 +49,7 @@ public class GameService {
         else
             partitaCasellaPrezzoproprietaRepository.populateWithRandomizationFalse(gameId);
         partitaCasellaPrezzoproprietaRepository.updatePrices(gameId);
+
         // Crea il giocatore
         Giocatore nuovoGiocatore = new Giocatore();
         nuovoGiocatore.setIdpartita(nuovaPartita);
@@ -75,33 +77,6 @@ public class GameService {
         nuovoGiocatore.setTipo("giocatore");
         nuovoGiocatore.setPuntiFedelta(0);
         giocatoreRepository.save(nuovoGiocatore);
-    }
-
-
-    public List<Casella> getCaselleForPartitaRandomizzate(String gameId) {
-        // Ottieni tutte le caselle per la partita con il gameId, ordinate per idCasella
-        List<Casella> caselle = partitaCasellaPrezzoproprietaRepository.findCaselleByPartita(gameId);
-
-        // Separare le caselle in due gruppi (Proprietà e altro tipo)
-        List<Casella> proprietaCaselle = caselle.stream()
-                .filter(casella -> "Proprietà".equals(casella.getTipo()))
-                .toList();
-
-        List<Casella> altreCaselle = caselle.stream()
-                .filter(casella -> !"Proprietà".equals(casella.getTipo()))
-                .toList();
-
-        // Mescolare le caselle di tipo "Proprietà" casualmente
-        Collections.shuffle(proprietaCaselle);
-
-        // Unire i due gruppi (caselle di tipo Proprietà casuali seguite da altre caselle ordinate)
-        proprietaCaselle.addAll(altreCaselle);
-
-        return proprietaCaselle;
-    }
-
-    public List<Casella >getCaselleForPartitaNonRandomizzate(String gameId){
-        return partitaCasellaPrezzoproprietaRepository.findCaselleByPartita(gameId);
     }
 
     public void populateGameProbability(String gameId) {
@@ -141,5 +116,18 @@ public class GameService {
     public void deletePlayer(String gameId, String nomeGiocatore){
         Integer idGiocatore = giocatoreRepository.findIdByNomeAndPartitaCodiceInvito(nomeGiocatore, gameId);
         giocatoreRepository.deleteByIdGiocatore(idGiocatore);
+    }
+
+    public List<Integer> getUnusedPedineByPartita(String gameId) {
+        return pedinaRepository.findUnusedPedineByPartita(gameId);
+    }
+
+    public List<String> getPlayersWithIdLowerThan(String gameId, String nomeGiocatore) {
+        Integer idGiocatore = giocatoreRepository.findIdGiocatoreByNome(nomeGiocatore, gameId);
+        if (idGiocatore != null) {
+            return giocatoreRepository.findGiocatoriConIdMinore(gameId, idGiocatore);
+        } else {
+            return Collections.emptyList();  // Se il giocatore non viene trovato
+        }
     }
 }

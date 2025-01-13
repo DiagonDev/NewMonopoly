@@ -40,6 +40,9 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
             case "MessaggioUtente":
                 chatHandler.chatHandler(parts, session);
                 break;
+            case "SceltaPedina":
+                gameHandler.choosePedina(parts, session);
+                break;
             default:
                 throw new IllegalArgumentException("Tipo di messaggio non supportato: " + parts[0]);
         }

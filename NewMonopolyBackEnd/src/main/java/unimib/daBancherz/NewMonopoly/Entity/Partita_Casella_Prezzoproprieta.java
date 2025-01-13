@@ -26,6 +26,7 @@ public class Partita_Casella_Prezzoproprieta {
 
     @Column(name = "prezzo_casa_corrente")
     private Integer prezzoCasaCorrente;
+    private Integer posizione;
 
     public Partita getIdpartita() {
         return idpartita;
@@ -65,5 +66,13 @@ public class Partita_Casella_Prezzoproprieta {
 
     public void setPrezzoCasaCorrente(Integer prezzoCasaCorrente) {
         this.prezzoCasaCorrente = prezzoCasaCorrente;
+    }
+
+    public Integer getPosizione() {
+        return posizione;
+    }
+
+    public void setPosizione(Integer posizione) {
+        this.posizione = posizione;
     }
 }

@@ -38,6 +38,7 @@ public class Casella {
     }
 
     public Integer getNumCasa() {
+
         return numCasa;
     }
 

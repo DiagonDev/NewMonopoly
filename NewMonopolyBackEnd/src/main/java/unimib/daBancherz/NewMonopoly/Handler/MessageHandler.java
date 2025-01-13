@@ -34,6 +34,22 @@ public class MessageHandler {
         }
     }
 
+    public void sendUnusedPedine(List<Integer> pedineNonUsate, WebSocketSession session) throws Exception {
+        if (session == null || !session.isOpen()) {
+            return; // Non fare nulla se la sessione è null o chiusa
+        }
+
+        // Crea il messaggio con le pedine non usate in formato JSON
+        String pedineMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "unusedPedine",
+                "pedine", pedineNonUsate
+        ));
+
+        // Invia il messaggio alla sessione specificata
+        session.sendMessage(new TextMessage(pedineMessage));
+    }
+
+
     public void sendJoinMessage(String playerName, Map<String, List<WebSocketSession>> gameSessions, String role, String gameId) throws IOException {
 
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
