@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import unimib.daBancherz.NewMonopoly.Handler.ChatHandler;
 import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
-import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
+import unimib.daBancherz.NewMonopoly.Handler.TurnHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,13 +16,16 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
     private final Map<String, WebSocketSession> playerSessions = new ConcurrentHashMap<>();
     private final GameHandler gameHandler;
     private final ChatHandler chatHandler;
+    private final TurnHandler turnHandler;
 
     // Iniezione di GameHandler e ChatHandler tramite il costruttore
     @Autowired
-    public WebSocketConnectionHandler(GameHandler gameHandler, ChatHandler chatHandler) {
+    public WebSocketConnectionHandler(GameHandler gameHandler, ChatHandler chatHandler, TurnHandler turnHandler) {
         this.gameHandler = gameHandler;
         this.chatHandler = chatHandler;
+        this.turnHandler = turnHandler;
     }
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         System.out.println("Nuova connessione stabilita. ID sessione: " + session.getId());
@@ -34,6 +37,15 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
 
         String[] parts = (message.getPayload().toString()).split(":");
         switch (parts[0]) {
+            case "LanciaDadi":
+                turnHandler.rollDice(session);
+                break;
+            case "FineTurno":
+                turnHandler.endTurn(session);
+                break;
+            case "InizioPartita": //TODO: controllare che il messaggio che mi arriva dal frontend sia uguale
+                turnHandler.startTurn(session);
+                break;
             case "Create", "Partecipa":
                 gameHandler.handleGameMessage(parts, session);
                 break;

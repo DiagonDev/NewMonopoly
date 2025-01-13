@@ -70,12 +70,12 @@ public class GameHandler {
                                                  //per fa si che la prima sessione sia quella dell'ADMIN
         }
 
+        //GESTIONE MESSAGGI
         messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella gameconsole
-        //invia a tutti i giocatori i messaggi di partecipazione alla partita
-        messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "ADMIN");
-        
+        messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "ADMIN");//invia a tutti i giocatori i messaggi di partecipazione alla partita
         messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
         messageHandler.sendTypePlayer("ADMIN", session);//invia all'admin il tipo di giocatore che è
+
         gameService.createGameAndPlayer(playerName,difficulty, gameId);//crea la parita nel database, più informazioni in GameService
                                                                        //TODO: aggiungi randomizzazione
         List<Integer> pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
@@ -138,6 +138,7 @@ public class GameHandler {
     }
 
     //genera il codice gameID in modo incrementale partendo da game-0
+    //TODO: devo controllare dal databese quale game ci sono già e restituire l'ID successivo a l'ultimo presente
     private String generateGameId() {
         return "game-" + String.valueOf(idCounter.getAndIncrement());
     }

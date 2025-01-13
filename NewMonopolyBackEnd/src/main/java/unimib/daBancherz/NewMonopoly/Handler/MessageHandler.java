@@ -12,6 +12,12 @@ import java.util.Map;
 @Component
 public class MessageHandler {
 
+    private final GameHandler gameHandler;
+
+    public MessageHandler(GameHandler gameHandler) {
+        this.gameHandler = gameHandler;
+    }
+
     //serve per creare un messaggio di sistema in Json così che il forntend lo metta nella game console
     public void sendSystemMessage(String gameId, String content, Map<String, List<WebSocketSession>> gameSessions, WebSocketSession session) throws Exception {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
@@ -53,6 +59,10 @@ public class MessageHandler {
     public void sendJoinMessage(String playerName, Map<String, List<WebSocketSession>> gameSessions, String role, String gameId) throws IOException {
 
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
+
+        //mettere il metodo che prende dal database i nomi dei giocatori che sono entrati prima di questa sessione
+
+
         //crea il messaggio di tipo join che contiene il nome del giocatore
         String joinMessage = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "join",
