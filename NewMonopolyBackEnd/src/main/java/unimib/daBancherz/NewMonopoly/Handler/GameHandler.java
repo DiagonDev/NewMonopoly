@@ -152,7 +152,7 @@ public class GameHandler {
     //genera il codice gameID in modo incrementale partendo da game-0
     //TODO: devo controllare dal databese quale game ci sono già e restituire l'ID successivo a l'ultimo presente
     private String generateGameId() {
-        int idCounter = 0;
+        int idCounter = 100;
 
         if(partitaRepository.findLastCodiceInvito() != null) {
             String[] lastGame = (partitaRepository.findLastCodiceInvito()).split("-");
