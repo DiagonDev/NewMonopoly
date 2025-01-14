@@ -1,29 +1,61 @@
 import React, { useContext, useState } from 'react';
-
-
-
+import { WebSocketContext } from '../../contexts/WebSocketContext';
 
 const RollDice = () => {
-
+    const { socket, connected } = useContext(WebSocketContext); // Accesso al WebSocket
     const [isRolled, setIsRolled] = useState(false);
+    //const [currentPosition, setCurrentPosition] = useState('Parco della vittoria'); // Posizione iniziale
+   
+    const [diceValue, setDiceValue1] = useState(null); // Valore del dado
+    const [diceValue2, setDiceValue2] = useState(null); // Valore del dado2
+
+    //const [finalPosition, setFinalPosition] = useState(''); // Posizione dopo il lancio
 
     // Funzione per gestire il click sul bottone
     const handleRoll = () => {
-        setIsRolled(true); // Quando il bottone viene premuto, cambia lo stato
+        if (socket && connected) {
+            // Invia un messaggio al server
+            socket.send('LanciaDadi');
+            console.log('Messaggio inviato: LanciaDadi');
+        } else {
+            console.error('Connessione WebSocket non stabilita!');
+        }
     };
+
+    // Ascolta i messaggi dalla WebSocket
+    if (socket) {
+        socket.onmessage = (message) => {
+            try {
+                const data = JSON.parse(message.data); // Analizza il messaggio JSON
+
+                // Verifica il tipo di messaggio e aggiorna i valori dei dadi
+                if (data.type === 'turn') {
+                    setDiceValue1(data.dice1);
+                    setDiceValue2(data.dice2);
+                    setIsRolled(true); // Aggiorna lo stato per mostrare il risultato
+                } else {
+                    console.warn('Messaggio non riconosciuto:', data);
+                }
+            } catch (error) {
+                console.error('Errore nell\'analisi del messaggio JSON:', error);
+            }
+        };
+       
+    }
 
     return (
         <div className='rollDiceDiv'>
-            <p id='posizioneAttuale'>Posizione Attuale: Parco della vittoria</p>
-            {/* Se isRolled è true, mostra la scritta, altrimenti mostra il bottone */}
+            <p id='posizioneAttuale'>Posizione Attuale: Pos1</p>
+            {/* Se isRolled è true, mostra la scritta con il risultato, altrimenti mostra il bottone */}
             {isRolled ? (
                 <div>
-                    <p>Hai lanciato i dadi!</p>
-                    <p id='posizioneFinale'>Posizione Attuale: Probabilità</p>
+                    <p>Hai lanciato i dadi! Hai ottenuto un {diceValue} con il primo dado.</p>
+                    <p>Hai lanciato i dadi! Hai ottenuto un {diceValue2} con il secondo dado.</p>
+                    <p>Totale: {diceValue+diceValue2}</p>
                 </div>
             ) : (
                 <button onClick={handleRoll}>
-                    Roll 
+                    Roll
                 </button>
             )}
         </div>
