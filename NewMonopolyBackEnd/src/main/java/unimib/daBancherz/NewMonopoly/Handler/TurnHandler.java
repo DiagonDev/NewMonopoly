@@ -76,7 +76,7 @@ public class TurnHandler {
         int diceR2 = ThreadLocalRandom.current().nextInt(1, 7);  // Valore da 1 a 6 per il secondo dado
 
         String diceRolled = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "turn",
+                "type", "diceRolled",
                 "dice1", diceR1,
                 "dice2", diceR2
         ));

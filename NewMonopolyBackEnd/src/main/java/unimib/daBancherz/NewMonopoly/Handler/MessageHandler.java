@@ -110,7 +110,7 @@ public class MessageHandler {
                 String playerMessage = new ObjectMapper().writeValueAsString(Map.of(
                         "type", "join",
                         "playerName", player,
-                        "userRole", "giocatore"
+                        "userRole", ""
                 ));
                 session.sendMessage(new TextMessage(playerMessage));
 
