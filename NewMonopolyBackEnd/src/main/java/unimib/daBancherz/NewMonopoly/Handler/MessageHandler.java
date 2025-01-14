@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.daBancherz.NewMonopoly.Service.GameService;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,6 +13,12 @@ import java.util.Map;
 
 @Component
 public class MessageHandler {
+
+    private final GameService gameService;
+
+    public MessageHandler(GameService gameService) {
+        this.gameService = gameService;
+    }
 
     //serve per creare un messaggio di sistema in Json così che il forntend lo metta nella game console
     public void sendSystemMessage(String gameId, String content, Map<String, List<WebSocketSession>> gameSessions, WebSocketSession session) throws Exception {
@@ -66,6 +73,7 @@ public class MessageHandler {
         ));
 
         for (WebSocketSession sessions : playersInGame) {
+
             sessions.sendMessage(new TextMessage(joinMessage));
         }
     }
@@ -96,16 +104,30 @@ public class MessageHandler {
         sendSystemMessage(gameId, "Ti sei unito alla partita con ID: " + gameId + " con successo!", gameSessions, session);
         sendSystemMessage(gameId, playerName + " si è unito alla partita!", gameSessions, session);
 
-        /*// Notifica all'admin della partita
-        WebSocketSession admin = playersInGame.get(0);
-        sendJoinMessage(playerName, admin);
-        sendTypePlayer("giocatore", admin);*/
+        List<String> playerJoined = gameService.getPlayersWithIdLowerThan(gameId, playerName);
+        if(!playerJoined.isEmpty()){
+            for(String player : playerJoined){
+                String playerMessage = new ObjectMapper().writeValueAsString(Map.of(
+                        "type", "join",
+                        "playerName", player,
+                        "userRole", "giocatore"
+                ));
+                session.sendMessage(new TextMessage(playerMessage));
 
-        /*
-         Ale - Stesso discorso qua, ho bisogno che il join arrivi a tutti
-         */
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // Ripristina lo stato di interruzione del thread
+                    System.out.println("Thread interrotto: " + e.getMessage());
+                }
+
+            }
+        }
+
         sendJoinMessage(playerName, gameSessions, role, gameId);
         //sendTypePlayer("giocatore", session);
+
+
 
     }
 }

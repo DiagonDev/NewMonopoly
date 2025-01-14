@@ -53,6 +53,11 @@ public class GameHandler {
                     session.sendMessage(new TextMessage("Errore: Il nome del giocatore è già presente in questa partita."));
                     return; // Esce dalla funzione senza aggiungere il giocatore
                 }
+
+                if(giocatoreRepository.countGiocatoriByPartita(gameId) == 6){
+                    //bisogna vedere se mandare un messaggio al front end per dire che la partita è piena
+                    return;
+                }
                 playerNameList.put(playerName, session);
                 joinGame(playerName, gameId, session);
                 break;
