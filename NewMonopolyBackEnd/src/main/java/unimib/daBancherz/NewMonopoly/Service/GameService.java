@@ -44,11 +44,11 @@ public class GameService {
         partitaRepository.save(nuovaPartita);       // Salva la partita nel database
 
         //inizializzo prezzo caselle
-        /*if(nuovaPartita.getRandomizzazione())
+        if(nuovaPartita.getRandomizzazione())
             partitaCasellaPrezzoproprietaRepository.populateWithRandomizationTrue(gameId);
         else
             partitaCasellaPrezzoproprietaRepository.populateWithRandomizationFalse(gameId);
-        partitaCasellaPrezzoproprietaRepository.updatePrices(gameId);*/
+        partitaCasellaPrezzoproprietaRepository.updatePrices(gameId);
         // Crea il giocatore
         Giocatore nuovoGiocatore = new Giocatore();
         nuovoGiocatore.setIdpartita(nuovaPartita);
@@ -124,9 +124,14 @@ public class GameService {
     public List<String> getPlayersWithIdLowerThan(String gameId, String nomeGiocatore) {
         Integer idGiocatore = giocatoreRepository.findIdGiocatoreByNome(nomeGiocatore, gameId);
         if (idGiocatore != null) {
-            return giocatoreRepository.findGiocatoriConIdMinore(gameId, idGiocatore);
+            List<String> giocatori= giocatoreRepository.findGiocatoriConIdMinore(gameId, idGiocatore);
+            if (!giocatori.isEmpty())
+                return giocatori;
+            else return Collections.emptyList();    // Se non ci sono giocatori precedenti
         } else {
             return Collections.emptyList();  // Se il giocatore non viene trovato
         }
     }
+
+
 }

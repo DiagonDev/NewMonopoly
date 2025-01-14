@@ -78,7 +78,7 @@ public class GameHandler {
         messageHandler.sendTypePlayer("ADMIN", session);//invia all'admin il tipo di giocatore che è
 
         gameService.createGameAndPlayer(playerName,difficulty, gameId);//crea la parita nel database, più informazioni in GameService
-                                                                       //TODO: aggiungi randomizzazione
+
         List<Integer> pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
         messageHandler.sendUnusedPedine(pedineNonUsate, session); //invia al giocatore la lista delle pedine disponibili
     }
