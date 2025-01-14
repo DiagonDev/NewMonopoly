@@ -18,10 +18,14 @@ export const WebSocketProvider = ({children}) => {
         balance: 0,
     });
     const [pawnsAvailable, setPawnsAvailable] = useState([]);
+    const [diceResult, setdiceResult] = useState({
+        dice1: 0,
+        dice2: 0,
+    });
 
     useEffect(() => {
-        const ws = new WebSocket("https://e026-84-33-149-58.ngrok-free.app/ws/gameNewMonopoly");
-        //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
+        //const ws = new WebSocket("https://e026-84-33-149-58.ngrok-free.app/ws/gameNewMonopoly");
+        const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
         ws.onopen = () => {
             setSocket(ws);
             setConnected(true);
@@ -79,6 +83,9 @@ export const WebSocketProvider = ({children}) => {
                 console.log("pawns available", message.content);
                 setPawnsAvailable(message.content);
             }
+            else if (message.type === 'diceRolled'){
+                setdiceResult(message.dice1, message.dice2);
+            }
         };
 
         ws.onerror = (error) => {
@@ -98,7 +105,7 @@ export const WebSocketProvider = ({children}) => {
 
     return (
         <WebSocketContext.Provider
-            value={{socket, connected, serverMessages, userMessages, gameId, playerBalance, playerJoin, pawnsAvailable}}>
+            value={{socket, connected, serverMessages, userMessages, gameId, playerBalance, playerJoin, pawnsAvailable, diceResult}}>
             {children}
         </WebSocketContext.Provider>
     );

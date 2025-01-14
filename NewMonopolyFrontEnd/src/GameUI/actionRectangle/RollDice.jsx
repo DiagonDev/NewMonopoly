@@ -1,8 +1,9 @@
-import React, { useContext, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import { WebSocketContext } from '../../contexts/WebSocketContext';
+import {pawnColors} from "../../pages/pawnColors.jsx";
 
 const RollDice = () => {
-    const { socket, connected } = useContext(WebSocketContext); // Accesso al WebSocket
+    const { socket, connected, diceResult } = useContext(WebSocketContext); // Accesso al WebSocket
     const [isRolled, setIsRolled] = useState(false);
     //const [currentPosition, setCurrentPosition] = useState('Parco della vittoria'); // Posizione iniziale
    
@@ -13,23 +14,30 @@ const RollDice = () => {
 
     // Funzione per gestire il click sul bottone
     const handleRoll = () => {
+
         if (socket && connected) {
             // Invia un messaggio al server
-            socket.send('LanciaDadi');
+            socket.send('LanciaDadi:');
             console.log('Messaggio inviato: LanciaDadi');
         } else {
             console.error('Connessione WebSocket non stabilita!');
         }
+        setIsRolled(true);
     };
+    useEffect(() => {
+        setDiceValue1(diceResult.dice1);
+        setDiceValue2(diceResult.dice2);
+    }, [diceResult]);
 
-    // Ascolta i messaggi dalla WebSocket
+
+   /* // Ascolta i messaggi dalla WebSocket
     if (socket) {
         socket.onmessage = (message) => {
             try {
                 const data = JSON.parse(message.data); // Analizza il messaggio JSON
 
                 // Verifica il tipo di messaggio e aggiorna i valori dei dadi
-                if (data.type === 'turn') {
+                if (data.type === 'diceRolled') {
                     setDiceValue1(data.dice1);
                     setDiceValue2(data.dice2);
                     setIsRolled(true); // Aggiorna lo stato per mostrare il risultato
@@ -42,7 +50,7 @@ const RollDice = () => {
         };
        
     }
-
+*/
     return (
         <div className='rollDiceDiv'>
             <p id='posizioneAttuale'>Posizione Attuale: Pos1</p>
