@@ -11,7 +11,8 @@ import java.util.List;
 // DAO per l'entità Pedina
 @Repository
 public interface PedinaRepository extends JpaRepository<Pedina, Long> {
-    @Query("SELECT p.idPedina FROM Pedina p WHERE p.idPedina NOT IN (" +
-            "SELECT g.idpedina.idPedina FROM Giocatore g WHERE g.idpartita.codiceInvito = :idpartita)")
-    List<Integer> findUnusedPedineByPartita(@Param("idpartita") String idpartita);
+    @Query(value = """
+        SELECT p.id_pedina FROM Pedina p WHERE p.id_pedina NOT IN (
+        SELECT g.idpedina FROM Giocatore g WHERE g.idpartita = :idpartita)
+    """, nativeQuery = true)List<Integer> findUnusedPedineByPartita(@Param("idpartita") String idpartita);
 }
