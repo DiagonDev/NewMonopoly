@@ -13,7 +13,7 @@ const SelectPawn = () => {
     const handleSelectPawn = (pawn) => {
         setSelectedPawn(pawn);
         // Invia la scelta al back-end
-        socket.send('Selected Pawn:${pawn.id}');
+        socket.send(`Selected Pawn:${pawn.id}`);
         navigate('/play')
     };
 

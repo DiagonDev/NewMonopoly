@@ -20,8 +20,8 @@ export const WebSocketProvider = ({children}) => {
     const [pawnsAvailable, setPawnsAvailable] = useState([]);
 
     useEffect(() => {
-        //const ws = new WebSocket("https://c3cb-84-33-176-173.ngrok-free.app/ws/gameNewMonopoly");
-        const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
+        const ws = new WebSocket("https://e026-84-33-149-58.ngrok-free.app/ws/gameNewMonopoly");
+        //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
         ws.onopen = () => {
             setSocket(ws);
             setConnected(true);
