@@ -201,11 +201,11 @@ public class GameHandler {
 
     public void choosePedina(String[] messageParts, WebSocketSession session) {
         String idPedina = messageParts[1];
-        String idPartita = messageParts[2];
+        String gameId = getGameIdBySession(session);
 
         String playerName = getPlayerNameBySession(session);    //tropo il giocatore associato alla sessione
 
-        giocatoreRepository.updatePedinaForGiocatore(playerName, Integer.parseInt(idPedina), Integer.parseInt(idPartita));  //Assegna la pedina al giocatore nel database
+        giocatoreRepository.updatePedinaForGiocatore(playerName, Integer.parseInt(idPedina), gameId);  //Assegna la pedina al giocatore nel database
 
     }
 }

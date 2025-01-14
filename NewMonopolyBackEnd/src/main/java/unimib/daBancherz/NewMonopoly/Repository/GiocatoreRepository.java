@@ -21,7 +21,7 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
 
     @Modifying
     @Query("UPDATE Giocatore g SET g.idpedina.idPedina = :idpedina WHERE g.nome = :nome AND g.idpartita.codiceInvito = :idpartita")
-    void updatePedinaForGiocatore(@Param("nome") String nome, @Param("idpedina") Integer idpedina, @Param("idpartita") Integer idpartita);
+    void updatePedinaForGiocatore(@Param("nome") String nome, @Param("idpedina") Integer idpedina, @Param("idpartita") String idpartita);
 
     @Query("SELECT p.codiceInvito FROM Partita p ORDER BY p.codiceInvito DESC")
     List<String> findFathersplayer();
