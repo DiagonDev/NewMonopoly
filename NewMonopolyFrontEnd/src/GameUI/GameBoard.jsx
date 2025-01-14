@@ -58,7 +58,6 @@ const GameBoard = () => {
 
             </div>
             <div className='horizontal-line'>
-
             </div>
             <div className="rectangle-top-right ">
                 <div className="grid-item">

@@ -49,8 +49,8 @@ public class MessageHandler {
 
         // Crea il messaggio con le pedine non usate in formato JSON
         String pedineMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "unusedPedine",
-                "pedine", pedineNonUsate
+                "type", "pawnsAvailable",
+                "content", pedineNonUsate
         ));
 
         // Invia il messaggio alla sessione specificata

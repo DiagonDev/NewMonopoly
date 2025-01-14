@@ -20,7 +20,7 @@ const CreateGamePage = () => {
       setUserName('');
       setDifficulty('');
       setRandomization('');
-      navigate('/play')
+      navigate('/pawns')
     } else {
       console.error("Connessione WebSocket non stabilita!");
     }

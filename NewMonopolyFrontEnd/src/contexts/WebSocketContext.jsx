@@ -17,6 +17,7 @@ export const WebSocketProvider = ({children}) => {
         player: '',
         balance: 0,
     });
+    const [pawnsAvailable, setPawnsAvailable] = useState([]);
 
     useEffect(() => {
         //const ws = new WebSocket("https://c3cb-84-33-176-173.ngrok-free.app/ws/gameNewMonopoly");
@@ -70,6 +71,14 @@ export const WebSocketProvider = ({children}) => {
                     balance: message.balance, // Aggiorna il bilancio
                 }));
             }
+            /**
+             * type: pawnsAvailable
+             * content : array di int[6]
+             */
+            else if (message.type === 'pawnsAvailable') {
+                console.log("pawns available", message.content);
+                setPawnsAvailable(message.content);
+            }
         };
 
         ws.onerror = (error) => {
@@ -89,7 +98,7 @@ export const WebSocketProvider = ({children}) => {
 
     return (
         <WebSocketContext.Provider
-            value={{socket, connected, serverMessages, userMessages, gameId, playerBalance, playerJoin}}>
+            value={{socket, connected, serverMessages, userMessages, gameId, playerBalance, playerJoin, pawnsAvailable}}>
             {children}
         </WebSocketContext.Provider>
     );

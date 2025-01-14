@@ -85,6 +85,9 @@ public class GameHandler {
         gameService.createGameAndPlayer(playerName,difficulty, gameId);//crea la parita nel database, più informazioni in GameService
 
         List<Integer> pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
+        for(int pedina : pedineNonUsate) {
+            System.out.println(pedina);
+        }
         messageHandler.sendUnusedPedine(pedineNonUsate, session); //invia al giocatore la lista delle pedine disponibili
     }
 
@@ -101,6 +104,9 @@ public class GameHandler {
         gameService.addPlayer(playerName, gameId);//aggiunge il giocatore nel databesa alla partita assegnata
         messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "giocatore");//invia a tutti i giocatori i messaggi di partecipazione alla partita
         List<Integer> pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
+        for(int pedina : pedineNonUsate) {
+            System.out.println("pedina visulizzata: "+ pedina);
+        }
         messageHandler.sendUnusedPedine(pedineNonUsate, session);   //invia al giocatore la lista delle pedine disponibili
     }
 

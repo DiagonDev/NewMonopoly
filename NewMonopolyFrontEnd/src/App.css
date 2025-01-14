@@ -27,9 +27,13 @@ body {
 /* Stile per il titolo */
 .titolo {
   position: absolute; /* Posizionamento assoluto */
-  top: 10px; /* Spazio dal bordo superiore */
-  left: 20px; /* Spazio dal bordo destro */
+
   margin: 0;
   font-size: 30px; /* Dimensione del testo */
-  color: #333;
+  color: white; /* Colore bianco */
+  text-align: center; /* Centra il testo (opzionale) */
 }
+/*
+top: 50%; /* Posizionamento verticale centrale */
+/*left: 50%; /* Posizionamento orizzontale centrale */
+/*transform: translate(-40%, -30%); /* Centratura precisa */
