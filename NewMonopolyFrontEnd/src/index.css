@@ -580,36 +580,42 @@
 
     }
     .horizontal-line {
+        background: #1a1a1a;
         grid-row-start: 6;
         grid-row-end: 6;
         grid-column-start: 2;
         grid-column-end: 11;
     }
     .vertical-line {
+        background: #1a1a1a;
         grid-row-start: 2;
         grid-row-end: 11;
         grid-column-start: 6;
         grid-column-end: 6;
     }
     .rectangle-top-left{
+        background: darkgrey;
         grid-row-start: 2;
         grid-row-end: 6;
         grid-column-start: 2;
         grid-column-end: 6;
     }
     .rectangle-top-right{
+        background: darkgrey;
         grid-row-start: 2;
         grid-row-end: 6;
         grid-column-start: 7;
         grid-column-end: 11;
     }
     .rectangle-bot-left{
+        background: darkgrey;
         grid-row-start: 7;
         grid-row-end: 11;
         grid-column-start: 2;
         grid-column-end: 6;
     }
     .rectangle-bot-right{
+        background: darkgrey;
         grid-row-start: 7;
         grid-row-end: 11;
         grid-column-start: 7;
@@ -636,24 +642,21 @@
     .grid-item:nth-child(1) {
         display: flex;
         flex-direction: column;
-        background-color: green;
     }
 
     .grid-item:nth-child(2) {
-        background-color: yellow;
+
     }
 
     .grid-item:nth-child(3) {
-        background-color: blue;
+
     }
 
     .grid-item:nth-child(4) {
-        background-color: red;
+
     }
 
     .player-container {
-        padding-left: 5px;
-        padding-right: 5px;
         box-sizing: content-box;
     }
 
@@ -663,6 +666,7 @@
         justify-content: space-around; /* Centra il contenuto orizzontalmente */
         align-items: center; /* Centra il contenuto verticalmente */
         color: white;
+        padding: 1px;
         border: 1px solid black; /* Aggiunge un bordo nero di 1px di spessore */
         font-weight: bold;
     }
@@ -682,7 +686,8 @@
         justify-content: space-around; /* Centra il contenuto orizzontalmente */
         align-items: center; /* Centra il contenuto verticalmente */
         gap: 10px;
-        margin-top: 10px;
+        margin-top: 5px;
+
     }
 
     .chatFatherDiv {
@@ -690,7 +695,7 @@
         flex-direction: column;
         gap: 5px;
         padding: 10px;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
 
     }
     .chat-window {
@@ -739,6 +744,7 @@
     ############# SHIMMER EFFECT #############
      */
     .shimmer-effect {
+
         background: linear-gradient(
                 90deg,
                 #f0f0f0 25%,

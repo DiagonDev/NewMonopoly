@@ -55,10 +55,10 @@ const GameBoard = () => {
                 )}
             </div>
             <div className='vertical-line'>
-                <p>provvisiorio</p>
+
             </div>
             <div className='horizontal-line'>
-                <p>provvisiorio</p>
+
             </div>
             <div className="rectangle-top-right ">
                 <div className="grid-item">
