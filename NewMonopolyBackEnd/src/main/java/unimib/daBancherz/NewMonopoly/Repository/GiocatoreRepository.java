@@ -1,5 +1,6 @@
 package unimib.daBancherz.NewMonopoly.Repository;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,12 +20,10 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
 
     void deleteByIdGiocatore(Integer idGiocatore);
 
+    @Transactional
     @Modifying
     @Query("UPDATE Giocatore g SET g.idpedina.idPedina = :idpedina WHERE g.nome = :nome AND g.idpartita.codiceInvito = :idpartita")
     void updatePedinaForGiocatore(@Param("nome") String nome, @Param("idpedina") Integer idpedina, @Param("idpartita") String idpartita);
-
-    @Query("SELECT p.codiceInvito FROM Partita p ORDER BY p.codiceInvito DESC")
-    List<String> findFathersplayer();
 
     @Query("SELECT g.idGiocatore FROM Giocatore g WHERE g.nome = :nomeGiocatore AND g.idpartita.codiceInvito = :codiceInvito")
     Integer findIdGiocatoreByNome(@Param("nomeGiocatore") String nomeGiocatore, @Param("codiceInvito") String codiceInvito);

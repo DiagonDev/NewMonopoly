@@ -12,7 +12,15 @@ import java.util.List;
 @Repository
 public interface PedinaRepository extends JpaRepository<Pedina, Long> {
     @Query(value = """
-        SELECT p.id_pedina FROM Pedina p WHERE p.id_pedina NOT IN (
-        SELECT g.idpedina FROM Giocatore g WHERE g.idpartita = :idpartita)
-    """, nativeQuery = true)List<Integer> findUnusedPedineByPartita(@Param("idpartita") String idpartita);
+    SELECT p.id_pedina
+    FROM pedina p 
+    WHERE p.id_pedina NOT IN (
+        SELECT g.idpedina 
+        FROM giocatore g 
+        WHERE g.idpartita = :idpartita
+        AND g.idpedina IS NOT NULL
+    )
+""", nativeQuery = true)
+    List<Integer> findUnusedPedineByPartita(@Param("idpartita") String idpartita);
+
 }

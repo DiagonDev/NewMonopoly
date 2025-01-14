@@ -9,6 +9,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.Repository.PartitaRepository;
+import unimib.daBancherz.NewMonopoly.Repository.PedinaRepository;
 import unimib.daBancherz.NewMonopoly.Service.GameService;
 
 import java.util.ArrayList;
@@ -35,6 +36,8 @@ public class GameHandler {
     private GiocatoreRepository giocatoreRepository;
     @Autowired
     private PartitaRepository partitaRepository;
+    @Autowired
+    private PedinaRepository pedinaRepository;
 
     public void handleGameMessage(String[] messageParts, WebSocketSession session) throws Exception {
 
@@ -87,7 +90,9 @@ public class GameHandler {
 
         gameService.createGameAndPlayer(playerName,difficulty, gameId);//crea la parita nel database, più informazioni in GameService
 
-        List<Integer> pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
+        System.out.println("Id Partita: " + gameId);
+
+        List<Integer> pedineNonUsate = pedinaRepository.findUnusedPedineByPartita(gameId);
         for(int pedina : pedineNonUsate) {
             System.out.println(pedina);
         }
