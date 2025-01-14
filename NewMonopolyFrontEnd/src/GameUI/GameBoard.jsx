@@ -6,13 +6,20 @@ import Scambia from "./actionRectangle/Scambia.jsx";
 import IpotecaProprieta from "./actionRectangle/IpotecaProrieta.jsx";
 import ChatFather from "./ChatFather.jsx";
 import PlayersStatsRectangle from "./PlayersStatsRectangle.jsx";
-import {WebSocketContext} from "../contexts/WebSocketContext.jsx"; // Assicurati di importare correttamente GameSquare
+import {WebSocketContext} from "../contexts/WebSocketContext.jsx";
+import SelectPawn from "../pages/SelectPawn.jsx"; // Assicurati di importare correttamente GameSquare
 
 const GameBoard = () => {
 
     const {playerJoin, gameId} = useContext(WebSocketContext);
     const [isPlayerJoined, setIsPlayerJoined] = useState(false);
     const [activeComponent, setActiveComponent] = useState("BaseRectangle"); // Stato per gestire il componente attivo
+    const [pawnSelected, setSelectedPawn] = useState(false);
+
+    const handlePawnSelection = (selectedPawn) => {
+        console.log("Pawn selected:", selectedPawn);
+        setSelectedPawn(true); // Aggiorna lo stato di pawnSelected
+    };
     useEffect(() => {
         // Aggiorna lo stato quando un giocatore entra
         if (playerJoin.player !== "" && playerJoin.playerRole === "giocatore") {
@@ -27,30 +34,32 @@ const GameBoard = () => {
             {num_squares.map((id) => (
                 <GameSquare id={id} key={id}/>
             ))}
-            <div className="rectangle-top-left ">
-                {playerJoin.playerRole === "giocatore" || isPlayerJoined ? (
-                    <>
-                        <div className="grid-item">
-                            <p>ID Partita: {gameId}</p>
-                            <div className='actionDiv'>
-                                <button onClick={() => setActiveComponent("RollDice")}>
-                                    Roll
-                                </button>
-                                <button onClick={() => setActiveComponent("Scambia")}>
-                                    Scambia
-                                </button>
-                                <button onClick={() => setActiveComponent("IpotecaProprieta")}>
-                                    Ipoteca Proprieta
-                                </button>
-                            </div>
-                        </div>
-                    </>
-                ) : (
+            <div className="rectangle-top-left">
+                {playerJoin.playerRole === "ADMIN" || !isPlayerJoined ? (
                     <div className="shimmer-effect">
                         {/* Effetto shimmer o messaggio di attesa */}
                         <p>ID Partita: {gameId}</p>
                         <br/>
                         <p>In attesa di un giocatore...</p>
+                    </div>
+                ) : !pawnSelected   ? (
+                    <div>
+                        <SelectPawn onPawnSelect={handlePawnSelection} />
+                    </div>
+                ) : (
+                    <div className="grid-item">
+                        <p>ID Partita: {gameId}</p>
+                        <div className='actionDiv'>
+                            <button onClick={() => setActiveComponent("RollDice")}>
+                                Roll
+                            </button>
+                            <button onClick={() => setActiveComponent("Scambia")}>
+                                Scambia
+                            </button>
+                            <button onClick={() => setActiveComponent("IpotecaProprieta")}>
+                                Ipoteca Proprieta
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>

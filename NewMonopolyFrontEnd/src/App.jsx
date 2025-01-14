@@ -5,7 +5,7 @@ import JoinGamePage from './pages/JoinGamePage';
 import './App.css';
 import { WebSocketProvider } from "./contexts/WebSocketContext";
 import GameBoard from "./GameUI/GameBoard.jsx";
-import SelectPawn from "./pages/SelectPawn.jsx";
+
 
 
 function App() {
@@ -27,7 +27,6 @@ function App() {
               <Route path="/create" element={<CreateGamePage />} />
               <Route path="/join" element={<JoinGamePage />} />
               <Route path="/play" element={<GameBoard />} />
-              <Route path="/pawns" element={<SelectPawn/>}/>
             </Routes>
           </div>
         

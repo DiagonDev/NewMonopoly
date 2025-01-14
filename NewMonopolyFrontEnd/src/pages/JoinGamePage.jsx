@@ -21,7 +21,7 @@ const JoinGamePage = () => {
       // Reset dei campi dopo il submit (opzionale)
       setName('');
       setGameId('');
-      navigate('/pawns')
+      navigate('/play')
     } else {
       console.error("Connessione WebSocket non stabilita!");
     }

@@ -24,8 +24,8 @@ export const WebSocketProvider = ({children}) => {
     });
 
     useEffect(() => {
-        //const ws = new WebSocket("https://e026-84-33-149-58.ngrok-free.app/ws/gameNewMonopoly");
-        const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
+        const ws = new WebSocket("https://e026-84-33-149-58.ngrok-free.app/ws/gameNewMonopoly");
+        //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
         ws.onopen = () => {
             setSocket(ws);
             setConnected(true);
@@ -84,7 +84,12 @@ export const WebSocketProvider = ({children}) => {
                 setPawnsAvailable(message.content);
             }
             else if (message.type === 'diceRolled'){
-                setdiceResult(message.dice1, message.dice2);
+                console.log("diceRolled", message.dice1, message.dice2);
+                setdiceResult((prevState) => ({
+                    ...prevState, // Copia il vecchio stato
+                    dice1: message.dice1, // Aggiorna solo dice1
+                    dice2: message.dice2, // Aggiorna solo dice2
+                }));
             }
         };
 
