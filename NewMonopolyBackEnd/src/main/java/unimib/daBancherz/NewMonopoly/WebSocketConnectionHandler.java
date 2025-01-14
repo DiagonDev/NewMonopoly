@@ -37,8 +37,6 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
 
         String[] parts = (message.getPayload().toString()).split(":");
         switch (parts[0]) {
-            case "Selected Pawn":
-                break;
             case "LanciaDadi":
                 turnHandler.rollDice(session);
                 break;

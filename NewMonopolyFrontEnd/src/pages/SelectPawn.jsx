@@ -13,8 +13,9 @@ const SelectPawn = ({ onPawnSelect }) => {
     const handleSelectPawn = (pawn) => {
         setSelectedPawn(pawn);
         onPawnSelect(); // Notifica il genitore che una pedina è stata selezionata
+        console.log("pedina mandata:", pawn.id);
         // Invia la scelta al back-end
-        socket.send(`Selected Pawn:${pawn.id}`);
+        socket.send(`SceltaPedina:${pawn.id}`);
         navigate('/play');
     };
 
@@ -27,7 +28,7 @@ const SelectPawn = ({ onPawnSelect }) => {
     }, [pawnsAvailable]);
 
     const placeholderPawns = Array.from({length: 4}, (_, i) => ({
-        id: `#${i + 1}`,
+        id: i + 1,
         color: "gray",
     }));
 

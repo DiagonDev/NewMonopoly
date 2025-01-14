@@ -16,8 +16,7 @@ const GameBoard = () => {
     const [activeComponent, setActiveComponent] = useState("BaseRectangle"); // Stato per gestire il componente attivo
     const [pawnSelected, setSelectedPawn] = useState(false);
 
-    const handlePawnSelection = (selectedPawn) => {
-        console.log("Pawn selected:", selectedPawn);
+    const handlePawnSelection = () => {
         setSelectedPawn(true); // Aggiorna lo stato di pawnSelected
     };
     useEffect(() => {
