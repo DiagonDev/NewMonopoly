@@ -11,6 +11,7 @@ import unimib.daBancherz.NewMonopoly.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.Repository.PartitaRepository;
 import unimib.daBancherz.NewMonopoly.Repository.PedinaRepository;
 import unimib.daBancherz.NewMonopoly.Service.GameService;
+import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,7 @@ public class GameHandler {
     private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
     private static AtomicLong idCounter = new AtomicLong();
+    GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
     List<Integer> pedineNonUsate = new ArrayList<>();
 
@@ -82,6 +84,10 @@ public class GameHandler {
                                                  //per fa si che la prima sessione sia quella dell'ADMIN
         }
 
+        gameBoard.createGame(gameId);
+        gameBoard.setPlayerPosition(gameId, playerName, 1);
+        System.out.println("La posizione di: " + playerName + " di game: " + gameId + " è: " + gameBoard.getPlayerPosition(gameId, playerName));
+
         //GESTIONE MESSAGGI
         messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella gameconsole
         messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "ADMIN");//invia a tutti i giocatori i messaggi di partecipazione alla partita
@@ -91,7 +97,7 @@ public class GameHandler {
         gameService.createGameAndPlayer(playerName,difficulty, randomization, gameId);//crea la parita nel database, più informazioni in GameService
 
         pedineNonUsate = pedinaRepository.findUnusedPedineByPartita(gameId);
-        messageHandler.sendUnusedPedine(pedineNonUsate, session); //invia al giocatore la lista delle pedine disponibili
+        messageHandler.sendUnusedPedine(pedineNonUsate, gameSessions, gameId); //invia al giocatore la lista delle pedine disponibili
     }
 
 
@@ -102,13 +108,16 @@ public class GameHandler {
             return;
         }
 
+        gameBoard.setPlayerPosition(gameId, playerName, 1);
+        System.out.println("La posizione di: " + playerName + " di game: " + gameId + " è: " + gameBoard.getPlayerPosition(gameId, playerName));
+
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         playersInGame.add(session);//aggiunge la sessione del giocatore alla lista di sessioni della partita a cuoi vuole partecipare
         gameService.addPlayer(playerName, gameId);//aggiunge il giocatore nel databesa alla partita assegnata
         messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "giocatore");//invia a tutti i giocatori i messaggi di partecipazione alla partita
 
         pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
-        messageHandler.sendUnusedPedine(pedineNonUsate, session);   //invia al giocatore la lista delle pedine disponibili
+        messageHandler.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);   //invia al giocatore la lista delle pedine disponibili
     }
 
     public String getGameIdBySession(WebSocketSession session) {
@@ -202,8 +211,8 @@ public class GameHandler {
         String gameId = getGameIdBySession(session);
 
         String playerName = getPlayerNameBySession(session);    //tropo il giocatore associato alla sessione
-        pedineNonUsate.remove(Integer.parseInt(idPedina));
-        messageHandler.sendUnusedPedine(pedineNonUsate, session);
+        pedineNonUsate.remove(Integer.parseInt(idPedina)-1);
+        messageHandler.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);
 
         giocatoreRepository.updatePedinaForGiocatore(playerName, Integer.parseInt(idPedina), gameId);  //Assegna la pedina al giocatore nel database
     }
