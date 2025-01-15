@@ -22,13 +22,16 @@ public class ChatHandler {
 
     public void chatHandler (String[] messageParts, WebSocketSession session) throws Exception {
 
-        String chatMessage = messageParts[1];
-        String gameId = gameHandler.getGameIdBySession(session);
-        String nameChat = gameHandler.getPlayerNameBySession(session);
+        if(messageParts.length == 2) {
+            String chatMessage = messageParts[1];
+            String gameId = gameHandler.getGameIdBySession(session);
+            String nameChat = gameHandler.getPlayerNameBySession(session);
 
-        //invia il messaggio a tutti gli utenti collegati allo stesso gameID sotto forma di messaggioChat
-        sendChatMessage(gameId,nameChat+ ": " + chatMessage);
-        //broadcastChatMessage(gameId, session, chatMessage);
+            //invia il messaggio a tutti gli utenti collegati allo stesso gameID sotto forma di messaggioChat
+            sendChatMessage(gameId,nameChat+ ": " + chatMessage);
+            //broadcastChatMessage(gameId, session, chatMessage);
+        }
+
     }
 
     //serve a creare un messaggio in Json per far si che il forntend riesca a capire chè per la game chat

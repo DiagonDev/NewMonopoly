@@ -29,6 +29,19 @@ export const WebSocketProvider = ({children}) => {
         ws.onopen = () => {
             setSocket(ws);
             setConnected(true);
+            const pingInterval = setInterval(() => {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send("Ping:");
+                    console.log("Ping inviato al server");
+                }
+            }, 30000);  // Ogni 30 secondi
+
+            // Pulizia dell'intervallo al momento della chiusura del WebSocket
+            ws.onclose = () => {
+                console.log("Connessione WebSocket chiusa");
+                clearInterval(pingInterval); // Pulisci l'intervallo quando il socket si chiude
+            };
+
         };
 
         ws.onmessage = (event) => {
@@ -49,6 +62,8 @@ export const WebSocketProvider = ({children}) => {
                     const updatedServerMessages = [...prevMessages, message.content];
                     return updatedServerMessages;
                 });
+            }else if (message.type === 'pong') {
+                console.log("Ricevuto Pong dal server");
             }
             /**
              * type: join

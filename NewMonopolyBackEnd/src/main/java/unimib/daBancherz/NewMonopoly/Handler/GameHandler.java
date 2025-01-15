@@ -24,12 +24,6 @@ public class GameHandler {
 
     @Autowired
     private MessageHandler messageHandler;  // Iniezione del bean MessageSender
-    private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
-    private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
-    private static AtomicLong idCounter = new AtomicLong();
-
-    List<Integer> pedineNonUsate = new ArrayList<>();
-
     @Autowired
     private GameService gameService;
     @Autowired
@@ -38,6 +32,12 @@ public class GameHandler {
     private PartitaRepository partitaRepository;
     @Autowired
     private PedinaRepository pedinaRepository;
+
+    private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
+    private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
+    private static AtomicLong idCounter = new AtomicLong();
+
+    List<Integer> pedineNonUsate = new ArrayList<>();
 
     public void handleGameMessage(String[] messageParts, WebSocketSession session) throws Exception {
 
@@ -206,6 +206,6 @@ public class GameHandler {
         messageHandler.sendUnusedPedine(pedineNonUsate, session);
 
         giocatoreRepository.updatePedinaForGiocatore(playerName, Integer.parseInt(idPedina), gameId);  //Assegna la pedina al giocatore nel database
-        
+
     }
 }

@@ -1,5 +1,6 @@
 package unimib.daBancherz.NewMonopoly;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
@@ -37,6 +38,15 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
 
         String[] parts = (message.getPayload().toString()).split(":");
         switch (parts[0]) {
+            case "Ping":
+                String pongMessage = new ObjectMapper().writeValueAsString(Map.of(
+                        "type", "pong",
+                        "content", "pong"
+
+                ));
+                session.sendMessage(new TextMessage(pongMessage));
+                System.out.println("Ping ricevuto, invio Pong al client.");
+                break;
             case "LanciaDadi":
                 turnHandler.rollDice(session);
                 break;
