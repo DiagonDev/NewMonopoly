@@ -28,7 +28,7 @@ public class GameHandler {
     private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
     private static AtomicLong idCounter = new AtomicLong();
 
-
+    List<Integer> pedineNonUsate = new ArrayList<>();
 
     @Autowired
     private GameService gameService;
@@ -90,12 +90,7 @@ public class GameHandler {
 
         gameService.createGameAndPlayer(playerName,difficulty, gameId);//crea la parita nel database, più informazioni in GameService
 
-        System.out.println("Id Partita: " + gameId);
-
-        List<Integer> pedineNonUsate = pedinaRepository.findUnusedPedineByPartita(gameId);
-        for(int pedina : pedineNonUsate) {
-            System.out.println(pedina);
-        }
+        pedineNonUsate = pedinaRepository.findUnusedPedineByPartita(gameId);
         messageHandler.sendUnusedPedine(pedineNonUsate, session); //invia al giocatore la lista delle pedine disponibili
     }
 
@@ -111,10 +106,8 @@ public class GameHandler {
         playersInGame.add(session);//aggiunge la sessione del giocatore alla lista di sessioni della partita a cuoi vuole partecipare
         gameService.addPlayer(playerName, gameId);//aggiunge il giocatore nel databesa alla partita assegnata
         messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "giocatore");//invia a tutti i giocatori i messaggi di partecipazione alla partita
-        List<Integer> pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
-        for(int pedina : pedineNonUsate) {
-            System.out.println("pedina visulizzata: "+ pedina);
-        }
+
+        pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
         messageHandler.sendUnusedPedine(pedineNonUsate, session);   //invia al giocatore la lista delle pedine disponibili
     }
 
@@ -204,13 +197,15 @@ public class GameHandler {
         System.out.println("Giocatore " + playerName + " disconnesso dalla partita con ID " + gameId + ".");
     }
 
-    public void choosePedina(String[] messageParts, WebSocketSession session) {
+    public void choosePedina(String[] messageParts, WebSocketSession session) throws Exception {
         String idPedina = messageParts[1];
         String gameId = getGameIdBySession(session);
 
         String playerName = getPlayerNameBySession(session);    //tropo il giocatore associato alla sessione
+        pedineNonUsate.remove(Integer.parseInt(idPedina));
+        messageHandler.sendUnusedPedine(pedineNonUsate, session);
 
         giocatoreRepository.updatePedinaForGiocatore(playerName, Integer.parseInt(idPedina), gameId);  //Assegna la pedina al giocatore nel database
-
+        
     }
 }
