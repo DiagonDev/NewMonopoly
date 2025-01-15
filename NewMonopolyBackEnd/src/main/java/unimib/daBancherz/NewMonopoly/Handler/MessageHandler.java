@@ -17,6 +17,7 @@ public class MessageHandler {
 
     private final GameService gameService;
 
+
     public MessageHandler(GameService gameService) {
         this.gameService = gameService;
     }
@@ -43,10 +44,7 @@ public class MessageHandler {
         }
     }
 
-    public void sendUnusedPedine(List<Integer> pedineNonUsate, WebSocketSession session) throws Exception {
-        if (session == null || !session.isOpen()) {
-            return; // Non fare nulla se la sessione è null o chiusa
-        }
+    public void sendUnusedPedine(List<Integer> pedineNonUsate, Map<String, List<WebSocketSession>> gameSessions, String gameId) throws Exception {
 
         // Crea il messaggio con le pedine non usate in formato JSON
         String pedineMessage = new ObjectMapper().writeValueAsString(Map.of(
@@ -54,8 +52,11 @@ public class MessageHandler {
                 "content", pedineNonUsate
         ));
 
-        // Invia il messaggio alla sessione specificata
-        session.sendMessage(new TextMessage(pedineMessage));
+        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
+        for (WebSocketSession sessions : playersInGame) {
+            sessions.sendMessage(new TextMessage(pedineMessage));
+        }
+
     }
 
     public void sendPawnMove(Integer pawnId, String playerName, Integer offset, Map<String, List<WebSocketSession>> gameSessions, String gameId) throws IOException {

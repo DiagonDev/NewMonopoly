@@ -45,7 +45,6 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
 
                 ));
                 session.sendMessage(new TextMessage(pongMessage));
-                System.out.println("Ping ricevuto, invio Pong al client.");
                 break;
             case "LanciaDadi":
                 turnHandler.rollDice(session);

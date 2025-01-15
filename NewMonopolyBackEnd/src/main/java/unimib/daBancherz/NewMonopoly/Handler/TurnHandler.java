@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,6 +18,7 @@ public class TurnHandler {
 
     private final GameHandler gameHandler;
     private final MessageHandler messageHandler;
+    GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
     @Autowired
     public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler) {
@@ -74,6 +76,7 @@ public class TurnHandler {
     public void rollDice(WebSocketSession session) throws Exception {
         int diceR1 = ThreadLocalRandom.current().nextInt(1, 7);  // Valore da 1 a 6 per il primo dado
         int diceR2 = ThreadLocalRandom.current().nextInt(1, 7);  // Valore da 1 a 6 per il secondo dado
+        int totDice = diceR1 + diceR2;
 
         String diceRolled = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "diceRolled",
@@ -82,5 +85,8 @@ public class TurnHandler {
         ));
 
         session.sendMessage(new TextMessage(diceRolled));
+        int oldPosition = gameBoard.getPlayerPosition(gameHandler.getGameIdBySession(session), gameHandler.getPlayerNameBySession(session));
+        gameBoard.setPlayerPosition(gameHandler.getGameIdBySession(session), gameHandler.getPlayerNameBySession(session), totDice + oldPosition);
+        System.out.println("La posizione di: " + gameHandler.getPlayerNameBySession(session) + " di game: " + gameHandler.getGameIdBySession(session) + " è: " + gameBoard.getPlayerPosition(gameHandler.getGameIdBySession(session), gameHandler.getPlayerNameBySession(session)));
     }
 }
