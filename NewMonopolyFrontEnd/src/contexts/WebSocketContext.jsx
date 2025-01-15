@@ -23,6 +23,11 @@ export const WebSocketProvider = ({children}) => {
         dice2: 0,
     });
 
+    const [startTurn, setStartTurn] = useState({
+        flag: false,
+        playername: ''
+    });
+
     useEffect(() => {
         const ws = new WebSocket("https://3729-84-33-149-58.ngrok-free.app/ws/gameNewMonopoly");
         //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
@@ -32,7 +37,7 @@ export const WebSocketProvider = ({children}) => {
             const pingInterval = setInterval(() => {
                 if (ws.readyState === WebSocket.OPEN) {
                     ws.send("Ping:");
-                    console.log("Ping inviato al server");
+                    
                 }
             }, 30000);  // Ogni 30 secondi
 
@@ -40,8 +45,7 @@ export const WebSocketProvider = ({children}) => {
             ws.onclose = () => {
                 console.log("Connessione WebSocket chiusa");
                 clearInterval(pingInterval); // Pulisci l'intervallo quando il socket si chiude
-            };
-
+            };
         };
 
         ws.onmessage = (event) => {
@@ -64,7 +68,7 @@ export const WebSocketProvider = ({children}) => {
                 });
             }else if (message.type === 'pong') {
                 console.log("Ricevuto Pong dal server");
-            }
+            }
             /**
              * type: join
              * content:playerName
@@ -106,6 +110,15 @@ export const WebSocketProvider = ({children}) => {
                     dice2: message.dice2, // Aggiorna solo dice2
                 }));
             }
+            else if (message.type === 'turn'){
+               
+                setStartTurn((prevState) => ({
+                    ...prevState, // Copia il vecchio stato
+                    flag: message.content, // Aggiorna solo content
+                    playername: message.playername, // Aggiorna solo playername
+                }));
+               
+            }
         };
 
         ws.onerror = (error) => {
@@ -125,7 +138,7 @@ export const WebSocketProvider = ({children}) => {
 
     return (
         <WebSocketContext.Provider
-            value={{socket, connected, serverMessages, userMessages, gameId, playerBalance, playerJoin, pawnsAvailable, diceResult}}>
+            value={{socket, connected, serverMessages, userMessages, gameId, playerBalance, playerJoin, pawnsAvailable, diceResult, startTurn}}>
             {children}
         </WebSocketContext.Provider>
     );
