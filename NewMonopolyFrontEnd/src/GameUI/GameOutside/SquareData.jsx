@@ -58,5 +58,5 @@ SquareConfigData.set(36, { type: SquareType.Airport, section: BoardSection.Right
 SquareConfigData.set(37, { type: SquareType.Utility, section: BoardSection.Right });
 
 SquareConfigData.set(38, { type: SquareType.Property, section: BoardSection.Right, groupId: 8 });
-SquareConfigData.set(39, { type: SquareType.Chance, section: BoardSection.Right });
+SquareConfigData.set(39, { type: SquareType.Property, section: BoardSection.Right, groupId: 15 });
 SquareConfigData.set(40, { type: SquareType.Property, section: BoardSection.Right, groupId: 8 });
