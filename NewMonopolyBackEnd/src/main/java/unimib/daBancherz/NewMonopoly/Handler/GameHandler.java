@@ -45,8 +45,8 @@ public class GameHandler {
         switch (messageParts[0]){
             case "Create":
                 String difficulty = messageParts[2];
+                System.out.println(difficulty);
                 String randomization = messageParts[3];
-
                 playerNameList.put(playerName, session);
                 createGame(playerName, difficulty, randomization, session);
                 break;
@@ -88,7 +88,7 @@ public class GameHandler {
         messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
         messageHandler.sendTypePlayer("ADMIN", session);//invia all'admin il tipo di giocatore che è
 
-        gameService.createGameAndPlayer(playerName,difficulty, gameId);//crea la parita nel database, più informazioni in GameService
+        gameService.createGameAndPlayer(playerName,difficulty, randomization, gameId);//crea la parita nel database, più informazioni in GameService
 
         pedineNonUsate = pedinaRepository.findUnusedPedineByPartita(gameId);
         messageHandler.sendUnusedPedine(pedineNonUsate, session); //invia al giocatore la lista delle pedine disponibili

@@ -6,8 +6,8 @@ import { useNavigate } from 'react-router-dom';
 const CreateGamePage = () => {
   const { socket, connected, serverMessage } = useContext(WebSocketContext);
   const [userName, setUserName] = useState('');
-  const [difficulty, setDifficulty] = useState('');
-  const [randomization, setRandomization] = useState('');
+  const [difficulty, setDifficulty] = useState('Facile');
+  const [randomization, setRandomization] = useState('false');
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -42,22 +42,19 @@ const CreateGamePage = () => {
         <br />
         <label>
           Difficoltà:
-          <input
-            type="text"
-            placeholder="Inserisci difficoltà"
-            value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value)}
-          />
+          <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+            <option value="Facile">Facile</option>
+            <option value="Medio">Medio</option>
+            <option value="Difficile">Difficile</option>
+          </select>
         </label>
         <br />
         <label>
           Randomizzazione caselle:
-          <input
-            type="text"
-            placeholder="Inserisci randomizzazione"
-            value={randomization}
-            onChange={(e) => setRandomization(e.target.value)}
-          />
+          <select value={randomization} onChange={(e) => setRandomization(e.target.value)}>
+            <option value="false">No</option>
+            <option value="true">Sì</option>
+          </select>
         </label>
         <br />
         <button type="submit">Crea</button>
