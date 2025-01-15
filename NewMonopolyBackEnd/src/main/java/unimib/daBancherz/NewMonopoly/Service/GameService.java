@@ -34,12 +34,15 @@ public class GameService {
     }
 
     //Crea la partita, aggiunge l'adim, popola partita_casella_prezzoproprietà in base alla randomizzazione
-    public void createGameAndPlayer(String playerName, String difficulty, String gameId) {
+    public void createGameAndPlayer(String playerName, String difficulty, String randomization, String gameId) {
         // Crea la partita
         Partita nuovaPartita = new Partita();
         nuovaPartita.setLivelloDifficolta(difficulty);
         nuovaPartita.setStato("nonIniziata");
-        nuovaPartita.setRandomizzazione(true);
+        if(randomization.equals("true"))
+            nuovaPartita.setRandomizzazione(true);
+        else
+            nuovaPartita.setRandomizzazione(false);
         nuovaPartita.setCodiceInvito(gameId);
         partitaRepository.save(nuovaPartita);       // Salva la partita nel database
 
