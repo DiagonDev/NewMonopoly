@@ -50,5 +50,25 @@ public class GameBoardSingleton {
         return (game != null) ? game.getPlayerPositions().get(playerName) : null;
     }
 
+    // Metodo per rimuovere una partita dalla mappa
+    public void removeGame(String gameId) {
+        games.remove(gameId);  // Rimuove la partita specificata dalla mappa
+    }
+
+    // Metodo per rimuovere un giocatore dalla mappa
+    public void removePlayerFromGame(String gameId, String playerName) {
+        Game game = games.get(gameId);
+        if (game != null) {
+            game.removePlayer(playerName);
+        }
+    }
+
+    // Metodo per rimuovere una partita se è vuota
+    public void removeGameIfEmpty(String gameId) {
+        Game game = games.get(gameId);
+        if (game != null && game.isEmpty()) {
+            games.remove(gameId);
+        }
+    }
 }
 

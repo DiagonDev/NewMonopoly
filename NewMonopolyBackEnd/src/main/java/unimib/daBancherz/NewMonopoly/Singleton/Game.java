@@ -21,5 +21,13 @@ class Game {
     public Map<String, Integer> getPlayerPositions() {
         return playerPositions;  // Restituisce la mappa delle posizioni dei giocatori
     }
+
+    public void removePlayer(String playerName) {
+        playerPositions.remove(playerName);
+    }
+
+    public boolean isEmpty() {
+        return playerPositions.isEmpty();
+    }
 }
 

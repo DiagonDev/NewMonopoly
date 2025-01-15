@@ -173,11 +173,12 @@ public class GameHandler {
             String player = getPlayerNameBySession(session);
             gameService.deletePlayer(gameId, player);
             playersInGame.remove(session); // Rimuove la sessione dalla lista dei giocatori
-
+            GameBoardSingleton.getInstance().removePlayerFromGame(gameId, player);
             // Se non ci sono più giocatori nella partita, rimuovi completamente la partita
             if (playersInGame.isEmpty()) {
                 partitaRepository.deleteByCodiceInvito(gameId);
                 gameSessions.remove(gameId);
+                GameBoardSingleton.getInstance().removeGameIfEmpty(gameId);
                 System.out.println("Partita con ID " + gameId + " rimossa poiché non ci sono più giocatori.");
             }
         }
