@@ -7,6 +7,7 @@ import org.springframework.web.socket.*;
 import unimib.daBancherz.NewMonopoly.Handler.ChatHandler;
 import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
 import unimib.daBancherz.NewMonopoly.Handler.TurnHandler;
+import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +19,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
     private final GameHandler gameHandler;
     private final ChatHandler chatHandler;
     private final TurnHandler turnHandler;
+    GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
     // Iniezione di GameHandler e ChatHandler tramite il costruttore
     @Autowired

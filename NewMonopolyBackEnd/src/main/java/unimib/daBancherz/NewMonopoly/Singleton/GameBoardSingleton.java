@@ -47,7 +47,13 @@ public class GameBoardSingleton {
         Game game = games.get(gameId);
 
         // Restituisce la posizione del giocatore specifico o null se il gioco o il giocatore non esiste
-        return (game != null) ? game.getPlayerPositions().get(playerName) : null;
+        return (game != null) ? game.getPlayerPositions().get(playerName) : 01010;
+    }
+
+    // Metodo per ottenere le posizioni di tutti i giocatori in una partita
+    public Map<String, Integer> getPlayerPositions(String gameId) {
+        Game game = games.get(gameId);
+        return game != null ? game.getPlayerPositions() : Collections.emptyMap();  // Restituisce la mappa delle posizioni dei giocatori
     }
 
     // Metodo per rimuovere una partita dalla mappa

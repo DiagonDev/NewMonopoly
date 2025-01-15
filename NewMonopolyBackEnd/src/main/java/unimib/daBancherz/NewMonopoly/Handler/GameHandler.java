@@ -217,6 +217,6 @@ public class GameHandler {
 
         giocatoreRepository.updatePedinaForGiocatore(playerName, Integer.parseInt(idPedina), gameId);  //Assegna la pedina al giocatore nel database
 
-        messageHandler.sendPawnMove(Integer.parseInt(idPedina), playerName, 0, gameSessions, gameId);   // Invia un messaggio per spostare la pedina sul via
+        messageHandler.sendPawnMove(Integer.parseInt(idPedina), playerName, 1, gameSessions, gameId);   // Invia un messaggio per spostare la pedina sul via
     }
 }
