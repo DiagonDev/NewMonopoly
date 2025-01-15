@@ -206,6 +206,5 @@ public class GameHandler {
         messageHandler.sendUnusedPedine(pedineNonUsate, session);
 
         giocatoreRepository.updatePedinaForGiocatore(playerName, Integer.parseInt(idPedina), gameId);  //Assegna la pedina al giocatore nel database
-
     }
 }
