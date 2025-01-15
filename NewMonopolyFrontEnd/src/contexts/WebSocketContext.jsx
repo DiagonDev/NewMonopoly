@@ -22,6 +22,7 @@ export const WebSocketProvider = ({children}) => {
         dice1: 0,
         dice2: 0,
     });
+    const [diceRolled, setDiceRolled] = useState(false);
 
     const [startTurn, setStartTurn] = useState({
         flag: false,
@@ -29,8 +30,8 @@ export const WebSocketProvider = ({children}) => {
     });
 
     useEffect(() => {
-        //const ws = new WebSocket("https://3729-84-33-149-58.ngrok-free.app/ws/gameNewMonopoly");
-        const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
+        const ws = new WebSocket("https://3729-84-33-149-58.ngrok-free.app/ws/gameNewMonopoly");
+        //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
         ws.onopen = () => {
             setSocket(ws);
             setConnected(true);
@@ -109,6 +110,7 @@ export const WebSocketProvider = ({children}) => {
                     dice1: message.dice1, // Aggiorna solo dice1
                     dice2: message.dice2, // Aggiorna solo dice2
                 }));
+                setDiceRolled(true);
             }
             else if (message.type === 'turn'){
                
@@ -117,7 +119,7 @@ export const WebSocketProvider = ({children}) => {
                     flag: message.content, // Aggiorna solo content
                     playername: message.playername, // Aggiorna solo playername
                 }));
-               
+                setDiceRolled(false);
             }
         };
 
@@ -138,7 +140,7 @@ export const WebSocketProvider = ({children}) => {
 
     return (
         <WebSocketContext.Provider
-            value={{socket, connected, serverMessages, userMessages, gameId, playerBalance, playerJoin, pawnsAvailable, diceResult, startTurn}}>
+            value={{socket, connected, serverMessages, userMessages, gameId, playerBalance, playerJoin, pawnsAvailable, diceResult, startTurn, diceRolled}}>
             {children}
         </WebSocketContext.Provider>
     );

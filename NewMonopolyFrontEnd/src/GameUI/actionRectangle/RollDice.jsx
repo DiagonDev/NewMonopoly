@@ -3,8 +3,8 @@ import { WebSocketContext } from '../../contexts/WebSocketContext';
 import {pawnColors} from "../../pages/pawnColors.jsx";
 
 const RollDice = () => {
-    const { socket, connected, diceResult } = useContext(WebSocketContext); // Accesso al WebSocket
-    const [isRolled, setIsRolled] = useState(false);
+    const { socket, connected, diceResult, diceRolled } = useContext(WebSocketContext); // Accesso al WebSocket
+    const [isRolled, setIsRolled] = useState(diceRolled);
     //const [currentPosition, setCurrentPosition] = useState('Parco della vittoria'); // Posizione iniziale
    
     const [diceValue, setDiceValue1] = useState(null); // Valore del dado
@@ -28,6 +28,11 @@ const RollDice = () => {
         setDiceValue1(diceResult.dice1);
         setDiceValue2(diceResult.dice2);
     }, [diceResult]);
+
+    useEffect(() => {
+        setIsRolled(diceRolled);
+    }, [diceRolled]);
+    
 
 
    /* // Ascolta i messaggi dalla WebSocket
