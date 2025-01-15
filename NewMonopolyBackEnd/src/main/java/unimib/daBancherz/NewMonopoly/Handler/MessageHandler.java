@@ -1,5 +1,6 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -57,13 +58,26 @@ public class MessageHandler {
         session.sendMessage(new TextMessage(pedineMessage));
     }
 
+    public void sendPawnMove(Integer pawnId, String playerName, Integer offset, Map<String, List<WebSocketSession>> gameSessions, String gameId) throws IOException {
+        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
+
+        String movimentoPedineMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "pawnMove",
+                "pawnId", pawnId,
+                "playerName", playerName,
+                "offset", offset
+        ));
+
+        for (WebSocketSession sessions : playersInGame) {
+            sessions.sendMessage(new TextMessage(movimentoPedineMessage));
+        }
+    }
 
     public void sendJoinMessage(String playerName, Map<String, List<WebSocketSession>> gameSessions, String role, String gameId) throws IOException {
 
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
 
         //mettere il metodo che prende dal database i nomi dei giocatori che sono entrati prima di questa sessione
-
 
         //crea il messaggio di tipo join che contiene il nome del giocatore
         String joinMessage = new ObjectMapper().writeValueAsString(Map.of(
