@@ -1,12 +1,11 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import unimib.daBancherz.NewMonopoly.Service.GameService;
+import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaCasellaPrezzoproprietaRepository;
+import unimib.daBancherz.NewMonopoly.dataBase.Service.GameService;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,10 +15,11 @@ import java.util.Map;
 public class MessageHandler {
 
     private final GameService gameService;
+    private final PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository;
 
-
-    public MessageHandler(GameService gameService) {
+    public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository) {
         this.gameService = gameService;
+        this.partitaCasellaPrezzoproprietaRepository = partitaCasellaPrezzoproprietaRepository;
     }
 
     //serve per creare un messaggio di sistema in Json così che il forntend lo metta nella game console
@@ -56,11 +56,21 @@ public class MessageHandler {
         for (WebSocketSession sessions : playersInGame) {
             sessions.sendMessage(new TextMessage(pedineMessage));
         }
-
     }
 
     public void sendPawnMove(Integer pawnId, String playerName, Integer offset, Map<String, List<WebSocketSession>> gameSessions, String gameId) throws IOException {
+        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
 
+        String movimentoPedineMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "pawnMove",
+                "pawnId", pawnId,
+                "playerName", playerName,
+                "offset", offset
+        ));
+
+        for (WebSocketSession sessions : playersInGame) {
+            sessions.sendMessage(new TextMessage(movimentoPedineMessage));
+        }
     }
 
     public void sendJoinMessage(String playerName, Map<String, List<WebSocketSession>> gameSessions, String role, String gameId) throws IOException {
@@ -119,7 +129,7 @@ public class MessageHandler {
                 session.sendMessage(new TextMessage(playerMessage));
 
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(100); //TODO: vedere se si può diminuire il tempo
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Ripristina lo stato di interruzione del thread
                     System.out.println("Thread interrotto: " + e.getMessage());
@@ -130,6 +140,44 @@ public class MessageHandler {
 
         sendJoinMessage(playerName, gameSessions, role, gameId);
         //sendTypePlayer("giocatore", session);
+    }
 
+    //posizione => il codice della cella dove il giocatore finisce dopo il lancio dadi
+    public void sendTypeBox(WebSocketSession session, int posizione, String gameId){
+
+       /* String typeBox = partitaCasellaPrezzoproprietaRepository.findTipoByPosizione(posizione, gameId);
+        switch (typeBox){
+            case "Via":
+                //aggiornamento del database per aggiungere i 200$
+                //
+                break;
+            case"Proprietà":
+
+                break;
+            case"Probabilità":
+
+                break;
+            case"Tassa":
+
+                break;
+            case"Stazione":
+
+                break;
+            case"Imprevisto":
+
+                break;
+            case"Prigione":
+
+                break;
+            case"Società":
+
+                break;
+            case"Posteggio":
+
+                break;
+            case"InPrigione":
+
+                break;
+        }*/
     }
 }
