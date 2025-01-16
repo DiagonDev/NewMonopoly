@@ -33,5 +33,9 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
 
     @Query("SELECT COUNT(g) FROM Giocatore g WHERE g.idpartita.codiceInvito = :codiceInvito")
     long countGiocatoriByPartita(@Param("codiceInvito") String codiceInvito);
+
+    @Query("SELECT g.idpedina.idPedina FROM Giocatore g  WHERE g.nome=:playername AND g.idpartita.codiceInvito = :idpartita")
+    Integer findPedinaFromGiocatore(@Param("playername") String playername, @Param("idpedina") String idpedina);
+
 }
 
