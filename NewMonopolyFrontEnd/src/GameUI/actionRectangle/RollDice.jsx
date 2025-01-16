@@ -3,13 +3,17 @@ import { WebSocketContext } from '../../contexts/WebSocketContext';
 import {pawnColors} from "../../pages/pawnColors.jsx";
 
 const RollDice = () => {
-    const { socket, connected, diceResult, diceRolled } = useContext(WebSocketContext); // Accesso al WebSocket
+    const { socket, connected, diceResult, diceRolled, payment, draw, buy } = useContext(WebSocketContext); // Accesso al WebSocket
     const [isRolled, setIsRolled] = useState(diceRolled);
     //const [currentPosition, setCurrentPosition] = useState('Parco della vittoria'); // Posizione iniziale
    
     const [diceValue, setDiceValue1] = useState(null); // Valore del dado
     const [diceValue2, setDiceValue2] = useState(null); // Valore del dado2
-
+    
+    //
+    const [isPayment, setIsPayment] = useState(payment.flag);
+    const [isDraw, setIsDraw] = useState(draw.flag);
+    const [isBuy, setIsBuy] = useState(buy.flag);
     //const [finalPosition, setFinalPosition] = useState(''); // Posizione dopo il lancio
 
     // Funzione per gestire il click sul bottone
@@ -24,6 +28,23 @@ const RollDice = () => {
         }
         setIsRolled(true);
     };
+    
+    //Da implementare che la schermata si blocca quando posso acquistare finche non scelgo un opzione
+    const handleAcquista = () => {
+        if (socket && connected) {
+            // Invia un messaggio al server
+            socket.send('AcquistaProprieta:');
+            console.log('Messaggio inviato: Proprieta acquistata');
+        } else {
+            console.error('Connessione WebSocket non stabilita!');
+        }
+    };
+
+    //Quello che fa quando non acquista la proprietà, per ora nulla
+    const handleNoAcquista = () => {
+
+    };
+
     useEffect(() => {
         setDiceValue1(diceResult.dice1);
         setDiceValue2(diceResult.dice2);
@@ -32,6 +53,21 @@ const RollDice = () => {
     useEffect(() => {
         setIsRolled(diceRolled);
     }, [diceRolled]);
+
+    useEffect(() => {
+        setIsPayment(payment.flag);
+
+    }, [payment]);
+
+    useEffect(() => {
+        setIsDraw(draw.flag);
+
+    }, [draw]);
+
+    useEffect(() => {
+        setIsBuy(buy.flag);
+    }, [buy]);
+
     
 
 
@@ -70,6 +106,29 @@ const RollDice = () => {
                 <button onClick={handleRoll}>
                     Roll
                 </button>
+            )}
+            {isRolled && isPayment && (
+                <div>
+                    <p>Hai pagato: {payment.payment}€ a {payment.destination} per {payment.description}</p>
+                </div>
+            )}
+            {isRolled && isDraw && (
+                <div>
+                    <p>Hai pescato un {draw.card} che dice: {card.description}</p>
+                </div>
+            )}
+            {isRolled && isBuy && (
+                <div>
+                    <p>Sei finito su una proprietà libera che costa {buy.price} </p>
+                    <p>Cosa vuoi fare: </p>
+                    <button onClick={handleAcquista}>
+                        Acquista
+                    </button>
+                    <button onClick={handleNoAcquista}>
+                        Non Acquistare
+                    </button>
+                </div>
+                
             )}
         </div>
     );

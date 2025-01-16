@@ -35,18 +35,23 @@ export const WebSocketProvider = ({children}) => {
         offset: 0,
     })
     const [payment, setPayment] = useState({
+        flag: false,
         describtion: '',
         destination: '',
         payment: 0,
     })
     const [draw, setDraw] = useState({
+        flag: false,
         card: '',
         describtion: '',
     })
-    const [propreryPrice, setPropreryPrice] = useState(0);
+    const [buy, setBuy] = useState({
+        flag: false,
+        price: 0,
+    })
     useEffect(() => {
-        const ws = new WebSocket("https://5dbf-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
-        //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
+        //const ws = new WebSocket("https://5dbf-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
+        const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
         ws.onopen = () => {
             setSocket(ws);
             setConnected(true);
@@ -132,6 +137,20 @@ export const WebSocketProvider = ({children}) => {
                         playername: message.playername, // Aggiorna solo playername
                     }));
                     setDiceRolled(false);
+                    //Imposta tutte le azioni a false 
+                    //Cosi quando termino il turno mi scompare dalla schermata roll la casella in cui ero capitato e le sue informazioni
+                    setPayment((prevState) => ({
+                        ...prevState,
+                        flag: false,
+                    }));
+                    setDraw((prevState) => ({
+                        ...prevState,
+                        flag: false,
+                    }));
+                    setBuy((prevState) => ({
+                        ...prevState,
+                        flag: false,
+                    }));
                 } else if (message.type === 'pawnMove') {
                     console.log("pawnMove", message.offset);
                     setPlayerPawn((prevState) => ({
@@ -144,6 +163,7 @@ export const WebSocketProvider = ({children}) => {
                     console.log(message.type);
                     setPayment((prevState) => ({
                         ...prevState,
+                        flag: true,
                         describtion: message.describtion,
                         destination: message.destination,
                         payment: message.payment,
@@ -153,12 +173,17 @@ export const WebSocketProvider = ({children}) => {
                     console.log(message.type);
                     setDraw((prevState) => ({
                         ...prevState,
+                        flag: true,
                         card: message.card,
                         describtion: message.describtion,
                     }));
                 } else if (message.type === 'buy') {
                     console.log(message.type);
-                    setPropreryPrice(message.price);
+                    setBuy((prevState) => ({
+                        ...prevState,
+                        flag: true,
+                        price: message.price,
+                    }));
                     
                 } 
             };
@@ -193,7 +218,10 @@ export const WebSocketProvider = ({children}) => {
                 diceResult,
                 startTurn,
                 diceRolled,
-                playerPawn
+                playerPawn,
+                payment,
+                draw,
+                buy
             }}>
             {children}
         </WebSocketContext.Provider>
