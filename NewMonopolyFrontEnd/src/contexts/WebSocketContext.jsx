@@ -34,6 +34,16 @@ export const WebSocketProvider = ({children}) => {
         playerName: 0,
         offset: 0,
     })
+    const [payment, setPayment] = useState({
+        describtion: '',
+        destination: '',
+        payment: 0,
+    })
+    const [draw, setDraw] = useState({
+        card: '',
+        describtion: '',
+    })
+    const [propreryPrice, setPropreryPrice] = useState(0);
     useEffect(() => {
         const ws = new WebSocket("https://5dbf-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
         //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
@@ -130,7 +140,27 @@ export const WebSocketProvider = ({children}) => {
                         playerName: message.playerName,
                         offset: message.offset,
                     }));
-                }
+                } else if (message.type === 'payment') {
+                    console.log(message.type);
+                    setPayment((prevState) => ({
+                        ...prevState,
+                        describtion: message.describtion,
+                        destination: message.destination,
+                        payment: message.payment,
+                    }));
+                    
+                } else if (message.type === 'draw') {
+                    console.log(message.type);
+                    setDraw((prevState) => ({
+                        ...prevState,
+                        card: message.card,
+                        describtion: message.describtion,
+                    }));
+                } else if (message.type === 'buy') {
+                    console.log(message.type);
+                    setPropreryPrice(message.price);
+                    
+                } 
             };
 
             ws.onerror = (error) => {
