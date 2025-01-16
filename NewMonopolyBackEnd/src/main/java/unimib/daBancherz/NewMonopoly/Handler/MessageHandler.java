@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import unimib.daBancherz.NewMonopoly.Service.GameService;
+import unimib.daBancherz.NewMonopoly.dataBase.Service.GameService;
 
 import java.io.IOException;
 import java.util.List;

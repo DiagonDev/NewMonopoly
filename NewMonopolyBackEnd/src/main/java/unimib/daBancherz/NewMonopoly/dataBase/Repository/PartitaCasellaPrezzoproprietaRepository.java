@@ -206,4 +206,21 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
             "WHERE pcp.posizione = :posizione AND pcp.idpartita.codiceInvito = :gameId")
     void setGiocatoreESaldo(@Param("playerName") String playerName, @Param("gameId") String gameId, @Param("posizione") Integer posizione);
 
+    // Metodo per trovare il costo di acquisto di una proprieta
+    @Query(value = """
+        SELECT pcp.prezzo_corrente
+        FROM partita_casella_prezzoproprieta pcp
+        WHERE pcp.posizione = :posizione 
+          AND pcp.idpartita = (SELECT p.codice_invito FROM partita p WHERE p.codice_invito = :idPartita)
+    """, nativeQuery = true)
+    Integer findValoreCorrenteByPosizione(@Param("posizione") Integer posizione, @Param("idPartita") String idPartita);
+
+    // Metodo per trovare il costo di acquisto di una casa/albergo di una proprieta
+    @Query(value = """
+        SELECT pcp.prezzo_casa_corrente
+        FROM partita_casella_prezzoproprieta pcp
+        WHERE pcp.posizione = :posizione 
+          AND pcp.idpartita = (SELECT p.codice_invito FROM partita p WHERE p.codice_invito = :idPartita)
+    """, nativeQuery = true)
+    Integer findValoreCasaCorrenteByPosizione(@Param("posizione") Integer posizione, @Param("idPartita") String idPartita);
 }
