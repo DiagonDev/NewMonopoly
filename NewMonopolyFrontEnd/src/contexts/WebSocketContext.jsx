@@ -133,7 +133,7 @@ export const WebSocketProvider = ({children}) => {
                     }));
                     setDiceRolled(false);
                 } else if (message.type === 'pawnMove') {
-                    console.log("pawnMove", message.content);
+                    console.log("pawnMove", message.offset);
                     setPlayerPawn((prevState) => ({
                         ...prevState,
                         pawnId: message.pawnId,
