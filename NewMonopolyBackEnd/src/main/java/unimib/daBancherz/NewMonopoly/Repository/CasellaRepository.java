@@ -8,4 +8,5 @@ import java.util.List;
 
 @Repository
 public interface CasellaRepository extends JpaRepository<Casella, Long> {
+
 }

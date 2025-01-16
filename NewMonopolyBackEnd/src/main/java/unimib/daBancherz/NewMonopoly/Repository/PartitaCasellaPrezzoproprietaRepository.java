@@ -10,6 +10,7 @@ import unimib.daBancherz.NewMonopoly.Entity.Casella;
 import unimib.daBancherz.NewMonopoly.Entity.Partita_Casella_Prezzoproprieta;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<Partita_Casella_Prezzoproprieta, Long> {
@@ -192,4 +193,21 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     
 """, nativeQuery = true)
     void updatePrices(@Param("idPartita") String idPartita);
+
+    // Metodo per capire di che tipo è la casella
+    @Query("SELECT p.idcasella.tipo FROM Partita_Casella_Prezzoproprieta p WHERE p.posizione = :posizione AND p.idpartita.codiceInvito = :idPartita")
+    String findTipoByPosizione(@Param("posizione") Integer posizione, @Param("idPartita") String idPartita);
+
+    // Metodo per capire se la casella è appartenente a qualcuno
+    @Query("SELECT g.nome FROM Partita_Casella_Prezzoproprieta pcp JOIN pcp.idgiocatore g WHERE pcp.posizione = :position AND pcp.idpartita.codiceInvito = :gameId")
+    String findNomeGiocatoreByPosizioneAndGameId(@Param("position") Integer position, @Param("gameId") String gameId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Partita_Casella_Prezzoproprieta pcp " +
+            "SET pcp.idgiocatore = (SELECT g FROM Giocatore g WHERE g.nome = :playerName), " +
+            "pcp.idgiocatore.saldo = pcp.idgiocatore.saldo - pcp.prezzoCorrente " +
+            "WHERE pcp.posizione = :posizione AND pcp.idpartita.codiceInvito = :gameId")
+    void setGiocatoreESaldo(@Param("playerName") String playerName, @Param("gameId") String gameId, @Param("posizione") Integer posizione);
+
 }

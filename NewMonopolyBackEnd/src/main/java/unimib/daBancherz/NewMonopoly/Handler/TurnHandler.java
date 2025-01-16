@@ -86,6 +86,9 @@ public class TurnHandler {
                 "dice2", diceR2
         ));
 
+        //TODO: metodo per inviare i messaggi per che tipo è la casella
+        messageHandler.sendTypeBox(gameId, playerName, newPosition, gameHandler.getGameSessions());
+
         if( newPosition > 40 ){
             newPosition -= 40;
             //TODO: aggiungere al saldo 200, perchè signfica che è passato dal VIA

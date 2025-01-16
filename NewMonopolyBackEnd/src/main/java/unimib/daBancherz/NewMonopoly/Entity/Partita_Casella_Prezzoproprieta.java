@@ -28,6 +28,18 @@ public class Partita_Casella_Prezzoproprieta {
     private Integer prezzoCasaCorrente;
     private Integer posizione;
 
+    @ManyToOne
+    @JoinColumn(name = "idgiocatore")
+    private Giocatore idgiocatore;
+
+    public Giocatore getIdgiocatore() {
+        return idgiocatore;
+    }
+
+    public void setIdgiocatore(Giocatore idgiocatore) {
+        this.idgiocatore = idgiocatore;
+    }
+
     public Partita getIdpartita() {
         return idpartita;
     }

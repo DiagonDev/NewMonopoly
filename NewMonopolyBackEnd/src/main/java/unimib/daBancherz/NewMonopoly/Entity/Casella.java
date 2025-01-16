@@ -17,10 +17,6 @@ public class Casella {
     private String tipo;
     private Integer prezzo;
 
-    @ManyToOne
-    @JoinColumn(name = "idgiocatore")
-    private Giocatore idgiocatore;
-
     public Integer getIdCasella() {
         return idCasella;
     }
@@ -78,12 +74,5 @@ public class Casella {
         this.prezzo = prezzo;
     }
 
-    public Giocatore getIdgiocatore() {
-        return idgiocatore;
-    }
-
-    public void setIdgiocatore(Giocatore idgiocatore) {
-        this.idgiocatore = idgiocatore;
-    }
 }
 
