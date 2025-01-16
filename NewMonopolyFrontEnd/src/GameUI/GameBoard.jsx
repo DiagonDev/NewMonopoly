@@ -8,15 +8,20 @@ import ChatFather from "./ChatFather.jsx";
 import PlayersStatsRectangle from "./PlayersStatsRectangle.jsx";
 import { WebSocketContext } from "../contexts/WebSocketContext.jsx";
 import SelectPawn from "../pages/SelectPawn.jsx";
+import {pawnColors} from "../pages/pawnColors.jsx"; // Assicurati di importare correttamente GameSquare
 
 const GameBoard = () => {
-    const { socket, connected, diceResult, playerJoin, gameId, startTurn} = useContext(WebSocketContext); // Accesso al WebSocket
-    
+    const { socket, connected, diceResult, playerJoin, gameId, startTurn, playerPawn, pawnsAvailable} = useContext(WebSocketContext); // Accesso al WebSocket
     const [isPlayerJoined, setIsPlayerJoined] = useState(false);
     const [activeComponent, setActiveComponent] = useState("BaseRectangle");
     const [pawnSelected, setSelectedPawn] = useState(false);
     const [isMyTurn, setIsMyTurn] = useState(false); // Stato per il turno del giocatore
     const [isGameStarted, setIsGameStarted] = useState(false); // Stato per la partita
+
+    const placeholderPawns = Array.from({length: 6}, (_, i) => ({
+        id: i + 1,
+        color: pawnColors[i+1] || "gray",
+    }));
 
     const handlePawnSelection = () => {
         setSelectedPawn(true);
@@ -27,12 +32,12 @@ const GameBoard = () => {
             // Invia un messaggio al server
             socket.send('InizioPartita:');
             console.log('Messaggio inviato: InizioPartita');
-           
+
         console.log("Partita avviata.");
         } else {
             console.error('Connessione WebSocket non stabilita!');
         }
-        
+
     };
     const handleEnd = () => {
 
@@ -43,7 +48,7 @@ const GameBoard = () => {
         } else {
             console.error('Connessione WebSocket non stabilita!');
         }
-       
+
     };
 
     useEffect(() => {
@@ -56,7 +61,7 @@ const GameBoard = () => {
 
     //Riceve il messaggio di inizio di un turno
     useEffect(() => {
-        
+
         if (startTurn && startTurn.flag !== undefined && startTurn.playername.length >0) {
             setActiveComponent("BaseRectangle");
             setIsGameStarted(true);
@@ -70,7 +75,11 @@ const GameBoard = () => {
     return (
         <div className="board">
             {num_squares.map((id) => (
-                <GameSquare id={id} key={id} />
+                <GameSquare
+                    id={id}
+                    key={id}
+                    tokens={placeholderPawns} // Passa le pedine alle caselle
+                />
             ))}
             <div className="rectangle-top-left">
                 {playerJoin.playerRole === "ADMIN" || !isPlayerJoined ? (

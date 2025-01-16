@@ -4,7 +4,7 @@ import { SquareConfigData } from "./SquareData";
 import { SquareInfo } from "./SquareInfo";
 import { SquareType } from "./SquareType.jsx";
 
-const GameSquare = ({ id }) => {
+const GameSquare = ({ id , tokens}) => {
     if (!id) {
         console.error("Missing id prop for GameSquare");
         return null;
