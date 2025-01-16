@@ -78,7 +78,7 @@ const GameBoard = () => {
                 <GameSquare
                     id={id}
                     key={id}
-                    tokens={id === 1 ? placeholderPawns : []} // Passa le pedine alla casella con id 1
+                    tokens={placeholderPawns} // Passa le pedine alle caselle
                 />
             ))}
             <div className="rectangle-top-left">

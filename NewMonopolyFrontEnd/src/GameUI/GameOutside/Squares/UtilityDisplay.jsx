@@ -16,6 +16,7 @@ export const UtilityDisplay = ({ id }) => {
                     <FontAwesomeIcon icon={faSubway} size="3x" color="blue" />
                 </div>
                 <div className="square-name">{txt}</div>
+
             </React.Fragment>
         );
     };
