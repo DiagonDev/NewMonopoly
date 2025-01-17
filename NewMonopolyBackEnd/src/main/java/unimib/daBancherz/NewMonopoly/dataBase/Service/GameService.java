@@ -136,35 +136,4 @@ public class GameService {
             return Collections.emptyList();  // Se il giocatore non viene trovato
         }
     }
-    /*
-    @Transactional
-    public void gestisciSaldoGiocatoreProbabilita(String nomeGiocatore, String idPartita, String descrizioneProbabilita) throws Exception {
-        // Recupero del giocatore
-        Giocatore giocatore = giocatoreRepository.findByNomeAndIdPartita_Idpartita(nomeGiocatore, idPartita)
-                .orElseThrow(() -> new IllegalArgumentException("Giocatore non trovato"));
-
-        // Recupero della probabilità
-        Probabilita probabilita = probabilitaRepository.findByDescrizione(descrizioneProbabilita)
-                .orElseThrow(() -> new IllegalArgumentException("Descrizione probabilità non trovata"));
-
-        // Controllo del tipo di azione
-        String tipoAzione = probabilita.getTipoAzione();
-        Importo importo = (Importo) probabilita.getParametroDeserializzato();
-
-        if (importo == null) {
-            throw new IllegalArgumentException("Parametro importo non valido");
-        }
-
-        if ("paga_importo".equals(tipoAzione)) {
-            giocatore.setSaldo(giocatore.getSaldo() - importo.getImporto());
-        } else if ("ricevi_importo".equals(tipoAzione)) {
-            giocatore.setSaldo(giocatore.getSaldo() + importo.getImporto());
-        } else {
-            throw new IllegalArgumentException("Tipo azione non supportato");
-        }
-
-        // Salvataggio delle modifiche al saldo
-        giocatoreRepository.save(giocatore);
-    }
-*/
 }

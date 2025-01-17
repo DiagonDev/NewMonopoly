@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import unimib.daBancherz.NewMonopoly.Handler.ChatHandler;
 import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
+import unimib.daBancherz.NewMonopoly.Handler.PropertyHandler;
 import unimib.daBancherz.NewMonopoly.Handler.TurnHandler;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 
@@ -20,16 +21,18 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
     private final ChatHandler chatHandler;
     private final TurnHandler turnHandler;
     private final WebSocketReconnect reconnect;
+    private final PropertyHandler propertyHandler;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
     // Iniezione di GameHandler e ChatHandler tramite il costruttore
     @Autowired
     public WebSocketConnectionHandler(GameHandler gameHandler, ChatHandler chatHandler, TurnHandler turnHandler,
-                                      WebSocketReconnect reconnect) {
+                                      WebSocketReconnect reconnect, PropertyHandler propertyHandler) {
         this.gameHandler = gameHandler;
         this.chatHandler = chatHandler;
         this.turnHandler = turnHandler;
         this.reconnect = reconnect;
+        this.propertyHandler = propertyHandler;
     }
 
     @Override
@@ -74,6 +77,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                 break;
             case "AcquistaProprieta":
                 //gestire il salvataggio della proprietà acquistata dal giocatore nel database
+                propertyHandler.acquistaProprieta();
                 break;
             case  "IpotecaProprieta":
                 //gestire l'ipoteca della proprietà

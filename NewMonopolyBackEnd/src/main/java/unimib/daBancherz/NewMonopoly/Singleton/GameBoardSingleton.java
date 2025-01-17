@@ -5,18 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GameBoardSingleton {
-
-    // Variabile statica per memorizzare l'istanza del Singleton
     private static GameBoardSingleton instance;
-
-    // Mappa per memorizzare tutte le partite. La chiave è l'ID della partita, il valore è l'oggetto Game che rappresenta la partita
     private Map<String, Game> games = new HashMap<>();
 
-    // Costruttore privato per impedire la creazione di nuove istanze (tipico pattern Singleton)
-    private GameBoardSingleton() {
-    }
+    private GameBoardSingleton() {}
 
-    // Metodo per ottenere l'istanza del Singleton. È sincronizzato per garantire che l'istanza sia creata una sola volta
     public static synchronized GameBoardSingleton getInstance() {
         if (instance == null) {
             instance = new GameBoardSingleton();
@@ -24,44 +17,35 @@ public class GameBoardSingleton {
         return instance;
     }
 
-    // Metodo per creare una nuova partita (aggiunge un oggetto Game alla mappa)
     public void createGame(String gameId) {
-        games.put(gameId, new Game(gameId));  // Crea una nuova partita con l'ID specificato
+        games.put(gameId, new Game(gameId));
     }
 
-    // Metodo per ottenere una partita per ID
     public Game getGame(String gameId) {
-        return games.get(gameId);  // Restituisce l'oggetto Game associato all'ID della partita
+        return games.get(gameId);
     }
 
-    // Metodo per aggiornare la posizione di un giocatore in una specifica partita
     public void setPlayerPosition(String gameId, String playerName, int position) {
         Game game = games.get(gameId);
         if (game != null) {
-            game.setPlayerPosition(playerName, position);  // Modifica la posizione del giocatore nella partita
+            game.setPlayerPosition(playerName, position);
         }
     }
 
-    // Metodo per ottenere le posizioni del giocatore in una partita
     public Integer getPlayerPosition(String gameId, String playerName) {
         Game game = games.get(gameId);
-
-        // Restituisce la posizione del giocatore specifico o null se il gioco o il giocatore non esiste
-        return (game != null) ? game.getPlayerPositions().get(playerName) : 01010;
+        return (game != null) ? game.getPlayerPositions().get(playerName) : null;
     }
 
-    // Metodo per ottenere le posizioni di tutti i giocatori in una partita
     public Map<String, Integer> getPlayerPositions(String gameId) {
         Game game = games.get(gameId);
-        return game != null ? game.getPlayerPositions() : Collections.emptyMap();  // Restituisce la mappa delle posizioni dei giocatori
+        return game != null ? game.getPlayerPositions() : Collections.emptyMap();
     }
 
-    // Metodo per rimuovere una partita dalla mappa
     public void removeGame(String gameId) {
-        games.remove(gameId);  // Rimuove la partita specificata dalla mappa
+        games.remove(gameId);
     }
 
-    // Metodo per rimuovere un giocatore dalla mappa
     public void removePlayerFromGame(String gameId, String playerName) {
         Game game = games.get(gameId);
         if (game != null) {
@@ -69,12 +53,22 @@ public class GameBoardSingleton {
         }
     }
 
-    // Metodo per rimuovere una partita se è vuota
     public void removeGameIfEmpty(String gameId) {
         Game game = games.get(gameId);
         if (game != null && game.isEmpty()) {
             games.remove(gameId);
         }
     }
-}
 
+    public void setPlayerPrison(String gameId, String playerName, boolean isInPrison) {
+        Game game = games.get(gameId);
+        if (game != null) {
+            game.setPlayerPrison(playerName, isInPrison);
+        }
+    }
+
+    public boolean isPlayerInPrison(String gameId, String playerName) {
+        Game game = games.get(gameId);
+        return game != null && game.isPlayerInPrison(playerName);
+    }
+}

@@ -18,8 +18,6 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
     @Query("SELECT g.idGiocatore FROM Giocatore g WHERE g.nome = :nomeGiocatore AND g.idpartita.codiceInvito = :idPartita")
     Integer findIdByNomeAndPartitaCodiceInvito(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
 
-    Optional<Giocatore> findByNomeAndIdpartita_CodiceInvito(String nome, String idpartita);
-
     void deleteByIdGiocatore(Integer idGiocatore);
 
     @Transactional
@@ -39,71 +37,34 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
     @Query("SELECT g.idpedina.idPedina FROM Giocatore g  WHERE g.nome=:playername AND g.idpartita.codiceInvito = :idPartita")
     Integer findPedinaFromGiocatore(@Param("playername") String playername, @Param("idPartita") String idPartita);
 
+    //Aggiorna i soldi
+    // Il via sarà negativo perchè quando passi dal via devi prendere i soldi
     @Modifying
     @Transactional
     @Query(value = """
         UPDATE giocatore
-            SET saldo = saldo - (
-                SELECT
-                    CASE
-                        WHEN pcp.num_albergo = true THEN p.affitto_albergo
-                        WHEN pcp.num_casa = 4 THEN p.affitto_4case
-                        WHEN pcp.num_casa = 3 THEN p.affitto_3case
-                        WHEN pcp.num_casa = 2 THEN p.affitto_2case
-                        WHEN pcp.num_casa = 1 THEN p.affitto_1casa
-                        ELSE p.affitto
-                    END
-                FROM partita_casella_prezzoproprieta pcp
-                JOIN prezzoproprieta p ON pcp.idprezzoproprieta = p.id_prezzoproprieta
-                JOIN giocatore g2 ON pcp.idgiocatore = g2.id_giocatore
-                WHERE g2.nome = :nomeGiocatore
-                AND pcp.posizione = :posizione
-                AND pcp.idpartita = :idPartita
-            )
-            WHERE nome = :nomeGiocatore
-    """, nativeQuery = true)
-    void diminuisciSaldoGiocatore(@Param("playerName") String playerName, @Param("idPartita") String idPartita, @Param("posizione") Integer posizione);
-
-    @Modifying
-    @Transactional
-    @Query(value = """
-        UPDATE giocatore
-            SET saldo = saldo + (
-                SELECT
-                    CASE
-                        WHEN pcp.num_albergo = true THEN p.affitto_albergo
-                        WHEN pcp.num_casa = 4 THEN p.affitto_4case
-                        WHEN pcp.num_casa = 3 THEN p.affitto_3case
-                        WHEN pcp.num_casa = 2 THEN p.affitto_2case
-                        WHEN pcp.num_casa = 1 THEN p.affitto_1casa
-                        ELSE p.affitto
-                    END
-                FROM partita_casella_prezzoproprieta pcp
-                JOIN prezzoproprieta p ON pcp.idprezzoproprieta = p.id_prezzoproprieta
-                JOIN giocatore g2 ON pcp.idgiocatore = g2.id_giocatore
-                WHERE g2.nome = :nomeGiocatore
-                AND pcp.posizione = :posizione
-                AND pcp.idpartita = :idPartita
-            )
-            WHERE nome = :nomeGiocatore
-    """, nativeQuery = true)
-    void aumentoSaldoGiocatore(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("posizione") Integer posizione);
-
-    //Aggiorna i soldi quando passi dal via e per quando devi pagare una tassa
-    @Modifying
-    @Transactional
-    @Query(value = """
-        UPDATE giocatore
-                SET saldo = saldo + (
-                    SELECT pcp.prezzo_corrente
-                    FROM partita_casella_prezzoproprieta pcp
-                    WHERE pcp.posizione = :posizione
-                    AND pcp.idpartita = :idPartita
-                )
+                SET saldo = saldo - :soldi
                 WHERE nome = :nomeGiocatore
         		AND idpartita= :idPartita
     """, nativeQuery = true)
-    int aggiornamentoSaldoGiocaorePerViaOTassa(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("posizione") Integer posizione);
+    Integer aggiornamentoSaldo(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("soldi") Integer soldi);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        UPDATE giocatore
+        SET saldo = saldo + :importo
+        WHERE idpartita = :idPartita
+        AND nome <> :nomeGiocatoreEscluso
+    """, nativeQuery = true)
+    Integer pagaImportoGiocatori(@Param("importo") Integer importo, @Param("idPartita") String idPartita, @Param("nomeGiocatoreEscluso") String nomeGiocatoreEscluso);
+
+    @Query(value = """
+        SELECT COUNT(*) 
+        FROM giocatore 
+        WHERE idpartita = :idPartita
+    """, nativeQuery = true)
+    Integer contaGiocatoriInPartita(@Param("idPartita") String idPartita);
 
 }
 

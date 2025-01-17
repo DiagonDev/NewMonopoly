@@ -213,10 +213,10 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     @Query(value = """
         SELECT pcp.prezzo_corrente
         FROM partita_casella_prezzoproprieta pcp
-        WHERE pcp.posizione = :posizione 
+        WHERE pcp.posizione = :posizione
           AND pcp.idpartita = (SELECT p.codice_invito FROM partita p WHERE p.codice_invito = :idPartita)
     """, nativeQuery = true)
-    Integer findValoreCorrenteByPosizione(@Param("posizione") Integer posizione, @Param("idPartita") String idPartita);
+    Integer prezzoCasella(@Param("posizione") Integer posizione, @Param("idPartita") String idPartita);
 
     // Metodo per trovare il costo di acquisto di una casa/albergo di una proprieta
     @Query(value = """
@@ -244,4 +244,38 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
             AND pcp.idpartita = :idPartita
     """, nativeQuery = true)
     int affittoProprieta(@Param("idPartita") String idPartita, @Param("posizione") Integer posizione);
+
+    //Metodo per contare quante caselle di quel tipo ha l'utente
+    @Query(value =  """
+        SELECT COUNT(*) AS numero_caselle
+        FROM Partita_Casella_Prezzoproprieta pc
+        JOIN Giocatore g ON pc.idgiocatore = g.id_giocatore
+        JOIN Casella c ON pc.idcasella = c.id_casella
+        JOIN Partita p ON pc.idpartita = p.codice_invito
+        WHERE g.nome = :nomeGiocatore
+          AND c.tipo = :casellaTipo
+          AND p.codice_invito:idPartita;
+    """, nativeQuery = true)
+    int countProprieta(@Param("nomeGiocatore") String nomeGiocatore, @Param("tipo") String tipo, @Param("idPartita") String idPartita);
+
+    @Query(value = """
+        SELECT SUM(pcp.num_casa)
+        FROM partita_casella_prezzoproprieta pcp
+        JOIN giocatore g ON pcp.idgiocatore = g.id_giocatore
+        WHERE g.nome= :nomeGiocatore
+        AND pcp.idpartita = :idPartita
+    """, nativeQuery = true)
+    int contaCase(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
+
+
+    @Query(value = """
+        SELECT COUNT(*) 
+        FROM partita_casella_prezzoproprieta  pcp
+        JOIN giocatore g ON pcp.idgiocatore = g.id_giocatore
+        WHERE g.nome= :nomeGiocatore
+        AND pcp.num_albergo=true
+        AND pcp.idpartita = :idPartita
+    """, nativeQuery = true)
+    int contaAlberghi(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
+
 }

@@ -8,5 +8,4 @@ import java.util.List;
 
 @Repository
 public interface ImprevistoRepository extends JpaRepository<Imprevisto, Long> {
-    List<Imprevisto> findAll();
 }
