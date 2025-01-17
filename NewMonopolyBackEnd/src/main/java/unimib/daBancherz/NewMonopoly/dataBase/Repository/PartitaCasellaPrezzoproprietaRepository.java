@@ -167,14 +167,14 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
             ELSE pcp.prezzo_casa_corrente
         END
     FROM (
-        SELECT\s
+        SELECT
             pcp.idcasella,
             c.prezzo,
             c.tipo,
             pp.costo_acquisto,
             pp.casa,
             pt.livello_difficolta
-        FROM\s
+        FROM
             Partita_Casella_Prezzoproprieta pcp
         JOIN
             Casella c ON pcp.idcasella = c.id_casella
@@ -198,6 +198,9 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     @Query("SELECT g.nome FROM Partita_Casella_Prezzoproprieta pcp JOIN pcp.idgiocatore g WHERE pcp.posizione = :position AND pcp.idpartita.codiceInvito = :gameId")
     String findNomeGiocatoreByPosizioneAndGameId(@Param("position") Integer position, @Param("gameId") String gameId);
 
+    @Query("SELECT c.nome FROM Partita_Casella_Prezzoproprieta pcp JOIN pcp.idcasella c WHERE pcp.posizione = :position AND pcp.idpartita.codiceInvito = :gameId")
+    String findNomeCasellaByPosizioneAndGameId(@Param("position") Integer position, @Param("gameId") String gameId);
+
     @Modifying
     @Transactional
     @Query("UPDATE Partita_Casella_Prezzoproprieta pcp " +
@@ -219,8 +222,26 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     @Query(value = """
         SELECT pcp.prezzo_casa_corrente
         FROM partita_casella_prezzoproprieta pcp
-        WHERE pcp.posizione = :posizione 
-          AND pcp.idpartita = (SELECT p.codice_invito FROM partita p WHERE p.codice_invito = :idPartita)
+        WHERE pcp.posizione = :posizione
+        AND pcp.idpartita = (SELECT p.codice_invito FROM partita p WHERE p.codice_invito = :idPartita)
     """, nativeQuery = true)
     Integer findValoreCasaCorrenteByPosizione(@Param("posizione") Integer posizione, @Param("idPartita") String idPartita);
+
+    //Seleziona il costo dell'affitto
+    @Query(value = """
+        SELECT
+            CASE
+                  WHEN pcp.num_albergo = true THEN p.affitto_albergo
+                  WHEN pcp.num_casa = 4 THEN p.affitto_4case
+                  WHEN pcp.num_casa = 3 THEN p.affitto_3case
+                  WHEN pcp.num_casa = 2 THEN p.affitto_2case
+                  WHEN pcp.num_casa = 1 THEN p.affitto_1casa
+                  ELSE p.affitto
+              END
+              FROM partita_casella_prezzoproprieta pcp
+              JOIN prezzoproprieta p ON pcp.idprezzoproprieta = p.id_prezzoproprieta
+              WHERE pcp.posizione = :posizione
+            AND pcp.idpartita = :idPartita
+    """, nativeQuery = true)
+    int affittoProprieta(@Param("idPartita") String idPartita, @Param("posizione") Integer posizione);
 }

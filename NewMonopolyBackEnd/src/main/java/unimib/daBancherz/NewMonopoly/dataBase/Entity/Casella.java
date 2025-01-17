@@ -9,10 +9,6 @@ public class Casella {
     private Integer idCasella;
 
     private String nome;
-    @Column(name = "num_casa")
-    private Integer numCasa;
-    @Column(name = "num_albergo")
-    private Boolean numAlbergo;
     private String colore;
     private String tipo;
     private Integer prezzo;
@@ -31,23 +27,6 @@ public class Casella {
 
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public Integer getNumCasa() {
-
-        return numCasa;
-    }
-
-    public void setNumCasa(Integer numCasa) {
-        this.numCasa = numCasa;
-    }
-
-    public Boolean getNumAlbergo() {
-        return numAlbergo;
-    }
-
-    public void setNumAlbergo(Boolean numAlbergo) {
-        this.numAlbergo = numAlbergo;
     }
 
     public String getColore() {

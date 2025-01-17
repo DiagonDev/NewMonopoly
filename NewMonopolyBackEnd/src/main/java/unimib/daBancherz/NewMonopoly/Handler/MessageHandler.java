@@ -18,11 +18,13 @@ public class MessageHandler {
     private final GameService gameService;
     private final PartitaCasellaPrezzoproprietaRepository pCPPRepository;
     private final GiocatoreRepository giocatoreRepository;
+    private final PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository;
 
-    public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository) {
+    public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository) {
         this.gameService = gameService;
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;
+        this.partitaCasellaPrezzoproprietaRepository = partitaCasellaPrezzoproprietaRepository;
     }
 
     //serve per creare un messaggio di sistema in Json così che il forntend lo metta nella game console
@@ -152,14 +154,16 @@ public class MessageHandler {
         switch (typeBox){
             case "Via":
                 //TODO: query per aggiungere il prezzo della tassa dal saldo del giocatore
+                //giocatoreRepository.aggiornamentoSaldoGiocaorePerViaOTassa(playerName, gameId, posizione);
                 break;
             case"Proprietà":
                 String proprietario = pCPPRepository.findNomeGiocatoreByPosizioneAndGameId(posizione, gameId);
                 if(proprietario == null){
                     String buyBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
                             "type", "buy",
-                            "price", "", //TODO: query per prendere il prezzo della casella
-                            "nameBox", "" //TODO: query per prendere il nome della casella
+                            "price", "", //TODO: query per prendere il prezzo della casella partitaCasella: pCPPRepository.findValoreCorrenteByPosizione(posizione, gameId)
+                            "nameBox", "" //TODO: query per prendere il nome della casella: pCPPRepository.findNomeCasellaByPosizioneAndGameId(posizione, gameId)
+
                     ));
                     session.sendMessage(new TextMessage(buyBoxMessage));
                 }else if(!playerName.equals(proprietario)){
@@ -168,22 +172,30 @@ public class MessageHandler {
                     String payBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
                             "description", "affitto",
                             "destination", proprietario,
-                            "payment", ""//TODO: query per prendere il prezzo dell'affitto da pagare
+                            "payment", ""//TODO: query per prendere il prezzo dell'affitto da pagare: pCPPRepository.affittoProprieta(gameId, posizione)
                     ));
                     session.sendMessage(new TextMessage(payBoxMessage));
                 }
                 break;
             case"Probabilità":
-                //TODO: query per ottenere la descrizione della probabilità
-                //TODO: query per aumentare o diminuire il prezzo se c'è bisogno di pagare/ricevere
+                //TODO: query per ottenere la descrizione della probabilità:
+                //descrizione=partitaProbabilitaRepository.findDescrizioneProbabilita(gameId)
+                //partitaProbabilitaRepository.setUtilizzatoTrue(gameId, descrizione)
+
+                //TODO: query per vedere se sono state usate tutte le probabilita
+
+                //TODO: query per aumentare o diminuire il prezzo se c'è bisogno di pagare/ricevere:
+
                 break;
             case"Tassa":
                 //TODO: query per togliere il prezzo della tassa dal saldo del giocatore
                 //Si può forse usare la stessa del via, ma mettendo i valori negativi nel database
                 //se si vole detrarre la tassa dal saldo del giocatore
+                //giocatoreRepository.aggiornamentoSaldoGiocaorePerViaOTassa(playerName, gameId, posizione);
                 break;
             case"Stazione":
-                //TODO: query che mi restituisce il numero di stazioni del giocatore
+                //TODO: query che mi restituisce il numero di stazioni del proprietario
+                //calcolo quante stazioni ha
                 //TODO: query che mi restituisce il prezzo della casella stazione
                 //calcola ipoteca --> è la meta del prezzo
                 //calcola numero stazioni per calcolare il prezzo di affitto

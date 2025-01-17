@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.Giocatore;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
@@ -16,6 +17,8 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
 
     @Query("SELECT g.idGiocatore FROM Giocatore g WHERE g.nome = :nomeGiocatore AND g.idpartita.codiceInvito = :idPartita")
     Integer findIdByNomeAndPartitaCodiceInvito(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
+
+    Optional<Giocatore> findByNomeAndIdPartita_Idpartita(String nome, Integer idPartita);
 
     void deleteByIdGiocatore(Integer idGiocatore);
 
@@ -43,15 +46,14 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
             SET saldo = saldo - (
                 SELECT
                     CASE
-                        WHEN c.num_albergo = true THEN p.affitto_albergo
-                        WHEN c.num_casa = 4 THEN p.affitto_4case
-                        WHEN c.num_casa = 3 THEN p.affitto_3case
-                        WHEN c.num_casa = 2 THEN p.affitto_2case
-                        WHEN c.num_casa = 1 THEN p.affitto_1casa
+                        WHEN pcp.num_albergo = true THEN p.affitto_albergo
+                        WHEN pcp.num_casa = 4 THEN p.affitto_4case
+                        WHEN pcp.num_casa = 3 THEN p.affitto_3case
+                        WHEN pcp.num_casa = 2 THEN p.affitto_2case
+                        WHEN pcp.num_casa = 1 THEN p.affitto_1casa
                         ELSE p.affitto
                     END
                 FROM partita_casella_prezzoproprieta pcp
-                JOIN casella c ON pcp.idcasella = c.id_casella
                 JOIN prezzoproprieta p ON pcp.idprezzoproprieta = p.id_prezzoproprieta
                 JOIN giocatore g2 ON pcp.idgiocatore = g2.id_giocatore
                 WHERE g2.nome = :nomeGiocatore
@@ -69,15 +71,14 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
             SET saldo = saldo + (
                 SELECT
                     CASE
-                        WHEN c.num_albergo = true THEN p.affitto_albergo
-                        WHEN c.num_casa = 4 THEN p.affitto_4case
-                        WHEN c.num_casa = 3 THEN p.affitto_3case
-                        WHEN c.num_casa = 2 THEN p.affitto_2case
-                        WHEN c.num_casa = 1 THEN p.affitto_1casa
+                        WHEN pcp.num_albergo = true THEN p.affitto_albergo
+                        WHEN pcp.num_casa = 4 THEN p.affitto_4case
+                        WHEN pcp.num_casa = 3 THEN p.affitto_3case
+                        WHEN pcp.num_casa = 2 THEN p.affitto_2case
+                        WHEN pcp.num_casa = 1 THEN p.affitto_1casa
                         ELSE p.affitto
                     END
                 FROM partita_casella_prezzoproprieta pcp
-                JOIN casella c ON pcp.idcasella = c.id_casella
                 JOIN prezzoproprieta p ON pcp.idprezzoproprieta = p.id_prezzoproprieta
                 JOIN giocatore g2 ON pcp.idgiocatore = g2.id_giocatore
                 WHERE g2.nome = :nomeGiocatore
@@ -86,25 +87,23 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
             )
             WHERE nome = :nomeGiocatore
     """, nativeQuery = true)
-    int aumentoSaldoGiocatore(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("posizione") Integer posizione);
+    void aumentoSaldoGiocatore(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("posizione") Integer posizione);
 
-
-    //Aggiorna i soldi quando passi dal via
+    //Aggiorna i soldi quando passi dal via e per quando devi pagare una tassa
     @Modifying
     @Transactional
     @Query(value = """
         UPDATE giocatore
-        SET saldo = saldo + (
-            SELECT pcp.prezzo_corrente
-            FROM partita_casella_prezzoproprieta pcp
-            JOIN giocatore g2 ON pcp.idgiocatore = g2.id_giocatore
-            WHERE g2.nome = :nomeGiocatore
-            AND pcp.posizione = :posizione
-            AND pcp.idpartita = :idPartita
-        )
-        WHERE nome = :nomeGiocatore
+                SET saldo = saldo + (
+                    SELECT pcp.prezzo_corrente
+                    FROM partita_casella_prezzoproprieta pcp
+                    WHERE pcp.posizione = :posizione
+                    AND pcp.idpartita = :idPartita
+                )
+                WHERE nome = :nomeGiocatore
+        		AND idpartita= :idPartita
     """, nativeQuery = true)
-    int aumentoSaldoGiocatoreVia(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("posizione") Integer posizione);
+    int aggiornamentoSaldoGiocaorePerViaOTassa(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("posizione") Integer posizione);
 
 }
 

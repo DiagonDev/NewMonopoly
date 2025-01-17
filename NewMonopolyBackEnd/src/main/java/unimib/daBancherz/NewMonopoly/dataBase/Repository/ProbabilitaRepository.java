@@ -5,8 +5,9 @@ import org.springframework.stereotype.Repository;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.Probabilita;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProbabilitaRepository extends JpaRepository<Probabilita, Long> {
-    List<Probabilita> findAll();
+    Optional<Probabilita> findByDescrizione(String descrizione);
 }
