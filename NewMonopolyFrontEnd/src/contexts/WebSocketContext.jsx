@@ -193,6 +193,10 @@ export const WebSocketProvider = ({children}) => {
                         price: message.price,
                     }));
 
+                } else if (message.type === 'nameBox') {
+                    console.log(message.name);
+                    
+
                 }
             };
 
