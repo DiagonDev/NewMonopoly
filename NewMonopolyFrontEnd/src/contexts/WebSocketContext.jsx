@@ -49,6 +49,8 @@ export const WebSocketProvider = ({children}) => {
         flag: false,
         price: 0,
     })
+    //Casella in cui finisco dopo il tiro dei dadi
+    const [nameBox, setNameBox] = useState('');
     useEffect(() => {
         const ws = new WebSocket("https://7559-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
         //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
@@ -185,7 +187,7 @@ export const WebSocketProvider = ({children}) => {
                         description: message.description,
                     }));
                 } else if (message.type === 'buy') {
-                    console.log(message.type);
+                    console.log("Acquisto: ", message.type," price",);
                     setBuy((prevState) => ({
                         ...prevState,
                         flag: true,
@@ -193,8 +195,8 @@ export const WebSocketProvider = ({children}) => {
                     }));
 
                 } else if (message.type === 'nameBox') {
-                    console.log(message.name);
                     
+                    setNameBox(message.name);
 
                 }
             };
@@ -232,7 +234,8 @@ export const WebSocketProvider = ({children}) => {
                 playerPawn,
                 payment,
                 draw,
-                buy
+                buy,
+                nameBox
             }}>
             {children}
         </WebSocketContext.Provider>
