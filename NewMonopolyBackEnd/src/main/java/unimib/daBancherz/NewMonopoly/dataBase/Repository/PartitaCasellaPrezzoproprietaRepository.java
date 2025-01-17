@@ -216,7 +216,7 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
         WHERE pcp.posizione = :posizione 
           AND pcp.idpartita = (SELECT p.codice_invito FROM partita p WHERE p.codice_invito = :idPartita)
     """, nativeQuery = true)
-    Integer findValoreCorrenteByPosizione(@Param("posizione") Integer posizione, @Param("idPartita") String idPartita);
+    Integer prezzoCasella(@Param("posizione") Integer posizione, @Param("idPartita") String idPartita);
 
     // Metodo per trovare il costo di acquisto di una casa/albergo di una proprieta
     @Query(value = """

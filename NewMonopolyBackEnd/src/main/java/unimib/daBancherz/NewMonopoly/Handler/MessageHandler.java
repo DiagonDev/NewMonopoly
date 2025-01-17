@@ -167,8 +167,8 @@ public class MessageHandler {
                     ));
                     session.sendMessage(new TextMessage(buyBoxMessage));
                 }else if(!playerName.equals(proprietario)){
-                    giocatoreRepository.diminuisciSaldoGiocatore(playerName, gameId, posizione);
-                    giocatoreRepository.aumentoSaldoGiocatore(proprietario, gameId, posizione);
+                    giocatoreRepository.pagaAffitto(playerName, gameId, posizione);
+                    giocatoreRepository.riscuotiAffitto(proprietario, gameId, posizione);
                     String payBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
                             "description", "affitto",
                             "destination", proprietario,
