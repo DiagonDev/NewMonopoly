@@ -1,4 +1,4 @@
-const IpotecaProprieta = () => ({
+const IpotecaProprieta = () => {
 
-});
+};
 export default IpotecaProprieta;

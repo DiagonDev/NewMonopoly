@@ -9,30 +9,29 @@ const GestisciProprieta = () => {
     const [activeComponent, setActiveComponent] = useState('');
     return (
         <>
-            <button
-                onClick={() => setActiveComponent("CostruisciCasa")}
-
-            >
-                Costruisci Casa
-            </button>
-            <button
-                onClick={() => setActiveComponent("ScambiaProrieta")}
-            >
-                ScambiaProprietà
-            </button>
-            <button
-                onClick={() => setActiveComponent("IpotecaProprieta")}
-            >
-                Ipoteca Proprietà
-            </button>
-            <div className="grid-item">
-                {activeComponent === "RollDice" && <CostruisciCasa/>}
-                {activeComponent === "GestisciProprieta" && <ScambiaProprieta/>}
-                {activeComponent === "IpotecaProprieta" && <IpotecaProprieta/>}
-                <button
-                onClick={setActiveComponent('') && <GestisciProprieta/>}>
-                    Indietro
-                </button>
+            <div className="gestisciProprieta-container">
+                <div className="gestisciProprieta-buttons">
+                    <button
+                        onClick={() => setActiveComponent("CostruisciCasa")}
+                    >
+                        Costruisci Casa
+                    </button>
+                    <button
+                        onClick={() => setActiveComponent("ScambiaProprieta")}
+                    >
+                        ScambiaProprietà
+                    </button>
+                    <button
+                        onClick={() => setActiveComponent("IpotecaProprieta")}
+                    >
+                        Ipoteca Proprietà
+                    </button>
+                </div>
+                <div className="gestisciProprieta-components">
+                    {activeComponent === "CostruisciCasa" && <CostruisciCasa/>}
+                    {activeComponent === "ScambiaProprieta" && <ScambiaProprieta/>}
+                    {activeComponent === "IpotecaProprieta" && <IpotecaProprieta/>}
+                </div>
             </div>
         </>
     );
