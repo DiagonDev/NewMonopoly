@@ -8,8 +8,8 @@ export const WebSocketProvider = ({children}) => {
     const [connected, setConnected] = useState(false);
     const [serverMessages, setServerMessages] = useState([]);
     const [userMessages, setUserMessages] = useState([]);
-    const [gameId, setGameId] = useState('');
-    const [playerJoin, setPlayerJoin] = useState({
+    const [gameId, setGameId] = useState(localStorage.getItem("gameId") || '');
+    const [playerJoin, setPlayerJoin] = useState(localStorage.getItem("playerName") || {
         player: '',
         playerRole: '',
     });
@@ -55,6 +55,12 @@ export const WebSocketProvider = ({children}) => {
         ws.onopen = () => {
             setSocket(ws);
             setConnected(true);
+
+            if (gameId && playerName) {
+                ws.send(`RECONNECT:${playerName}:${gameId}`);
+                console.log(`Tentativo di riconnessione per ${playerName} nel gioco ${gameId}`);
+            }
+
             const pingInterval = setInterval(() => {
                 if (ws.readyState === WebSocket.OPEN) {
                     ws.send("Ping:");
@@ -100,8 +106,10 @@ export const WebSocketProvider = ({children}) => {
                         player: message.playerName, // Aggiorna il nome del giocatore
                         playerRole: message.userRole, // Aggiorna il bilancio
                     }));
+                    localStorage.setItem("playerName", message.playerName); // Salva playername nel localStorage
                 } else if (message.type === 'gameId') {
                     setGameId(message.content);
+                    localStorage.setItem("gameId", message.content);  // Salva gameId nel localStorage
                 }
                 /**
                  * type: balance
@@ -201,7 +209,7 @@ export const WebSocketProvider = ({children}) => {
                 ws.close();
             }
         };
-    }, []);
+    }, [gameId, playerName]);
 
 
     return (

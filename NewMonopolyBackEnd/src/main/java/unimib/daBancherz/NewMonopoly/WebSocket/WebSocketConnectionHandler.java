@@ -19,14 +19,17 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
     private final GameHandler gameHandler;
     private final ChatHandler chatHandler;
     private final TurnHandler turnHandler;
+    private final WebSocketReconnect reconnect;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
     // Iniezione di GameHandler e ChatHandler tramite il costruttore
     @Autowired
-    public WebSocketConnectionHandler(GameHandler gameHandler, ChatHandler chatHandler, TurnHandler turnHandler) {
+    public WebSocketConnectionHandler(GameHandler gameHandler, ChatHandler chatHandler, TurnHandler turnHandler,
+                                      WebSocketReconnect reconnect) {
         this.gameHandler = gameHandler;
         this.chatHandler = chatHandler;
         this.turnHandler = turnHandler;
+        this.reconnect = reconnect;
     }
 
     @Override
@@ -47,6 +50,9 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
 
                 ));
                 session.sendMessage(new TextMessage(pongMessage));
+                break;
+            case "Riconnetti":
+
                 break;
             case "LanciaDadi":
                 turnHandler.rollDice(session);
