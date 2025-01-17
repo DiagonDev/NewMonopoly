@@ -247,14 +247,16 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
 
     //Metodo per contare quante caselle di quel tipo ha l'utente
     @Query(value =  """
-        SELECT COUNT(pc.idcasella) 
-        FROM partita_casella_prezzoproprieta pc
-        JOIN casella c ON pc.idcasella = c.id_casella 
-        WHERE pc.idgiocatore = :idGiocatore 
-        AND c.tipo = :tipo
-        AND pc.idpartita = :idPartita
+        SELECT COUNT(*) AS numero_caselle
+        FROM Partita_Casella_Prezzoproprieta pc
+        JOIN Giocatore g ON pc.idgiocatore = g.id_giocatore
+        JOIN Casella c ON pc.idcasella = c.id_casella
+        JOIN Partita p ON pc.idpartita = p.codice_invito
+        WHERE g.nome = :nomeGiocatore
+          AND c.tipo = :casellaTipo
+          AND p.codice_invito:idPartita;
     """, nativeQuery = true)
-    Long countProprieta(@Param("idGiocatore") Integer idGiocatore, @Param("tipo") String tipo, @Param("idPartita") String idPartita);
+    int countProprieta(@Param("nomeGiocatore") String nomeGiocatore, @Param("tipo") String tipo, @Param("idPartita") String idPartita);
 
     @Query(value = """
         SELECT SUM(pcp.num_casa)

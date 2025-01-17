@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaCasellaPrezzoproprietaRepository;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaProbabilitaRepository;
@@ -21,6 +22,7 @@ public class MessageHandler {
     private final GiocatoreRepository giocatoreRepository;
     private final PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository;
     private final PartitaProbabilitaRepository partitaProbabilitaRepository;
+    GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
     public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository, PartitaProbabilitaRepository partitaProbabilitaRepository) {
         this.gameService = gameService;
@@ -28,6 +30,7 @@ public class MessageHandler {
         this.giocatoreRepository = giocatoreRepository;
         this.partitaCasellaPrezzoproprietaRepository = partitaCasellaPrezzoproprietaRepository;
         this.partitaProbabilitaRepository = partitaProbabilitaRepository;
+
     }
 
     //serve per creare un messaggio di sistema in Json così che il forntend lo metta nella game console
@@ -151,13 +154,12 @@ public class MessageHandler {
     }
 
     //posizione => il codice della cella dove il giocatore finisce dopo il lancio dadi
-    public void sendBoxUsage(String playerName, WebSocketSession session, int posizione, String gameId) throws Exception{
+    public void sendBoxUsage(String playerName, WebSocketSession session, int posizione, String gameId, Map<String, List<WebSocketSession>> gameSessions ,Integer pawnId) throws Exception{
 
         String typeBox = pCPPRepository.findTipoByPosizione(posizione, gameId);
         String nomeCasella = pCPPRepository.findNomeCasellaByPosizioneAndGameId(posizione, gameId);
         String proprietario;
-        int prezzoCasella;
-        int prezzoAffitto;
+        int prezzoCasella, prezzoAffitto, nStazione, nSocietà;
 
         String nameBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "nameBox",
@@ -195,7 +197,7 @@ public class MessageHandler {
                     session.sendMessage(new TextMessage(payBoxMessage));
                 }
                 break;
-            case"Stazione":
+            case"Stazione", "Società":
                 proprietario = pCPPRepository.findNomeGiocatoreByPosizioneAndGameId(posizione, gameId);
                 prezzoCasella = pCPPRepository.prezzoCasella(posizione, gameId);
                 if(proprietario == null){
@@ -207,38 +209,23 @@ public class MessageHandler {
                     session.sendMessage(new TextMessage(buyBoxMessage));
 
                 }else if(!playerName.equals(proprietario)){
-
+                    if(typeBox.equals("Stazione")){
+                        nStazione = pCPPRepository.countProprieta(playerName, typeBox, gameId);
+                        prezzoAffitto = 25 * nStazione;
+                        giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoAffitto);
+                        giocatoreRepository.aggiornamentoSaldo(proprietario, gameId, -prezzoAffitto);
+                    }else{
+                        nSocietà = pCPPRepository.countProprieta(playerName, typeBox, gameId);
+                        prezzoAffitto = 100 * nSocietà;
+                        giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoAffitto);
+                        giocatoreRepository.aggiornamentoSaldo(proprietario, gameId, -prezzoAffitto);
+                    }
                 }
-                //TODO: query che mi restituisce il numero di stazioni del proprietario
-                //calcolo quante stazioni ha
-                //TODO: query che mi restituisce il prezzo della casella stazione
-                //calcola numero stazioni per calcolare il prezzo di affitto
-                break;
-            case"Società":
-                proprietario = pCPPRepository.findNomeGiocatoreByPosizioneAndGameId(posizione, gameId);
-                prezzoCasella = pCPPRepository.prezzoCasella(posizione, gameId);
-                if(proprietario == null){
-                    String buyBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
-                            "type", "buy",
-                            "price", prezzoCasella,
-                            "nameBox", nomeCasella
-                    ));
-                    session.sendMessage(new TextMessage(buyBoxMessage));
-
-                }else if(!playerName.equals(proprietario)){
-
-                }
-                //TODO: query che mi restituisce il numero delle società del giocatore
-                //capire se il prezzo si moltiplica in base al numero delle società
-                //TODO: query che mi restituisce il prezzo della casella società
-                //calcola ipoteca --> è la meta del prezzo
-                //calcola numero società per calcolare il prezzo di affitto
                 break;
             case"InPrigione":
-                
-                //mandarlo alla cella 11
-                //non so se si necessario ma potrebbe servirmi in più casi
-                //spostare la pedina sulla casella prigione
+                gameBoard.setPlayerPosition(gameId, playerName, 11);//aggiorna la posizione del giocatore
+                sendPawnMove(pawnId, playerName, 11, gameSessions, gameId);
+                gameBoard.setPlayerPrison(gameId, playerName, true);
                 break;
             case"Imprevisto":
                 //TODO: query per ottenere la descrizione dell'imprevisto

@@ -81,7 +81,7 @@ public class TurnHandler {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
         int playerPosition = gameBoard.getPlayerPosition(gameId, playerName);
-        int newPosition = totDice + playerPosition;
+        boolean isInPrison = gameBoard.isPlayerInPrison(gameId, playerName);
 
         String diceRolled = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "diceRolled",
@@ -90,29 +90,21 @@ public class TurnHandler {
         ));
         session.sendMessage(new TextMessage(diceRolled));//invia il risultato dei dati al giocatore che li ha tirati
 
-        //serve a recuperare la pawnId del giocatore
-        int pawnId = giocatoreRepository.findPedinaFromGiocatore(playerName, gameId);
-        if( newPosition > 40 ){
-            newPosition -= 40;
-            //TODO: aggiungere al saldo 200, perchè signfica che è passato dal VIA
+        if(!isInPrison || (diceR1 == diceR2)) {
+            gameBoard.setPlayerPrison(gameId, playerName, false);
+            int newPosition = totDice + playerPosition;
+            //serve a recuperare la pawnId del giocatore
+            int pawnId = giocatoreRepository.findPedinaFromGiocatore(playerName, gameId);
+            if (newPosition > 40) {
+                newPosition -= 40;
+                //TODO: aggiungere al saldo 200, perchè signfica che è passato dal VIA
+            }
+            gameBoard.setPlayerPosition(gameId, playerName, newPosition);//aggiorna la posizione del giocatore
+            //invia a tutti i giocatori che il "playername" si è postato di tot caselle "newPosition"
+            messageHandler.sendPawnMove(pawnId, playerName, newPosition, gameHandler.getGameSessions(), gameId);
+
+            //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
+            messageHandler.sendBoxUsage(playerName, session, newPosition, gameId, gameHandler.getGameSessions(), pawnId);
         }
-        gameBoard.setPlayerPosition(gameId, playerName, newPosition);//aggiorna la posizione del giocatore
-        //invia a tutti i giocatori che il "playername" si è postato di tot caselle "newPosition"
-        messageHandler.sendPawnMove(pawnId, playerName, newPosition, gameHandler.getGameSessions(), gameId);
-        //metodo per inviare il nome della casella su cui si è finiti
-
-        //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
-        messageHandler.sendBoxUsage(playerName,session, newPosition, gameId);
-
-        /*//TODO: aggiungere l'opzione per uscire dalla prigione se si fa il doppio(due dadi uguali)
-        if(diceR1 == diceR2) {
-            counterRollDice++;
-            if (counterRollDice < 3) {
-                rollDice(session);
-            }
-            else {
-                //TODO: manda in prigione il giocatore
-            }
-        }*/
     }
 }
