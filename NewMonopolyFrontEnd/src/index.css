@@ -80,6 +80,7 @@ button:focus-visible {
 
     grid-template-columns: 11vw repeat(9, 8.5vw) 11vw;
     grid-template-rows: 11vh repeat(9, 8.5vh) 11vh;
+
 }
 
 .square {
@@ -87,6 +88,7 @@ button:focus-visible {
     padding: 0;
     text-align: center;
     border: 1px solid black;
+    position: relative;
 }
 
 .square .container {
@@ -790,11 +792,14 @@ button:focus-visible {
 ################ PAWNSONMOVE ################
  */
 .pawn-onMove{
+    position: absolute; /* Posiziona sopra */
+    top: 50%; /* Centra verticalmente */
+    left: 50%; /* Centra orizzontalmente */
+    transform: translate(-50%, -50%); /* Centra rispetto al contenitore */
     display: flex;
     gap: 10px;
-    justify-content: center;
-    margin-top: 20px;
-    z-index: 2;
+    z-index: 2; /* Assicura che stia sopra gli altri elementi */
+    pointer-events: none; /* Evita che blocchi il clic sugli elementi sottostanti */
 }
 .pawn-move{
     width: 25px;
