@@ -9,4 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface ProbabilitaRepository extends JpaRepository<Probabilita, Long> {
+    Probabilita findByDescrizione(String descrizione);
 }

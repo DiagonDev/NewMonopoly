@@ -5,12 +5,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
-import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
-import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaCasellaPrezzoproprietaRepository;
-import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaProbabilitaRepository;
+import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.IdCasella;
+import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.Importo;
+import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.PagaPossedimenti;
+import unimib.daBancherz.NewMonopoly.dataBase.Entity.Imprevisto;
+import unimib.daBancherz.NewMonopoly.dataBase.Entity.Probabilita;
+import unimib.daBancherz.NewMonopoly.dataBase.Repository.*;
 import unimib.daBancherz.NewMonopoly.dataBase.Service.GameService;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,17 +24,20 @@ public class MessageHandler {
     private final GameService gameService;
     private final PartitaCasellaPrezzoproprietaRepository pCPPRepository;
     private final GiocatoreRepository giocatoreRepository;
-    private final PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository;
     private final PartitaProbabilitaRepository partitaProbabilitaRepository;
+    private final ProbabilitaRepository probabilitaRepository;
+    private final PartitaImprevistoRepository partitaImprevistoRepository;
+    private final ImprevistoRepository imprevistoRepository;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
-    public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository, PartitaProbabilitaRepository partitaProbabilitaRepository) {
+    public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, ProbabilitaRepository probabilitaRepository, PartitaImprevistoRepository partitaImprevistoRepository, ProbabilitaRepository probabilitaRepository1, PartitaImprevistoRepository partitaImprevistoRepository1, ImprevistoRepository imprevistoRepository) {
         this.gameService = gameService;
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;
-        this.partitaCasellaPrezzoproprietaRepository = partitaCasellaPrezzoproprietaRepository;
         this.partitaProbabilitaRepository = partitaProbabilitaRepository;
-
+        this.probabilitaRepository = probabilitaRepository;
+        this.partitaImprevistoRepository = partitaImprevistoRepository;
+        this.imprevistoRepository = imprevistoRepository;
     }
 
     //serve per creare un messaggio di sistema in Json così che il forntend lo metta nella game console
@@ -159,6 +166,9 @@ public class MessageHandler {
         String typeBox = pCPPRepository.findTipoByPosizione(posizione, gameId);
         String nomeCasella = pCPPRepository.findNomeCasellaByPosizioneAndGameId(posizione, gameId);
         String proprietario;
+        String descrizione;
+        String tipoAzione;
+        Object parametri;
         int prezzoCasella, prezzoAffitto, nStazione, nSocietà;
 
         String nameBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
@@ -228,57 +238,89 @@ public class MessageHandler {
                 gameBoard.setPlayerPrison(gameId, playerName, true);
                 break;
             case"Imprevisto":
-                //TODO: query per ottenere la descrizione dell'imprevisto
-                //TODO: query per aumentare o diminuire il prezzo se c'è bisogno di pagare/ricevere
-                //controllare se si può usare la stessa di Probabilità
+                descrizione = partitaImprevistoRepository.findDescrizioneImprevsto(gameId);
+                if (descrizione==null) {
+                    partitaImprevistoRepository.setUtilizzatoFalse(gameId);
+                    descrizione = partitaImprevistoRepository.findDescrizioneImprevsto(gameId);
+                }
+                Imprevisto imprevisto = imprevistoRepository.findByDescrizione(descrizione);
+                tipoAzione = imprevisto.getTipoAzione();
+                parametri = imprevisto.getParametroDeserializzato();
+
+                gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions);
+                partitaProbabilitaRepository.setUtilizzatoTrue(gameId, descrizione);
+
+                String imprevistoMessage = new ObjectMapper().writeValueAsString(Map.of(
+                        "type", "draw",
+                        "card", "imprevisto",
+                        "description", descrizione
+                ));
+                session.sendMessage(new TextMessage(imprevistoMessage));
+
                 break;
             case"Probabilità":
-                //TODO: query per ottenere la descrizione della probabilità:
-                //descrizione=partitaProbabilitaRepository.findDescrizioneProbabilita(gameId)
-                //partitaProbabilitaRepository.setUtilizzatoTrue(gameId, descrizione)
+                descrizione = partitaProbabilitaRepository.findDescrizioneProbabilita(gameId);
+                if (descrizione==null) {
+                    partitaProbabilitaRepository.setUtilizzatoFalse(gameId);
+                    descrizione = partitaProbabilitaRepository.findDescrizioneProbabilita(gameId);
+                }
+                //Messaggio descrizione
+                Probabilita probabilita = probabilitaRepository.findByDescrizione(descrizione);
+                tipoAzione = probabilita.getTipoAzione();
+                parametri = probabilita.getParametroDeserializzato();
 
-                //TODO: query per vedere se sono state usate tutte le probabilita
-
-                //TODO: query per aumentare o diminuire il prezzo se c'è bisogno di pagare/ricevere:
-
+                gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions);
+                partitaProbabilitaRepository.setUtilizzatoTrue(gameId, descrizione);
+                String probabilitaMessage = new ObjectMapper().writeValueAsString(Map.of(
+                        "type", "draw",
+                        "card", "probabilità",
+                        "description", descrizione
+                ));
+                session.sendMessage(new TextMessage(probabilitaMessage));
                 break;
-
         }
     }
 
-    public void gestisciAzione(String tipoAzione, Map<String, Object> parametri, String idPartita, String nomeGiocatore, Integer posizione, int pawnId, Map<String, List<WebSocketSession>> gameSession ) throws IOException {
-        Integer importo;
+    public void gestisciAzione(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Integer posizione, int pawnId, Map<String, List<WebSocketSession>> gameSession ) throws IOException {
+        Importo importo_deserializzato;
+        int importo;
         int soldi;
+        IdCasella id_casellaDeserializzato;
         int id_casella;
 
         switch (tipoAzione) {
             case "paga_importo":
-                importo = (Integer) parametri.get("importo");
+                importo_deserializzato = (Importo) parametri;
+                importo = importo_deserializzato.getImporto();
                 giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, importo);
                 break;
 
             case "ricevi_importo":
-                importo = (Integer) parametri.get("importo");
+                importo_deserializzato = (Importo) parametri;
+                importo = importo_deserializzato.getImporto();
                 giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, -importo);
                 break;
 
             case "paga_importo_giocatore":
-                importo = (Integer) parametri.get("importo");
+                importo_deserializzato = (Importo) parametri;
+                importo = importo_deserializzato.getImporto();
                 soldi = (giocatoreRepository.contaGiocatoriInPartita(idPartita)-1) * importo;
                 giocatoreRepository.pagaImportoGiocatori(importo, idPartita, nomeGiocatore);
                 giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, soldi);
                 break;
 
             case "ricevi_importo_giocatore":
-                importo = (Integer) parametri.get("importo");
+                importo_deserializzato = (Importo) parametri;
+                importo = importo_deserializzato.getImporto();
                 soldi = -((giocatoreRepository.contaGiocatoriInPartita(idPartita)-1) * importo);
                 giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, soldi);
                 giocatoreRepository.pagaImportoGiocatori(-importo, idPartita, nomeGiocatore);
                 break;
 
             case "paga_possedimenti":
-                int importoCasa = (Integer) parametri.get("costo_casa");
-                int importoAlbergo= (Integer) parametri.get("costo_albergo");
+                PagaPossedimenti pagaPossedimentiDeserializzato = (PagaPossedimenti) parametri;
+                int importoCasa =  pagaPossedimentiDeserializzato.getCosto_casa();
+                int importoAlbergo= pagaPossedimentiDeserializzato.getCosto_abergo();
                 int numCase = pCPPRepository.contaCase(nomeGiocatore, idPartita);
                 int numAlberghi = pCPPRepository.contaAlberghi(nomeGiocatore, idPartita);
                 int totaleDaPagare = (numCase * importoCasa) + (numAlberghi * importoAlbergo);
@@ -286,14 +328,16 @@ public class MessageHandler {
                 break;
 
             case "sposta_avanti":
-                id_casella = (Integer) parametri.get("id_casella");
+                id_casellaDeserializzato =(IdCasella) parametri;
+                id_casella = id_casellaDeserializzato.getId_casella();
                 if(posizione > id_casella)
                     giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, -200);
                 sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSession, idPartita);
                 break;
 
             case "vai_in_prigione":
-                id_casella = (Integer) parametri.get("id_casella");
+                id_casellaDeserializzato =(IdCasella) parametri;
+                id_casella = id_casellaDeserializzato.getId_casella();
                 sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSession, idPartita);
                 break;
 

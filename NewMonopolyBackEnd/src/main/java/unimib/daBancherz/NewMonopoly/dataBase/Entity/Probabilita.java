@@ -66,11 +66,7 @@ public class Probabilita {
                 return null;
 
             case "ricevi_importo":
-                return objectMapper.readValue(parametro, Importo.class);
-
             case "ricevi_importo_giocatore":
-                return objectMapper.readValue(parametro, Importo.class);
-
             case "paga_importo":
                 return objectMapper.readValue(parametro, Importo.class);
         }
