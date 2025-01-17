@@ -2,8 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import GameSquare from "./GameOutside/GameSquare.jsx";
 import BaseRectangle from "./actionRectangle/BaseRectangle.jsx";
 import RollDice from "./actionRectangle/RollDice.jsx";
-import Scambia from "./actionRectangle/Scambia.jsx";
-import IpotecaProprieta from "./actionRectangle/IpotecaProrieta.jsx";
+import GestisciProprieta from "./actionRectangle/GestisciProprieta.jsx";
 import ChatFather from "./ChatFather.jsx";
 import PlayersStatsRectangle from "./PlayersStatsRectangle.jsx";
 import {WebSocketContext} from "../contexts/WebSocketContext.jsx";
@@ -13,12 +12,10 @@ const GameBoard = () => {
     const {
         socket,
         connected,
-        diceResult,
         playerJoin,
         gameId,
         startTurn,
         playerPawn,
-        pawnsAvailable
     } = useContext(WebSocketContext); // Accesso al WebSocket
     const [isPlayerJoined, setIsPlayerJoined] = useState(false);
     const [activeComponent, setActiveComponent] = useState("BaseRectangle");
@@ -141,16 +138,10 @@ const GameBoard = () => {
                                         Roll
                                     </button>
                                     <button
-                                        onClick={() => setActiveComponent("Scambia")}
+                                        onClick={() => setActiveComponent("GestisciProprieta")}
                                         disabled={!isMyTurn} // Disabilitato di default
                                     >
-                                        Scambia
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveComponent("IpotecaProprieta")}
-                                        disabled={!isMyTurn} // Disabilitato di default
-                                    >
-                                        Ipoteca Proprieta
+                                        Gestisci proprietà
                                     </button>
                                     <button
                                         onClick={handleEnd}
@@ -176,8 +167,7 @@ const GameBoard = () => {
                 <div className="grid-item">
                     {activeComponent === "BaseRectangle" && <BaseRectangle/>}
                     {activeComponent === "RollDice" && <RollDice/>}
-                    {activeComponent === "Scambia" && <Scambia/>}
-                    {activeComponent === "IpotecaProprieta" && <IpotecaProprieta/>}
+                    {activeComponent === "GestisciProprieta" && <GestisciProprieta/>}
                 </div>
             </div>
             <div className="rectangle-bot-left">
