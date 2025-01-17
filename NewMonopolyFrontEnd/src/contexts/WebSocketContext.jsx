@@ -8,8 +8,8 @@ export const WebSocketProvider = ({children}) => {
     const [connected, setConnected] = useState(false);
     const [serverMessages, setServerMessages] = useState([]);
     const [userMessages, setUserMessages] = useState([]);
-    const [gameId, setGameId] = useState(localStorage.getItem("gameId") || '');
-    const [playerJoin, setPlayerJoin] = useState(localStorage.getItem("playerName") || {
+    const [gameId, setGameId] = useState( '');
+    const [playerJoin, setPlayerJoin] = useState({
         player: '',
         playerRole: '',
     });
@@ -43,7 +43,7 @@ export const WebSocketProvider = ({children}) => {
     const [draw, setDraw] = useState({
         flag: false,
         card: '',
-        describtion: '',
+        description: '',
     })
     const [buy, setBuy] = useState({
         flag: false,
@@ -56,10 +56,10 @@ export const WebSocketProvider = ({children}) => {
             setSocket(ws);
             setConnected(true);
 
-            if (gameId && playerJoin) {
-                ws.send(`RECONNECT:${playerJoin}:${gameId}`);
-                console.log(`Tentativo di riconnessione per ${playerJoin} nel gioco ${gameId}`);
-            }
+            // if (gameId && playerJoin) {
+            //     ws.send(`RECONNECT:${playerJoin}:${gameId}`);
+            //     console.log(`Tentativo di riconnessione per ${playerJoin} nel gioco ${gameId}`);
+            // }
 
             const pingInterval = setInterval(() => {
                 if (ws.readyState === WebSocket.OPEN) {
@@ -106,10 +106,9 @@ export const WebSocketProvider = ({children}) => {
                         player: message.playerName, // Aggiorna il nome del giocatore
                         playerRole: message.userRole,
                     }));
-                    localStorage.setItem("playerName", message.playerName); // Salva playername nel localStorage
+
                 } else if (message.type === 'gameId') {
                     setGameId(message.content);
-                    localStorage.setItem("gameId", message.content);  // Salva gameId nel localStorage
                 }
                 /**
                  * type: balance
@@ -213,7 +212,7 @@ export const WebSocketProvider = ({children}) => {
                 ws.close();
             }
         };
-    }, [gameId, playerJoin]);
+    }, []);
 
 
     return (

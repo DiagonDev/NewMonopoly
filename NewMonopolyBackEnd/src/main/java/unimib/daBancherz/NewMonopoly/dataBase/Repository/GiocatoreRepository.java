@@ -18,7 +18,7 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
     @Query("SELECT g.idGiocatore FROM Giocatore g WHERE g.nome = :nomeGiocatore AND g.idpartita.codiceInvito = :idPartita")
     Integer findIdByNomeAndPartitaCodiceInvito(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
 
-    Optional<Giocatore> findByNomeAndIdPartita_Idpartita(String nome, Integer idPartita);
+    Optional<Giocatore> findByNomeAndIdpartita_CodiceInvito(String nome, String idpartita);
 
     void deleteByIdGiocatore(Integer idGiocatore);
 

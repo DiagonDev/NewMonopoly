@@ -40,7 +40,7 @@ public class GameService {
         Partita nuovaPartita = new Partita();
         nuovaPartita.setLivelloDifficolta(difficulty);
         nuovaPartita.setStato("nonIniziata");
-        if(randomization.equals("true"))
+        if (randomization.equals("true"))
             nuovaPartita.setRandomizzazione(true);
         else
             nuovaPartita.setRandomizzazione(false);
@@ -48,7 +48,7 @@ public class GameService {
         partitaRepository.save(nuovaPartita);       // Salva la partita nel database
 
         //inizializzo prezzo caselle
-        if(nuovaPartita.getRandomizzazione())
+        if (nuovaPartita.getRandomizzazione())
             partitaCasellaPrezzoproprietaRepository.populateWithRandomizationTrue(gameId);
         else
             partitaCasellaPrezzoproprietaRepository.populateWithRandomizationFalse(gameId);
@@ -116,7 +116,7 @@ public class GameService {
     }
 
     @Transactional
-    public void deletePlayer(String gameId, String nomeGiocatore){
+    public void deletePlayer(String gameId, String nomeGiocatore) {
         Integer idGiocatore = giocatoreRepository.findIdByNomeAndPartitaCodiceInvito(nomeGiocatore, gameId);
         giocatoreRepository.deleteByIdGiocatore(idGiocatore);
     }
@@ -128,7 +128,7 @@ public class GameService {
     public List<String> getPlayersWithIdLowerThan(String gameId, String nomeGiocatore) {
         Integer idGiocatore = giocatoreRepository.findIdGiocatoreByNome(nomeGiocatore, gameId);
         if (idGiocatore != null) {
-            List<String> giocatori= giocatoreRepository.findGiocatoriConIdMinore(gameId, idGiocatore);
+            List<String> giocatori = giocatoreRepository.findGiocatoriConIdMinore(gameId, idGiocatore);
             if (!giocatori.isEmpty())
                 return giocatori;
             else return Collections.emptyList();    // Se non ci sono giocatori precedenti
@@ -136,9 +136,9 @@ public class GameService {
             return Collections.emptyList();  // Se il giocatore non viene trovato
         }
     }
-
+    /*
     @Transactional
-    public void gestisciSaldoGiocatoreProbabilita(String nomeGiocatore, Integer idPartita, String descrizioneProbabilita) throws Exception {
+    public void gestisciSaldoGiocatoreProbabilita(String nomeGiocatore, String idPartita, String descrizioneProbabilita) throws Exception {
         // Recupero del giocatore
         Giocatore giocatore = giocatoreRepository.findByNomeAndIdPartita_Idpartita(nomeGiocatore, idPartita)
                 .orElseThrow(() -> new IllegalArgumentException("Giocatore non trovato"));
@@ -166,5 +166,5 @@ public class GameService {
         // Salvataggio delle modifiche al saldo
         giocatoreRepository.save(giocatore);
     }
-
+*/
 }
