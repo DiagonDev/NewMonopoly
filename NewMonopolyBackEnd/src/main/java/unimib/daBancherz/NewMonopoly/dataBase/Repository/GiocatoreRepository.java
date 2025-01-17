@@ -18,8 +18,6 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
     @Query("SELECT g.idGiocatore FROM Giocatore g WHERE g.nome = :nomeGiocatore AND g.idpartita.codiceInvito = :idPartita")
     Integer findIdByNomeAndPartitaCodiceInvito(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
 
-    Optional<Giocatore> findByNomeAndIdpartita_CodiceInvito(String nome, String idpartita);
-
     void deleteByIdGiocatore(Integer idGiocatore);
 
     @Transactional
@@ -49,8 +47,24 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
                 WHERE nome = :nomeGiocatore
         		AND idpartita= :idPartita
     """, nativeQuery = true)
-    int aggiornamentoSaldo(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("soldi") Integer soldi);
+    Integer aggiornamentoSaldo(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("soldi") Integer soldi);
 
+    @Modifying
+    @Transactional
+    @Query(value = """
+        UPDATE giocatore
+        SET saldo = saldo + :importo
+        WHERE idpartita = :idPartita
+        AND nome <> :nomeGiocatoreEscluso
+    """, nativeQuery = true)
+    Integer pagaImportoGiocatori(@Param("importo") Integer importo, @Param("idPartita") String idPartita, @Param("nomeGiocatoreEscluso") String nomeGiocatoreEscluso);
+
+    @Query(value = """
+        SELECT COUNT(*) 
+        FROM giocatore 
+        WHERE idpartita = :idPartita
+    """, nativeQuery = true)
+    Integer contaGiocatoriInPartita(@Param("idPartita") String idPartita);
 
 }
 

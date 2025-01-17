@@ -12,15 +12,16 @@ import unimib.daBancherz.NewMonopoly.dataBase.Entity.Partita_Probabilita;
 public interface PartitaProbabilitaRepository extends JpaRepository<Partita_Probabilita, Long> {
     //Metodo per trovare la descrizione di probabilita
     @Query(value = """
-        select p.descrizione
-        from partita_probabilita pp
-        join probabilita p
-        on id_probabilita=pp.idprobabilita
-        where pp.idpartita= :idPartita
-        and pp.utilizzato=false
-        limit 1
+        SELECT p.descrizione
+        FROM partita_probabilita pp
+        JOIN probabilita p
+        ON id_probabilita=pp.idprobabilita
+        WHERE pp.idpartita= :idPartita
+        AND pp.utilizzato=false
+        ORDER BY RANDOM()
+        LIMIT 1
     """, nativeQuery = true)
-    Integer findDescrizioneProbabilita(@Param("idPartita") String idPartita);
+    String findDescrizioneProbabilita(@Param("idPartita") String idPartita);
 
     //metodo per settare a true l'utilizzo
     @Transactional
@@ -28,6 +29,26 @@ public interface PartitaProbabilitaRepository extends JpaRepository<Partita_Prob
     @Query("UPDATE Partita_Probabilita pp SET pp.utilizzato = true " +
             "WHERE pp.idpartita.codiceInvito = :idPartita " +
             "AND pp.idprobabilita.descrizione = :descrizione")
-    void setUtilizzatoTrue(@Param("idPartita") Integer idPartita, @Param("descrizione") String descrizione);
+    void setUtilizzatoTrue(@Param("idPartita") String idPartita, @Param("descrizione") String descrizione);
 
+    //metodo per settare a false l'utilizzo
+    @Transactional
+    @Modifying
+    @Query("""
+        UPDATE Partita_Probabilita pp
+        SET pp.utilizzato = CASE
+            WHEN pp.idgiocatore IS NOT NULL THEN true 
+            ELSE false 
+        END
+        WHERE pp.idpartita.codiceInvito = :idPartita 
+    """)
+    void setUtilizzatoFalse(@Param("idPartita") String idPartita);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Partita_Probabilita pp SET pp.idgiocatore = (" +
+            "SELECT g.idGiocatore FROM Giocatore g " +
+            "WHERE g.nome = :nomeGiocatore " +
+            "AND g.idpartita=:idPartita) ")
+    void setGiocatore(@Param("idPartita") String idPartita, @Param("nomeGiocatore") String nomeGiocatore);
 }

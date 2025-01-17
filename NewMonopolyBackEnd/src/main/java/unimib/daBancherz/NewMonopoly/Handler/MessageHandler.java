@@ -6,6 +6,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaCasellaPrezzoproprietaRepository;
+import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaProbabilitaRepository;
 import unimib.daBancherz.NewMonopoly.dataBase.Service.GameService;
 
 import java.io.IOException;
@@ -19,12 +20,14 @@ public class MessageHandler {
     private final PartitaCasellaPrezzoproprietaRepository pCPPRepository;
     private final GiocatoreRepository giocatoreRepository;
     private final PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository;
+    private final PartitaProbabilitaRepository partitaProbabilitaRepository;
 
-    public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository) {
+    public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository, PartitaProbabilitaRepository partitaProbabilitaRepository) {
         this.gameService = gameService;
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;
         this.partitaCasellaPrezzoproprietaRepository = partitaCasellaPrezzoproprietaRepository;
+        this.partitaProbabilitaRepository = partitaProbabilitaRepository;
     }
 
     //serve per creare un messaggio di sistema in Json così che il forntend lo metta nella game console
@@ -253,6 +256,63 @@ public class MessageHandler {
 
                 break;
 
+        }
+    }
+
+    public void gestisciAzione(String tipoAzione, Map<String, Object> parametri, String idPartita, String nomeGiocatore, Integer posizione, int pawnId, Map<String, List<WebSocketSession>> gameSession ) throws IOException {
+        Integer importo;
+        int soldi;
+        int id_casella;
+
+        switch (tipoAzione) {
+            case "paga_importo":
+                importo = (Integer) parametri.get("importo");
+                giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, importo);
+                break;
+
+            case "ricevi_importo":
+                importo = (Integer) parametri.get("importo");
+                giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, -importo);
+                break;
+
+            case "paga_importo_giocatore":
+                importo = (Integer) parametri.get("importo");
+                soldi = (giocatoreRepository.contaGiocatoriInPartita(idPartita)-1) * importo;
+                giocatoreRepository.pagaImportoGiocatori(importo, idPartita, nomeGiocatore);
+                giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, soldi);
+                break;
+
+            case "ricevi_importo_giocatore":
+                importo = (Integer) parametri.get("importo");
+                soldi = -((giocatoreRepository.contaGiocatoriInPartita(idPartita)-1) * importo);
+                giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, soldi);
+                giocatoreRepository.pagaImportoGiocatori(-importo, idPartita, nomeGiocatore);
+                break;
+
+            case "paga_possedimenti":
+                int importoCasa = (Integer) parametri.get("costo_casa");
+                int importoAlbergo= (Integer) parametri.get("costo_albergo");
+                int numCase = pCPPRepository.contaCase(nomeGiocatore, idPartita);
+                int numAlberghi = pCPPRepository.contaAlberghi(nomeGiocatore, idPartita);
+                int totaleDaPagare = (numCase * importoCasa) + (numAlberghi * importoAlbergo);
+                giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, totaleDaPagare);
+                break;
+
+            case "sposta_avanti":
+                id_casella = (Integer) parametri.get("id_casella");
+                if(posizione > id_casella)
+                    giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, -200);
+                sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSession, idPartita);
+                break;
+
+            case "vai_in_prigione":
+                id_casella = (Integer) parametri.get("id_casella");
+                sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSession, idPartita);
+                break;
+
+            case "esci_prigione":
+                partitaProbabilitaRepository.setGiocatore(idPartita, nomeGiocatore);
+                break;
         }
     }
 }
