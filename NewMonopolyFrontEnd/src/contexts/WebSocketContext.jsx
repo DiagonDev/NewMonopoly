@@ -36,7 +36,7 @@ export const WebSocketProvider = ({children}) => {
     })
     const [payment, setPayment] = useState({
         flag: false,
-        describtion: '',
+        description: '',
         destination: '',
         payment: 0,
     })
@@ -50,15 +50,15 @@ export const WebSocketProvider = ({children}) => {
         price: 0,
     })
     useEffect(() => {
-        //const ws = new WebSocket("https://5dbf-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
-        const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
+        const ws = new WebSocket("https://7559-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
+        //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
         ws.onopen = () => {
             setSocket(ws);
             setConnected(true);
 
-            if (gameId && playerName) {
-                ws.send(`RECONNECT:${playerName}:${gameId}`);
-                console.log(`Tentativo di riconnessione per ${playerName} nel gioco ${gameId}`);
+            if (gameId && playerJoin) {
+                ws.send(`RECONNECT:${playerJoin}:${gameId}`);
+                console.log(`Tentativo di riconnessione per ${playerJoin} nel gioco ${gameId}`);
             }
 
             const pingInterval = setInterval(() => {
@@ -104,7 +104,7 @@ export const WebSocketProvider = ({children}) => {
                     setPlayerJoin((prevState) => ({
                         ...prevState, // Mantieni le altre proprietà, se esistono
                         player: message.playerName, // Aggiorna il nome del giocatore
-                        playerRole: message.userRole, // Aggiorna il bilancio
+                        playerRole: message.userRole,
                     }));
                     localStorage.setItem("playerName", message.playerName); // Salva playername nel localStorage
                 } else if (message.type === 'gameId') {
@@ -172,18 +172,18 @@ export const WebSocketProvider = ({children}) => {
                     setPayment((prevState) => ({
                         ...prevState,
                         flag: true,
-                        describtion: message.describtion,
+                        description: message.description,
                         destination: message.destination,
                         payment: message.payment,
                     }));
-                    
+
                 } else if (message.type === 'draw') {
                     console.log(message.type);
                     setDraw((prevState) => ({
                         ...prevState,
                         flag: true,
                         card: message.card,
-                        describtion: message.describtion,
+                        description: message.description,
                     }));
                 } else if (message.type === 'buy') {
                     console.log(message.type);
@@ -192,8 +192,8 @@ export const WebSocketProvider = ({children}) => {
                         flag: true,
                         price: message.price,
                     }));
-                    
-                } 
+
+                }
             };
 
             ws.onerror = (error) => {
@@ -209,7 +209,7 @@ export const WebSocketProvider = ({children}) => {
                 ws.close();
             }
         };
-    }, [gameId, playerName]);
+    }, [gameId, playerJoin]);
 
 
     return (

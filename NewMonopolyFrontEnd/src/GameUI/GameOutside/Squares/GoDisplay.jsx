@@ -21,7 +21,7 @@ export const GoDisplay = ({id, players}) => {
             <div className="icon">
                 <FontAwesomeIcon icon={faHandPointLeft} color="green"/>
             </div>
-            <div className="square-name">GO</div>
+            <div className="square-name">VIA</div>
         </React.Fragment>
     );
 };
