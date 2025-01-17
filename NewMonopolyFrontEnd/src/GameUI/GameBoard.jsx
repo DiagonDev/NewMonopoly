@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import GameSquare from "./GameOutside/GameSquare.jsx";
 import BaseRectangle from "./actionRectangle/BaseRectangle.jsx";
 import RollDice from "./actionRectangle/RollDice.jsx";
@@ -6,23 +6,41 @@ import Scambia from "./actionRectangle/Scambia.jsx";
 import IpotecaProprieta from "./actionRectangle/IpotecaProrieta.jsx";
 import ChatFather from "./ChatFather.jsx";
 import PlayersStatsRectangle from "./PlayersStatsRectangle.jsx";
-import { WebSocketContext } from "../contexts/WebSocketContext.jsx";
+import {WebSocketContext} from "../contexts/WebSocketContext.jsx";
 import SelectPawn from "../pages/SelectPawn.jsx";
-import {pawnColors} from "../pages/pawnColors.jsx"; // Assicurati di importare correttamente GameSquare
 
 const GameBoard = () => {
-    const { socket, connected, diceResult, playerJoin, gameId, startTurn, playerPawn, pawnsAvailable} = useContext(WebSocketContext); // Accesso al WebSocket
+    const {
+        socket,
+        connected,
+        diceResult,
+        playerJoin,
+        gameId,
+        startTurn,
+        playerPawn,
+        pawnsAvailable
+    } = useContext(WebSocketContext); // Accesso al WebSocket
     const [isPlayerJoined, setIsPlayerJoined] = useState(false);
     const [activeComponent, setActiveComponent] = useState("BaseRectangle");
     const [pawnSelected, setSelectedPawn] = useState(false);
     const [isMyTurn, setIsMyTurn] = useState(false); // Stato per il turno del giocatore
     const [isGameStarted, setIsGameStarted] = useState(false); // Stato per la partita
 
-    const placeholderPawns = Array.from({length: 6}, (_, i) => ({
-        id: i + 1,
-        color: pawnColors[i+1] || "gray",
-    }));
-
+    /**
+     * tiene la posizione dei player, quando scelgo una pedina, setto la posizione a 1. Ma dove?
+     * Ad esempio se player sceglie pedina green(id 3) playerPositions sarà = [0,0,1,0,0,0]
+     */
+    const [playerPositions, setPlayerPositions] = useState([0, 0, 0, 0, 0, 0]); // max 6 giocatori
+    useEffect(() => {
+        if (playerPawn) { // Supponendo che playerMove arrivi dal WebSocket
+            setPlayerPositions((prevPositions) => {
+                const newPositions = [...prevPositions];
+                newPositions[playerPawn.pawnId-1] = playerPawn.offset;
+                return newPositions;
+            });
+        }
+        console.log("playerPositions", playerPositions);
+    }, [playerPawn]);
     const handlePawnSelection = () => {
         setSelectedPawn(true);
     };
@@ -33,7 +51,7 @@ const GameBoard = () => {
             socket.send('InizioPartita:');
             console.log('Messaggio inviato: InizioPartita');
 
-        console.log("Partita avviata.");
+            console.log("Partita avviata.");
         } else {
             console.error('Connessione WebSocket non stabilita!');
         }
@@ -62,7 +80,7 @@ const GameBoard = () => {
     //Riceve il messaggio di inizio di un turno
     useEffect(() => {
 
-        if (startTurn && startTurn.flag !== undefined && startTurn.playername.length >0) {
+        if (startTurn && startTurn.flag !== undefined && startTurn.playername.length > 0) {
             setActiveComponent("BaseRectangle");
             setIsGameStarted(true);
             setIsMyTurn(startTurn.flag);
@@ -70,34 +88,44 @@ const GameBoard = () => {
     }, [startTurn]);
 
     // Creare un array di numeri da 1 a 40
-    const num_squares = Array.from({ length: 40 }, (_, index) => index + 1);
+    const num_squares = Array.from({length: 40}, (_, index) => index + 1);
 
+    /**
+     * players={playerPositions.map((pos, index) => (pos === id ? index : null))
+     *                         .filter((p) => p !== null)}
+     * questa funzione itera su playerPositions e controlla che playerPosition[pos] === id(casella)
+     * se si ritorna index se no ritorna null
+     * .filter poi filtra laddove io ho valori null
+     * quindi se io ho [0,0,1,0,0,0] e id = 1 avrò [null, null, 2, null, null, null] che filtrato mi dà [2]
+     */
     return (
         <div className="board">
             {num_squares.map((id) => (
                 <GameSquare
                     id={id}
                     key={id}
-                    tokens={placeholderPawns} // Passa le pedine alle caselle
+                    players={playerPositions.map((pos, index) => (pos === id ? index : null))
+                        .filter((p) => p !== null)}
+
                 />
             ))}
             <div className="rectangle-top-left">
                 {playerJoin.playerRole === "ADMIN" || !isPlayerJoined ? (
                     <div className="shimmer-effect">
                         <p>ID Partita: {gameId}</p>
-                        <br />
+                        <br/>
                         <p>In attesa di un giocatore...</p>
                     </div>
                 ) : !pawnSelected ? (
                     <div>
-                        <SelectPawn onPawnSelect={handlePawnSelection} />
+                        <SelectPawn onPawnSelect={handlePawnSelection}/>
                     </div>
                 ) : (
                     <div className="grid-item">
                         <p>ID Partita: {gameId}</p>
                         <div className="actionDiv">
                             {/* Pulsante "Avvia Partita" visibile solo se la partita non è iniziata */}
-                            {!isGameStarted && gameId.length>0 && (
+                            {!isGameStarted && gameId.length > 0 && (
                                 <button onClick={handleStartGame}>
                                     Avvia Partita
                                 </button>
@@ -132,12 +160,12 @@ const GameBoard = () => {
                                     </button>
                                 </>
                             )}{isGameStarted && !isMyTurn && (
-                                <>
-                                    <p>
-                                        E il turno di {startTurn.playername}
-                                    </p>
-                                </>
-                            )}
+                            <>
+                                <p>
+                                    E il turno di {startTurn.playername}
+                                </p>
+                            </>
+                        )}
                         </div>
                     </div>
                 )}
@@ -146,20 +174,20 @@ const GameBoard = () => {
             <div className="horizontal-line"></div>
             <div className="rectangle-top-right">
                 <div className="grid-item">
-                    {activeComponent === "BaseRectangle" && <BaseRectangle />}
-                    {activeComponent === "RollDice" && <RollDice />}
-                    {activeComponent === "Scambia" && <Scambia />}
-                    {activeComponent === "IpotecaProprieta" && <IpotecaProprieta />}
+                    {activeComponent === "BaseRectangle" && <BaseRectangle/>}
+                    {activeComponent === "RollDice" && <RollDice/>}
+                    {activeComponent === "Scambia" && <Scambia/>}
+                    {activeComponent === "IpotecaProprieta" && <IpotecaProprieta/>}
                 </div>
             </div>
             <div className="rectangle-bot-left">
                 <div className="grid-item">
-                    <ChatFather />
+                    <ChatFather/>
                 </div>
             </div>
             <div className="rectangle-bot-right">
                 <div className="grid-item">
-                    <PlayersStatsRectangle />
+                    <PlayersStatsRectangle/>
                 </div>
             </div>
         </div>

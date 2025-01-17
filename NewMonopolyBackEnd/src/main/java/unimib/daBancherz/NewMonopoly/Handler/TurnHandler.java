@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 
 import java.util.List;
@@ -16,12 +17,15 @@ public class TurnHandler {
 
     private final GameHandler gameHandler;
     private final MessageHandler messageHandler;
+    private final GiocatoreRepository giocatoreRepository;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
+    int counterRollDice = 0;
 
     @Autowired
-    public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler) {
+    public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository) {
         this.gameHandler = gameHandler;
         this.messageHandler = messageHandler;
+        this.giocatoreRepository = giocatoreRepository;
     }
 
     public void endTurn( WebSocketSession session ) throws Exception {
@@ -68,7 +72,6 @@ public class TurnHandler {
                 session.sendMessage(new TextMessage(yourTurnMessage));
             }
         }
-
     }
 
     public void rollDice(WebSocketSession session) throws Exception {
@@ -85,18 +88,31 @@ public class TurnHandler {
                 "dice1", diceR1,
                 "dice2", diceR2
         ));
+        session.sendMessage(new TextMessage(diceRolled));//invia il risultato dei dati al giocatore che li ha tirati
 
-        //TODO: metodo per inviare i messaggi per che tipo è la casella
-        messageHandler.sendTypeBox(gameId, playerName, newPosition, gameHandler.getGameSessions());
-
+        //serve a recuperare la pawnId del giocatore
+        int pawnId = giocatoreRepository.findPedinaFromGiocatore(playerName, gameId);
         if( newPosition > 40 ){
             newPosition -= 40;
             //TODO: aggiungere al saldo 200, perchè signfica che è passato dal VIA
         }
-        session.sendMessage(new TextMessage(diceRolled));//invia il risultato dei dati al giocatore che li ha tirati
         gameBoard.setPlayerPosition(gameId, playerName, newPosition);//aggiorna la posizione del giocatore
+        //invia a tutti i giocatori che il "playername" si è postato di tot caselle "newPosition"
+        messageHandler.sendPawnMove(pawnId, playerName, newPosition, gameHandler.getGameSessions(), gameId);
+        //metodo per inviare il nome della casella su cui si è finiti
 
-        //serve come controllo per capire dove finisce la pedina, SERVE PER IL DEBUG/TEST
-        System.out.println("La posizione di: " + playerName + " di game: " + gameId + " è: " + newPosition);
+        //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
+        messageHandler.sendBoxUsage(playerName,session, newPosition, gameId);
+
+        /*//TODO: aggiungere l'opzione per uscire dalla prigione se si fa il doppio(due dadi uguali)
+        if(diceR1 == diceR2) {
+            counterRollDice++;
+            if (counterRollDice < 3) {
+                rollDice(session);
+            }
+            else {
+                //TODO: manda in prigione il giocatore
+            }
+        }*/
     }
 }

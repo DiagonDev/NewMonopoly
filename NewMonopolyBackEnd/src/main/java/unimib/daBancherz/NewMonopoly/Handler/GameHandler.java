@@ -2,22 +2,20 @@ package unimib.daBancherz.NewMonopoly.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import unimib.daBancherz.NewMonopoly.Repository.GiocatoreRepository;
-import unimib.daBancherz.NewMonopoly.Repository.PartitaRepository;
-import unimib.daBancherz.NewMonopoly.Repository.PedinaRepository;
-import unimib.daBancherz.NewMonopoly.Service.GameService;
+import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
+import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaRepository;
+import unimib.daBancherz.NewMonopoly.dataBase.Repository.PedinaRepository;
+import unimib.daBancherz.NewMonopoly.dataBase.Service.GameService;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
@@ -99,7 +97,6 @@ public class GameHandler {
         pedineNonUsate = pedinaRepository.findUnusedPedineByPartita(gameId);
         messageHandler.sendUnusedPedine(pedineNonUsate, gameSessions, gameId); //invia al giocatore la lista delle pedine disponibili
     }
-
 
     private void joinGame(String playerName, String gameId, WebSocketSession session) throws Exception {
         //TODO: aggiornare il messaggio in formato Json, e gestire il messaggio in frontEnd
@@ -187,7 +184,6 @@ public class GameHandler {
         playerNameList.values().removeIf(existingSession -> existingSession.equals(session));
     }
 
-
     public void notifyPlayerDisconnected(String gameId, String playerName) throws Exception {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
 
@@ -212,7 +208,7 @@ public class GameHandler {
         String gameId = getGameIdBySession(session);
 
         String playerName = getPlayerNameBySession(session);    //tropo il giocatore associato alla sessione
-        pedineNonUsate.remove(Integer.parseInt(idPedina)-1);
+        pedineNonUsate.remove(Integer.valueOf(Integer.parseInt(idPedina)));
         messageHandler.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);
 
         giocatoreRepository.updatePedinaForGiocatore(playerName, Integer.parseInt(idPedina), gameId);  //Assegna la pedina al giocatore nel database

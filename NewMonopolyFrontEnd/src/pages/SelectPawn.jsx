@@ -43,7 +43,6 @@ const SelectPawn = ({ onPawnSelect }) => {
                         style={{backgroundColor: pawn.color}}
                         onClick={() => handleSelectPawn(pawn)}
                     >
-                        <span className="pawn-id">{pawn.id}</span>
                     </div>
                 ))}
             </div>
