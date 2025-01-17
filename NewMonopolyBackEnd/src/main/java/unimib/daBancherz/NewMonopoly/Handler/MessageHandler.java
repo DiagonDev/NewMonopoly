@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaCasellaPrezzoproprietaRepository;
 import unimib.daBancherz.NewMonopoly.dataBase.Service.GameService;
 
@@ -15,11 +16,13 @@ import java.util.Map;
 public class MessageHandler {
 
     private final GameService gameService;
-    private final PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository;
+    private final PartitaCasellaPrezzoproprietaRepository pCPPRepository;
+    private final GiocatoreRepository giocatoreRepository;
 
-    public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository) {
+    public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository) {
         this.gameService = gameService;
-        this.partitaCasellaPrezzoproprietaRepository = partitaCasellaPrezzoproprietaRepository;
+        this.pCPPRepository = pCPPRepository;
+        this.giocatoreRepository = giocatoreRepository;
     }
 
     //serve per creare un messaggio di sistema in Json così che il forntend lo metta nella game console
@@ -143,41 +146,73 @@ public class MessageHandler {
     }
 
     //posizione => il codice della cella dove il giocatore finisce dopo il lancio dadi
-    public void sendTypeBox(WebSocketSession session, int posizione, String gameId){
+    public void sendBoxUsage(String playerName, WebSocketSession session, int posizione, String gameId) throws Exception{
 
-       /* String typeBox = partitaCasellaPrezzoproprietaRepository.findTipoByPosizione(posizione, gameId);
+        String typeBox = pCPPRepository.findTipoByPosizione(posizione, gameId);
         switch (typeBox){
             case "Via":
-                //aggiornamento del database per aggiungere i 200$
-                //
+                //TODO: query per aggiungere il prezzo della tassa dal saldo del giocatore
                 break;
             case"Proprietà":
-
+                String proprietario = pCPPRepository.findNomeGiocatoreByPosizioneAndGameId(posizione, gameId);
+                if(proprietario == null){
+                    String buyBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
+                            "type", "buy",
+                            "price", "", //TODO: query per prendere il prezzo della casella
+                            "nameBox", "" //TODO: query per prendere il nome della casella
+                    ));
+                    session.sendMessage(new TextMessage(buyBoxMessage));
+                }else if(!playerName.equals(proprietario)){
+                    giocatoreRepository.diminuisciSaldoGiocatore(playerName, gameId, posizione);
+                    giocatoreRepository.aumentoSaldoGiocatore(proprietario, gameId, posizione);
+                    String payBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
+                            "description", "affitto",
+                            "destination", proprietario,
+                            "payment", ""//TODO: query per prendere il prezzo dell'affitto da pagare
+                    ));
+                    session.sendMessage(new TextMessage(payBoxMessage));
+                }
                 break;
             case"Probabilità":
-
+                //TODO: query per ottenere la descrizione della probabilità
+                //TODO: query per aumentare o diminuire il prezzo se c'è bisogno di pagare/ricevere
                 break;
             case"Tassa":
-
+                //TODO: query per togliere il prezzo della tassa dal saldo del giocatore
+                //Si può forse usare la stessa del via, ma mettendo i valori negativi nel database
+                //se si vole detrarre la tassa dal saldo del giocatore
                 break;
             case"Stazione":
-
+                //TODO: query che mi restituisce il numero di stazioni del giocatore
+                //TODO: query che mi restituisce il prezzo della casella stazione
+                //calcola ipoteca --> è la meta del prezzo
+                //calcola numero stazioni per calcolare il prezzo di affitto
                 break;
             case"Imprevisto":
-
+                //TODO: query per ottenere la descrizione dell'imprevisto
+                //TODO: query per aumentare o diminuire il prezzo se c'è bisogno di pagare/ricevere
+                //controllare se si può usare la stessa di Probabilità
                 break;
             case"Prigione":
-
+                //invia un messaggio che sei in transito sulla prigione
+                //far si che il front-end riesca a gestirlo
                 break;
             case"Società":
-
+                //TODO: query che mi restituisce il numero delle società del giocatore
+                //capire se il prezzo si moltiplica in base al numero delle società
+                //TODO: query che mi restituisce il prezzo della casella società
+                //calcola ipoteca --> è la meta del prezzo
+                //calcola numero società per calcolare il prezzo di affitto
                 break;
             case"Posteggio":
-
+                //inviare un messaggio per dire che si è finiti sul posteggio
+                //far si che il front-end riesca a gestirlo
                 break;
             case"InPrigione":
-
+                //TODO: query che in pase al nome della casella ti restituisce l'id della cella
+                //non so se si necessario ma potrebbe servirmi in più casi
+                //spostare la pedina sulla casella prigione
                 break;
-        }*/
+        }
     }
 }

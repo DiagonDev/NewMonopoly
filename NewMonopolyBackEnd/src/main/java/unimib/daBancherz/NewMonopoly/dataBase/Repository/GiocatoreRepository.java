@@ -51,7 +51,7 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
         )
         WHERE nome = :playerName
     """, nativeQuery = true)
-    void diminuisciSaldoGiocatore(@Param("playerName") String playerName, @Param("gameId") String gameId, @Param("posizione") Integer posizione);
+    void diminuisciSaldoGiocatore(@Param("playerName") String playerName, @Param("idPartita") String idPartita, @Param("posizione") Integer posizione);
 
     @Modifying
     @Transactional
@@ -68,7 +68,7 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
         )
         WHERE nome = :playerName
     """, nativeQuery = true)
-    int aumentoSaldoGiocatore(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") Integer idPartita, @Param("posizione") Integer posizione);
+    int aumentoSaldoGiocatore(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("posizione") Integer posizione);
 
 }
 

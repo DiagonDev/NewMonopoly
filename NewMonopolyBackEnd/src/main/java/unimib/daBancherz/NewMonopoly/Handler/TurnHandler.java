@@ -99,9 +99,10 @@ public class TurnHandler {
         gameBoard.setPlayerPosition(gameId, playerName, newPosition);//aggiorna la posizione del giocatore
         //invia a tutti i giocatori che il "playername" si è postato di tot caselle "newPosition"
         messageHandler.sendPawnMove(pawnId, playerName, newPosition, gameHandler.getGameSessions(), gameId);
+        //metodo per inviare il nome della casella su cui si è finiti
 
-        //metodo per vedere il tipo di casella
-        messageHandler.sendTypeBox(session, newPosition, gameId);
+        //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
+        messageHandler.sendBoxUsage(playerName,session, newPosition, gameId);
 
         /*//TODO: aggiungere l'opzione per uscire dalla prigione se si fa il doppio(due dadi uguali)
         if(diceR1 == diceR2) {

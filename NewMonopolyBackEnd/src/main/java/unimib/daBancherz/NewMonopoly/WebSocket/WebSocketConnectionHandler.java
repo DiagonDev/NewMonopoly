@@ -66,6 +66,15 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
             case "SceltaPedina":
                 gameHandler.choosePedina(parts, session);
                 break;
+            case "AcquistaProprieta":
+                //gestire il salvataggio della proprietà acquistata dal giocatore nel database
+                break;
+            case  "IpotecaProprieta":
+                //gestire l'ipoteca della proprietà
+                break;
+            case "ScambiaProprieta":
+                //gestire lo scambio della proprietà
+                break;
             default:
                 throw new IllegalArgumentException("Tipo di messaggio non supportato: " + parts[0]);
         }
