@@ -50,5 +50,7 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
         		AND idpartita= :idPartita
     """, nativeQuery = true)
     int aggiornamentoSaldo(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("soldi") Integer soldi);
+
+
 }
 

@@ -213,7 +213,7 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     @Query(value = """
         SELECT pcp.prezzo_corrente
         FROM partita_casella_prezzoproprieta pcp
-        WHERE pcp.posizione = :posizione 
+        WHERE pcp.posizione = :posizione
           AND pcp.idpartita = (SELECT p.codice_invito FROM partita p WHERE p.codice_invito = :idPartita)
     """, nativeQuery = true)
     Integer prezzoCasella(@Param("posizione") Integer posizione, @Param("idPartita") String idPartita);
@@ -244,4 +244,15 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
             AND pcp.idpartita = :idPartita
     """, nativeQuery = true)
     int affittoProprieta(@Param("idPartita") String idPartita, @Param("posizione") Integer posizione);
+
+    //Metodo per contare quante caselle di quel tipo ha l'utente
+    @Query(value =  """
+        SELECT COUNT(pc.idcasella) 
+        FROM partita_casella_prezzoproprieta pc
+        JOIN casella c ON pc.idcasella = c.id_casella 
+        WHERE pc.idgiocatore = :idGiocatore 
+        AND c.tipo = :tipo
+        AND pc.idpartita = :idPartita
+    """, nativeQuery = true)
+    Long countProprieta(@Param("idGiocatore") Integer idGiocatore, @Param("tipo") String tipo, @Param("idPartita") String idPartita);
 }
