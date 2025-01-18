@@ -16,18 +16,18 @@ import java.util.Map;
 public class PropertyHandler {
     private final PartitaCasellaPrezzoproprietaRepository pCPPRepository;
     private final GiocatoreRepository giocatoreRepository;
-    private final PartitaProbabilitaRepository partitaProbabilitaRepository;
     private final GameHandler gameHandler;
+    private final MessageHandler messageHandler;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
-    public PropertyHandler(PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, GameHandler gameHandler) {
+    public PropertyHandler(PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, GameHandler gameHandler, MessageHandler messageHandler) {
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;
-        this.partitaProbabilitaRepository = partitaProbabilitaRepository;
         this.gameHandler = gameHandler;
+        this.messageHandler = messageHandler;
     }
 
-    public void acquistaProprieta(String[] messageParts, WebSocketSession session) throws IOException {
+    public void acquistaProprieta(String[] messageParts, WebSocketSession session) throws Exception {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
 
@@ -36,6 +36,7 @@ public class PropertyHandler {
         if(saldoGiocatore > prezzoCasella){
             pCPPRepository.setGiocatore(playerName, gameId, messageParts[1]);
             giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoCasella);
+            messageHandler.updateBalance(gameHandler.getGameSessions(), gameId);
             String probabilitaMessage = new ObjectMapper().writeValueAsString(Map.of(
                     "type", "acquistoRiuscito"
             ));
