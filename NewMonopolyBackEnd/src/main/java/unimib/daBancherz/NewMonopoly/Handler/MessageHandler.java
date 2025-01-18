@@ -364,8 +364,8 @@ public class MessageHandler {
                 PagaPossedimenti pagaPossedimentiDeserializzato = (PagaPossedimenti) parametri;
                 int importoCasa =  pagaPossedimentiDeserializzato.getCosto_casa();
                 int importoAlbergo= pagaPossedimentiDeserializzato.getCosto_abergo();
-                int numCase = pCPPRepository.contaCase(nomeGiocatore, idPartita);
-                int numAlberghi = pCPPRepository.contaAlberghi(nomeGiocatore, idPartita);
+                int numCase = pCPPRepository.contaCaseTot(nomeGiocatore, idPartita);
+                int numAlberghi = pCPPRepository.contaAlberghiTot(nomeGiocatore, idPartita);
                 int totaleDaPagare = (numCase * importoCasa) + (numAlberghi * importoAlbergo);
                 giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, totaleDaPagare);
                 updateBalance(gameSessions, idPartita);
@@ -386,7 +386,6 @@ public class MessageHandler {
                     gameBoard.setPlayerPosition(idPartita, nomeGiocatore, id_casella);
                     sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSessions, idPartita);
                 }
-
                 break;
 
             case "vai_in_prigione":
@@ -394,6 +393,7 @@ public class MessageHandler {
                 id_casella = id_casellaDeserializzato.getId_casella();
                 gameBoard.setPlayerPosition(idPartita, nomeGiocatore, id_casella);
                 sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSessions, idPartita);
+                gameBoard.setPlayerPrison(idPartita, nomeGiocatore, true);
                 break;
 
             case "esci_prigione":

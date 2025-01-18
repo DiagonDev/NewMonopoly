@@ -7,6 +7,8 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
+import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaImprevistoRepository;
+import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaProbabilitaRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -18,14 +20,18 @@ public class TurnHandler {
     private final GameHandler gameHandler;
     private final MessageHandler messageHandler;
     private final GiocatoreRepository giocatoreRepository;
+    private final PartitaProbabilitaRepository partitaProbabilitaRepository;
+    private final PartitaImprevistoRepository partitaImprevistoRepository;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     int counterRollDice = 0;
 
     @Autowired
-    public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository) {
+    public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, PartitaImprevistoRepository partitaImprevistoRepository) {
         this.gameHandler = gameHandler;
         this.messageHandler = messageHandler;
         this.giocatoreRepository = giocatoreRepository;
+        this.partitaProbabilitaRepository = partitaProbabilitaRepository;
+        this.partitaImprevistoRepository = partitaImprevistoRepository;
     }
 
     public void endTurn( WebSocketSession session ) throws Exception {
@@ -92,7 +98,25 @@ public class TurnHandler {
                 "dice2", diceR2
         ));
         session.sendMessage(new TextMessage(diceRolled));//invia il risultato dei dati al giocatore che li ha tirati
-
+        if(isInPrison){
+            boolean possiedeProbabilita = partitaProbabilitaRepository.possiedeCarta(gameId, playerName);
+            boolean possiedeImprevisto = partitaImprevistoRepository.possiedeCarta(gameId, playerName);
+            if(possiedeProbabilita){
+                isInPrison=false;
+                partitaProbabilitaRepository.setGiocatore(gameId, null, "esci_prigione");
+                String prigioneMessage = new ObjectMapper().writeValueAsString(Map.of(
+                        "type", "Uscito gratis grazie alla carta proabilità"
+                ));
+                session.sendMessage(new TextMessage(prigioneMessage));
+            } else if(possiedeImprevisto){
+                isInPrison=false;
+                partitaImprevistoRepository.setGiocatore(gameId, null, "esci_prigione");
+                String prigioneMessage = new ObjectMapper().writeValueAsString(Map.of(
+                        "type", "Uscito gratis grazie alla carta imprevisto"
+                ));
+                session.sendMessage(new TextMessage(prigioneMessage));
+            }
+        }
         if(!isInPrison || (diceR1 == diceR2)) {
             gameBoard.setPlayerPrison(gameId, playerName, false);
             newPosition = totDice + playerPosition;

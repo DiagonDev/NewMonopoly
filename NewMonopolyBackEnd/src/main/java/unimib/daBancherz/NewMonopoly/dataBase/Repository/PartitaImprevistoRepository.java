@@ -52,4 +52,12 @@ public interface PartitaImprevistoRepository extends JpaRepository<Partita_Impre
             "AND g.idpartita.codiceInvito=:idPartita) " +
             "WHERE pii.idimprevisto.tipoAzione = :tipoAzione")
     void setGiocatore(@Param("idPartita") String idPartita, @Param("nomeGiocatore") String nomeGiocatore, @Param("tipoAzione") String tipoAzione);
+
+    @Query("""
+        SELECT COUNT(pp) > 0
+        FROM Partita_Probabilita pp
+        WHERE pp.idgiocatore.nome = :nomeGiocatore
+        AND pp.idpartita.codiceInvito = :idPartita
+    """)
+    boolean possiedeCarta(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
 }

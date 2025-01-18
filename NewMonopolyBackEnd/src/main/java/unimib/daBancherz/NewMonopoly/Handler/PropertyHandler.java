@@ -1,5 +1,6 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -37,15 +38,15 @@ public class PropertyHandler {
             pCPPRepository.setGiocatore(playerName, gameId, messageParts[1]);
             giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoCasella);
             messageHandler.updateBalance(gameHandler.getGameSessions(), gameId);
-            String probabilitaMessage = new ObjectMapper().writeValueAsString(Map.of(
+            String proprietaMessage = new ObjectMapper().writeValueAsString(Map.of(
                     "type", "acquistoRiuscito"
             ));
-            session.sendMessage(new TextMessage(probabilitaMessage));
+            session.sendMessage(new TextMessage(proprietaMessage));
         }else{
-            String probabilitaMessage = new ObjectMapper().writeValueAsString(Map.of(
+            String proprietaMessage = new ObjectMapper().writeValueAsString(Map.of(
                     "type", "acquistoFallito"
             ));
-            session.sendMessage(new TextMessage(probabilitaMessage));
+            session.sendMessage(new TextMessage(proprietaMessage));
         }
     }
 
@@ -56,4 +57,41 @@ public class PropertyHandler {
     }
 
 
+    public void gestisciCase(String nomeGiocatore, String idPartita, Integer posizione, WebSocketSession session) throws IOException {
+        int saldoGiocatore = giocatoreRepository.saldoGiocatore(nomeGiocatore, idPartita);
+        int costoCasa = pCPPRepository.prezzoCasa(posizione, idPartita);
+        int numCase = pCPPRepository.contaCase(posizione);
+        if (saldoGiocatore > costoCasa && numCase < 4) {
+            giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, costoCasa);
+            pCPPRepository.compraCasa(posizione);
+            String casaMessage = new ObjectMapper().writeValueAsString(Map.of(
+                    "type", "acquistoRiuscito"
+            ));
+            session.sendMessage(new TextMessage(casaMessage));
+        } else {
+            String casaMessage = new ObjectMapper().writeValueAsString(Map.of(
+                    "type", "acquistoFallito"
+            ));
+            session.sendMessage(new TextMessage(casaMessage));
+        }
+    }
+
+    public void gestisciAlbergo(String nomeGiocatore, String idPartita, Integer posizione, WebSocketSession session) throws IOException {
+        int saldoGiocatore = giocatoreRepository.saldoGiocatore(nomeGiocatore, idPartita);
+        int costoAlbergo = pCPPRepository.prezzoCasa(posizione, idPartita);
+        Boolean numAlbergo = pCPPRepository.contaAlbergo(posizione);
+        if (saldoGiocatore > costoAlbergo && !(numAlbergo)) {
+            giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, costoAlbergo);
+            pCPPRepository.compraAlbergo(posizione);
+            String albergoMessage = new ObjectMapper().writeValueAsString(Map.of(
+                    "type", "acquistoRiuscito"
+            ));
+            session.sendMessage(new TextMessage(albergoMessage));
+        } else {
+            String albergoMessage = new ObjectMapper().writeValueAsString(Map.of(
+                    "type", "acquistoFallito"
+            ));
+            session.sendMessage(new TextMessage(albergoMessage));
+        }
+    }
 }
