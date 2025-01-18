@@ -90,7 +90,7 @@ const RollDice = () => {
             {isRolled && isDraw && (
                 <div>
                     <p>Hai pescato una carta {draw.card} che dice:</p>
-                    <p> {draw.card.description}</p>
+                    <p> {draw.description}</p>
                 </div>
             )}
             {isRolled && isBuy && (

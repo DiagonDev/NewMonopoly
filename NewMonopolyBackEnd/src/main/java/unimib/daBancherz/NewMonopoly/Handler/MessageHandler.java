@@ -341,12 +341,15 @@ public class MessageHandler {
                     id_casella = id_casellaDeserializzato.getId_casella();
                     if(posizione > id_casella)
                         giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, -200);
+                    gameBoard.setPlayerPosition(idPartita, nomeGiocatore, id_casella);
                     sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSession, idPartita);
                 } else if (parametri instanceof TipoCasella tipoCasellaDeserializzato) {
                     String tipoCasella = tipoCasellaDeserializzato.getTipo_casella();
                     id_casella = pCPPRepository.findNextCasellaByTipo(tipoCasella, posizione, idPartita);
+                    gameBoard.setPlayerPosition(idPartita, nomeGiocatore, id_casella);
+                    sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSession, idPartita);
                 }
-                sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSession, idPartita);
+
                 break;
 
             case "vai_in_prigione":

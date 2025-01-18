@@ -1,11 +1,16 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaCasellaPrezzoproprietaRepository;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaProbabilitaRepository;
+
+import java.io.IOException;
+import java.util.Map;
 
 @Component
 public class PropertyHandler {
@@ -22,19 +27,32 @@ public class PropertyHandler {
         this.gameHandler = gameHandler;
     }
 
-    public void acquistaProprieta(String[] messageParts, WebSocketSession session){
+    public void acquistaProprieta(String[] messageParts, WebSocketSession session) throws IOException {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
-        int idCasella = gameBoard.getPlayerPosition(gameId, playerName);
 
-        int prezzoCasella = 0; //TODO: query per prendere il prezzo della casella dal nome e dal gameId
+        int prezzoCasella = pCPPRepository.prezzoCasella2(messageParts[1], gameId);
         int saldoGiocatore = giocatoreRepository.saldoGiocatore(playerName, gameId);
         if(saldoGiocatore > prezzoCasella){
-            //pCPPRepository.setGiocatore();
+            pCPPRepository.setGiocatore(playerName, gameId, messageParts[1]);
             giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoCasella);
+            String probabilitaMessage = new ObjectMapper().writeValueAsString(Map.of(
+                    "type", "acquistoRiuscito"
+            ));
+            session.sendMessage(new TextMessage(probabilitaMessage));
+        }else{
+            String probabilitaMessage = new ObjectMapper().writeValueAsString(Map.of(
+                    "type", "acquistoFallito"
+            ));
+            session.sendMessage(new TextMessage(probabilitaMessage));
         }
-
-
-
     }
+
+    public void gestisciProprieta(String[] messageParts, WebSocketSession session) throws IOException {
+        String gameId = gameHandler.getGameIdBySession(session);
+        String playerName = gameHandler.getPlayerNameBySession(session);
+        
+    }
+
+
 }

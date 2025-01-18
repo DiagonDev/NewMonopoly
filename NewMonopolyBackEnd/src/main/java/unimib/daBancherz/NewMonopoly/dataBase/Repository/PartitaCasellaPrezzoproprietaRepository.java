@@ -205,7 +205,7 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     @Transactional
     @Query(value = """
         UPDATE Partita_Casella_Prezzoproprieta pcp
-        SET idgiocatore =  (SELECT g.id_giocatore FROM Giocatore g WHERE g.nome = :playerName)
+        SET idgiocatore =  (SELECT g.id_giocatore FROM Giocatore g WHERE g.nome = :playerName AND g.idpartita = :gameId)
         WHERE pcp.idcasella = (SELECT c.id_casella FROM Casella c WHERE c.nome = :nomeCasella)
         AND pcp.idpartita = :gameId
     """, nativeQuery = true)

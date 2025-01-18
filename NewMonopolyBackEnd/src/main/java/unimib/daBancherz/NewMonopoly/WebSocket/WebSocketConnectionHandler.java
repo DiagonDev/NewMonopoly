@@ -84,6 +84,9 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
             case "ScambiaProprieta":
                 //gestire lo scambio della proprietà
                 break;
+            case "GestisciProprieta":
+
+            break;
             default:
                 throw new IllegalArgumentException("Tipo di messaggio non supportato: " + parts[0]);
         }
