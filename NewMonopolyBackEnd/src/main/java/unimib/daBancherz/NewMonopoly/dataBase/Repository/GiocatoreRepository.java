@@ -20,6 +20,9 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
 
     void deleteByIdGiocatore(Integer idGiocatore);
 
+    @Query("SELECT g.saldo FROM Giocatore g WHERE g.nome = :nomeGiocatore AND g.idpartita.codiceInvito = :idPartita")
+    Integer saldoGiocatore(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
+
     @Transactional
     @Modifying
     @Query("UPDATE Giocatore g SET g.idpedina.idPedina = :idpedina WHERE g.nome = :nome AND g.idpartita.codiceInvito = :idPartita")

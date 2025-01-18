@@ -180,7 +180,7 @@ public class MessageHandler {
         switch (typeBox){
             case "Via", "Tassa":
                 prezzoCasella = pCPPRepository.prezzoCasella(posizione, gameId);
-                giocatoreRepository.aggiornamentoSaldo(playerName, gameId, -prezzoCasella); //è negativo perhcè la funzione è fatta da saldo attuale - (prezzoCasella)
+                giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoCasella);
                 break;
             case"Proprietà":
                 proprietario = pCPPRepository.findNomeGiocatoreByPosizioneAndGameId(posizione, gameId);
@@ -243,12 +243,13 @@ public class MessageHandler {
                     partitaImprevistoRepository.setUtilizzatoFalse(gameId);
                     descrizione = partitaImprevistoRepository.findDescrizioneImprevsto(gameId);
                 }
+
+                System.out.println(descrizione);
                 Imprevisto imprevisto = imprevistoRepository.findByDescrizione(descrizione);
                 tipoAzione = imprevisto.getTipoAzione();
                 parametri = imprevisto.getParametroDeserializzato();
-
                 gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions);
-                partitaProbabilitaRepository.setUtilizzatoTrue(gameId, descrizione);
+                partitaImprevistoRepository.setUtilizzatoTrue(gameId, descrizione);
 
                 String imprevistoMessage = new ObjectMapper().writeValueAsString(Map.of(
                         "type", "draw",
@@ -264,7 +265,7 @@ public class MessageHandler {
                     partitaProbabilitaRepository.setUtilizzatoFalse(gameId);
                     descrizione = partitaProbabilitaRepository.findDescrizioneProbabilita(gameId);
                 }
-                //Messaggio descrizione
+                System.out.println(descrizione);
                 Probabilita probabilita = probabilitaRepository.findByDescrizione(descrizione);
                 tipoAzione = probabilita.getTipoAzione();
                 parametri = probabilita.getParametroDeserializzato();
@@ -290,15 +291,10 @@ public class MessageHandler {
 
         switch (tipoAzione) {
             case "paga_importo":
-                importo_deserializzato = (Importo) parametri;
-                importo = importo_deserializzato.getImporto();
-                giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, importo);
-                break;
-
             case "ricevi_importo":
                 importo_deserializzato = (Importo) parametri;
                 importo = importo_deserializzato.getImporto();
-                giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, -importo);
+                giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, importo);
                 break;
 
             case "paga_importo_giocatore":

@@ -259,11 +259,12 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     int countProprieta(@Param("nomeGiocatore") String nomeGiocatore, @Param("tipo") String tipo, @Param("idPartita") String idPartita);
 
     @Query(value = """
-        SELECT SUM(pcp.num_casa)
-        FROM partita_casella_prezzoproprieta pcp
-        JOIN giocatore g ON pcp.idgiocatore = g.id_giocatore
-        WHERE g.nome= :nomeGiocatore
+        SELECT COALESCE(SUM(pcp.num_casa), 0) AS total_casa
+        FROM giocatore g
+        LEFT JOIN partita_casella_prezzoproprieta pcp
+        ON pcp.idgiocatore = g.id_giocatore
         AND pcp.idpartita = :idPartita
+        WHERE g.nome = :nomeGiocatore;
     """, nativeQuery = true)
     int contaCase(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
 
