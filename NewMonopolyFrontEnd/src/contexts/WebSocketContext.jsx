@@ -13,6 +13,10 @@ export const WebSocketProvider = ({children}) => {
         player: '',
         playerRole: '',
     });
+    const [statsPlayer, setStatsPlayer]= useState({
+        playerName: '',
+        balance: '',
+    });
     const [playerBalance, setPlayerBalance] = useState({
         player: '',
         balance: 0,
@@ -200,6 +204,14 @@ export const WebSocketProvider = ({children}) => {
                     setNameBox(message.name);
                 } else if (message.type === 'propertiesOwned'){
                     setPlayerProperties(message.properties);
+
+                } else if (message.type === 'statsPlayer'){
+                    console.log("statsPlayer",message.playerName,message.balance);
+                    setBuy((prevState) => ({
+                        ...prevState,
+                        playerName: message.playerName,
+                        balance: message.balance,
+                    }));
                 }
             };
 
