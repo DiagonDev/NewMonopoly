@@ -1,10 +1,10 @@
 import PropertyOwned from "./PropertyOwned.jsx";
 
-const CostruisciCasa = () => {
+const CostruisciCasa = ({playerProperties}) => {
 
     return (
         <>
-            <PropertyOwned/>
+            <PropertyOwned playerProperties={playerProperties} />
         </>
     )
 

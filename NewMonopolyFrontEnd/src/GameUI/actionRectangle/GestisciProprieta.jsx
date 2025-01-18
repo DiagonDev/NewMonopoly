@@ -3,9 +3,11 @@ import React, {useContext, useState} from 'react';
 import IpotecaProprieta from "./gestioneProprieta/IpotecaProprieta.jsx";
 import CostruisciCasa from "./gestioneProprieta/CostruisciCasa.jsx";
 import ScambiaProprieta from "./gestioneProprieta/ScambiaProprieta.jsx";
+import {WebSocketContext} from "../../contexts/WebSocketContext.jsx";
 
 
 const GestisciProprieta = () => {
+    const {playerProperties} = useContext(WebSocketContext);
     const [activeComponent, setActiveComponent] = useState('');
     return (
         <>
@@ -28,9 +30,9 @@ const GestisciProprieta = () => {
                     </button>
                 </div>
                 <div className="gestisciProprieta-components">
-                    {activeComponent === "CostruisciCasa" && <CostruisciCasa/>}
-                    {activeComponent === "ScambiaProprieta" && <ScambiaProprieta/>}
-                    {activeComponent === "IpotecaProprieta" && <IpotecaProprieta/>}
+                    {activeComponent === "CostruisciCasa" && <CostruisciCasa playerProperties={playerProperties} />}
+                    {activeComponent === "ScambiaProprieta" && <ScambiaProprieta playerProperties={playerProperties}/>}
+                    {activeComponent === "IpotecaProprieta" && <IpotecaProprieta playerProperties={playerProperties}/>}
                 </div>
             </div>
         </>

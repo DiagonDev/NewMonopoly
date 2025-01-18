@@ -1,14 +1,19 @@
-import React, {useState} from "react";
+import {useContext, useState} from "react";
+import {WebSocketContext} from "../../../contexts/WebSocketContext.jsx";
 
-const PropertyOwned = () => {
+
+// eslint-disable-next-line react/prop-types
+const PropertyOwned = ({playerProperties}) => {
     const [selectedProperty, setSelectedProperty] = useState(null); // Stato per il property selezionato
     const [isModalOpen, setIsModalOpen] = useState(false); // Stato per aprire/chiudere il modal
-
     // Esempio di dati dei quadrati
     const properties = [
         {id: 1, name: "Proprietà 1", description: "Descrizione della Proprietà 1"},
         {id: 2, name: "Proprietà 2", description: "Descrizione della Proprietà 2"},
         {id: 3, name: "Proprietà 3", description: "Descrizione della Proprietà 3"},
+        {id: 4, name: "Proprietà 4", description: "Descrizione della Proprietà 4"},
+        {id: 5, name: "Proprietà 5", description: "Descrizione della Proprietà 5"},
+        {id: 6, name: "Proprietà 6", description: "Descrizione della Proprietà 6"},
         // Aggiungi altre proprietà come necessario
     ];
 
@@ -27,7 +32,8 @@ const PropertyOwned = () => {
     return (
         <>
         <div className="propertyGrid">
-            {properties.map((property) => (
+            {/* eslint-disable-next-line react/prop-types *//*playerProperties è un array di proprietà*/}
+            {playerProperties.map((property) => (
                 <div
                     key={property.id}
                     className="propertySquare"
@@ -35,6 +41,7 @@ const PropertyOwned = () => {
                 >
                     {property.name}
                 </div>
+
             ))}
             {isModalOpen && (
                 <div className="modal">

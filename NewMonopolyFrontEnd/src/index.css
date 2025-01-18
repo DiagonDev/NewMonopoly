@@ -878,7 +878,7 @@ button:focus-visible {
 }
 
 .gestisciProprieta-buttons button {
-    flex: 1; /* Ogni pulsante occupa lo stesso spazio disponibile */
+    flex: 0.5; /* Ogni pulsante occupa lo stesso spazio disponibile */
     padding: 10px 20px;
     cursor: pointer;
     border: 1px solid #007bff;
@@ -894,7 +894,7 @@ button:focus-visible {
 }
 
 .gestisciProprieta-components {
-    flex: 2; /* Occupa 2 unità di spazio su 3 */
+    flex: 2.5; /* Occupa 2 unità di spazio su 3 */
     width: 100%; /* Adatta la larghezza al contenitore padre */
     height: 100%; /* Adatta l'altezza disponibile calcolata da Flexbox */
     display: flex; /* Garantisce che gli elementi interni possano essere disposti con flexbox */
@@ -911,16 +911,18 @@ button:focus-visible {
 ###########################
  */
 .propertyGrid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Fissa un massimo di 3 colonne con larghezza uguale */
-    gap: 10px; /* Spazio tra gli elementi */
-    width: 100%; /* Adatta la larghezza al contenitore genitore */
-    height: 100%; /* Adatta l'altezza al contenitore genitore */
-    overflow-y: auto; /* Abilita lo scrolling verticale se necessario */
-    box-sizing: border-box; /* Include padding e bordo nel calcolo delle dimensioni */
+    display: flex;
+    flex-wrap: wrap; /* Permette agli elementi di andare a capo */
+    justify-content: space-between;
+    align-items: start;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
 }
 
 .propertySquare {
+    flex: 0 0 calc(30% - 10px); /* Ogni quadrato occupa circa il 30% della riga, meno il gap */
     aspect-ratio: 1; /* Mantiene un rapporto 1:1 per altezza e larghezza */
     background-color: #f0f0f0;
     border: 1px solid #ccc;
@@ -934,6 +936,7 @@ button:focus-visible {
 .propertySquare:hover {
     background-color: #ddd;
 }
+
 
 .modal {
     position: fixed;

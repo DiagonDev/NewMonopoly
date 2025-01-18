@@ -55,6 +55,16 @@ const GameBoard = () => {
         }
 
     };
+    const handleGestisciProprieta = () => {
+        setActiveComponent("GestisciProprieta")
+        if (socket && connected) {
+            // Invia un messaggio al server
+            socket.send('GestisciProprieta:');
+            console.log('Messaggio inviato: GestisciProprieta');
+        } else {
+            console.error('Connessione WebSocket non stabilita!');
+        }
+    }
     const handleEnd = () => {
 
         if (socket && connected) {
@@ -139,7 +149,7 @@ const GameBoard = () => {
                                         Roll
                                     </button>
                                     <button
-                                        onClick={() => setActiveComponent("GestisciProprieta")}
+                                        onClick={handleGestisciProprieta}
                                         disabled={!isMyTurn} // Disabilitato di default
                                     >
                                         Gestisci proprietà
