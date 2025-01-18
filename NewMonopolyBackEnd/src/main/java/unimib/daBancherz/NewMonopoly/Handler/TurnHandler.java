@@ -82,6 +82,9 @@ public class TurnHandler {
         String playerName = gameHandler.getPlayerNameBySession(session);
         int playerPosition = gameBoard.getPlayerPosition(gameId, playerName);
         boolean isInPrison = gameBoard.isPlayerInPrison(gameId, playerName);
+        int newPosition;
+        boolean viaPay = false;
+
 
         String diceRolled = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "diceRolled",
@@ -92,19 +95,20 @@ public class TurnHandler {
 
         if(!isInPrison || (diceR1 == diceR2)) {
             gameBoard.setPlayerPrison(gameId, playerName, false);
-            int newPosition = totDice + playerPosition;
+            newPosition = totDice + playerPosition;
             //serve a recuperare la pawnId del giocatore
             int pawnId = giocatoreRepository.findPedinaFromGiocatore(playerName, gameId);
             if (newPosition > 40) {
                 newPosition -= 40;
-                //TODO: aggiungere al saldo 200, perchè signfica che è passato dal VIA
+                viaPay = true;
+
             }
             gameBoard.setPlayerPosition(gameId, playerName, newPosition);//aggiorna la posizione del giocatore
             //invia a tutti i giocatori che il "playername" si è postato di tot caselle "newPosition"
             messageHandler.sendPawnMove(pawnId, playerName, newPosition, gameHandler.getGameSessions(), gameId);
 
             //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
-            messageHandler.sendBoxUsage(playerName, session, newPosition, gameId, gameHandler.getGameSessions(), pawnId);
+            messageHandler.sendBoxUsage(playerName, session, newPosition, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
         }
     }
 }

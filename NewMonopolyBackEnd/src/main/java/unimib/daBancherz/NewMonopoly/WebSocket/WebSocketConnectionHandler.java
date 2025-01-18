@@ -76,8 +76,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                 gameHandler.choosePedina(parts, session);
                 break;
             case "AcquistaProprieta":
-                //gestire il salvataggio della proprietà acquistata dal giocatore nel database
-                propertyHandler.acquistaProprieta();
+                propertyHandler.acquistaProprieta(parts, session);
                 break;
             case  "IpotecaProprieta":
                 //gestire l'ipoteca della proprietà

@@ -162,7 +162,7 @@ public class MessageHandler {
     }
 
     //posizione => il codice della cella dove il giocatore finisce dopo il lancio dadi
-    public void sendBoxUsage(String playerName, WebSocketSession session, int posizione, String gameId, Map<String, List<WebSocketSession>> gameSessions ,Integer pawnId) throws Exception{
+    public void sendBoxUsage(String playerName, WebSocketSession session, int posizione, String gameId, Map<String, List<WebSocketSession>> gameSessions ,Integer pawnId, boolean viaPay) throws Exception{
 
         String typeBox = pCPPRepository.findTipoByPosizione(posizione, gameId);
         String nomeCasella = pCPPRepository.findNomeCasellaByPosizioneAndGameId(posizione, gameId);
@@ -170,7 +170,7 @@ public class MessageHandler {
         String descrizione;
         String tipoAzione;
         Object parametri;
-        int prezzoCasella, prezzoAffitto, nStazione, nSocietà;
+        int prezzoCasella, prezzoAffitto, prezzoCasellaVia, nStazione, nSocietà;
 
         String nameBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "nameBox",
@@ -178,8 +178,16 @@ public class MessageHandler {
         ));
         session.sendMessage(new TextMessage(nameBoxMessage));
 
+        //aggiorna i soldi quando passi dal via anche senza fermarti sopra
+        if(viaPay){
+            prezzoCasellaVia = pCPPRepository.prezzoCasella(1, gameId);
+            giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoCasellaVia);
+        }
+
         switch (typeBox){
-            case "Via", "Tassa":
+            case "Via":
+                break;
+            case "Tassa":
                 prezzoCasella = pCPPRepository.prezzoCasella(posizione, gameId);
                 giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoCasella);
                 break;
@@ -235,6 +243,12 @@ public class MessageHandler {
                 break;
             case"InPrigione":
                 gameBoard.setPlayerPosition(gameId, playerName, 11);//aggiorna la posizione del giocatore
+                try {
+                    Thread.sleep(1000); //TODO: vedere se si può diminuire il tempo
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // Ripristina lo stato di interruzione del thread
+                    System.out.println("Thread interrotto: " + e.getMessage());
+                }
                 sendPawnMove(pawnId, playerName, 11, gameSessions, gameId);
                 gameBoard.setPlayerPrison(gameId, playerName, true);
                 break;
