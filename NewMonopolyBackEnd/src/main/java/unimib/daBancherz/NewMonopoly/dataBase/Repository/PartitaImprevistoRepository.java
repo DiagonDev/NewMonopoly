@@ -49,6 +49,7 @@ public interface PartitaImprevistoRepository extends JpaRepository<Partita_Impre
     @Query("UPDATE Partita_Imprevisto pii SET pii.idgiocatore = (" +
             "SELECT g.idGiocatore FROM Giocatore g " +
             "WHERE g.nome = :nomeGiocatore " +
-            "AND g.idpartita=:idPartita) ")
-    void setGiocatore(@Param("idPartita") String idPartita, @Param("nomeGiocatore") String nomeGiocatore);
+            "AND g.idpartita.codiceInvito=:idPartita) " +
+            "WHERE pii.idimprevisto.tipoAzione = :tipoAzione")
+    void setGiocatore(@Param("idPartita") String idPartita, @Param("nomeGiocatore") String nomeGiocatore, @Param("tipoAzione") String tipoAzione);
 }

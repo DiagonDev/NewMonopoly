@@ -8,6 +8,7 @@ import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.IdCasella;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.Importo;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.PagaPossedimenti;
+import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.TipoCasella;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.Imprevisto;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.Probabilita;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.*;
@@ -248,7 +249,7 @@ public class MessageHandler {
                 Imprevisto imprevisto = imprevistoRepository.findByDescrizione(descrizione);
                 tipoAzione = imprevisto.getTipoAzione();
                 parametri = imprevisto.getParametroDeserializzato();
-                gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions);
+                gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions, typeBox);
                 partitaImprevistoRepository.setUtilizzatoTrue(gameId, descrizione);
 
                 String imprevistoMessage = new ObjectMapper().writeValueAsString(Map.of(
@@ -270,7 +271,7 @@ public class MessageHandler {
                 tipoAzione = probabilita.getTipoAzione();
                 parametri = probabilita.getParametroDeserializzato();
 
-                gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions);
+                gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions, typeBox);
                 partitaProbabilitaRepository.setUtilizzatoTrue(gameId, descrizione);
                 String probabilitaMessage = new ObjectMapper().writeValueAsString(Map.of(
                         "type", "draw",
@@ -282,16 +283,14 @@ public class MessageHandler {
         }
     }
 
-    public void gestisciAzione(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Integer posizione, int pawnId, Map<String, List<WebSocketSession>> gameSession ) throws IOException {
+    public void gestisciAzione(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Integer posizione, int pawnId, Map<String, List<WebSocketSession>> gameSession, String typeBox) throws IOException {
         Importo importo_deserializzato;
         int importo;
         int soldi;
-        IdCasella id_casellaDeserializzato;
-        int id_casella;
+        int id_casella=1;
 
-        switch (tipoAzione) {
-            case "paga_importo":
-            case "ricevi_importo":
+        switch (tipoAzione){
+            case "ricevi_importo", "paga_importo":
                 importo_deserializzato = (Importo) parametri;
                 importo = importo_deserializzato.getImporto();
                 giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, importo);
@@ -324,21 +323,30 @@ public class MessageHandler {
                 break;
 
             case "sposta_avanti":
-                id_casellaDeserializzato =(IdCasella) parametri;
-                id_casella = id_casellaDeserializzato.getId_casella();
-                if(posizione > id_casella)
-                    giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, -200);
+                if(parametri instanceof IdCasella id_casellaDeserializzato) {
+                    id_casella = id_casellaDeserializzato.getId_casella();
+                    if(posizione > id_casella)
+                        giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, -200);
+                    sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSession, idPartita);
+                } else if (parametri instanceof TipoCasella tipoCasellaDeserializzato) {
+                    String tipoCasella = tipoCasellaDeserializzato.getTipo_casella();
+                    id_casella = pCPPRepository.findNextCasellaByTipo(tipoCasella, posizione, idPartita);
+                }
                 sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSession, idPartita);
                 break;
 
             case "vai_in_prigione":
-                id_casellaDeserializzato =(IdCasella) parametri;
+                IdCasella id_casellaDeserializzato =(IdCasella) parametri;
                 id_casella = id_casellaDeserializzato.getId_casella();
+                gameBoard.setPlayerPosition(idPartita, nomeGiocatore, id_casella);
                 sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSession, idPartita);
                 break;
 
             case "esci_prigione":
-                partitaProbabilitaRepository.setGiocatore(idPartita, nomeGiocatore);
+                if(typeBox.equals("Probabilità"))
+                    partitaProbabilitaRepository.setGiocatore(idPartita, nomeGiocatore, tipoAzione);
+                else
+                    partitaImprevistoRepository.setGiocatore(idPartita, nomeGiocatore, tipoAzione);
                 break;
         }
     }

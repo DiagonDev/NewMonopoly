@@ -56,18 +56,13 @@ public class Probabilita {
             case "esci_prigione":
                 return null;
 
-            case "sposta_avanti":
+            case "vai_in_prigione", "sposta_avanti":
                 return objectMapper.readValue(parametro, IdCasella.class);  // Tipo Casella
 
             case "paga_possedimenti":
                 return objectMapper.readValue(parametro, PagaPossedimenti.class);
 
-            case "vai_in_prigione":
-                return null;
-
-            case "ricevi_importo":
-            case "ricevi_importo_giocatore":
-            case "paga_importo":
+            case "ricevi_importo", "ricevi_importo_giocatore", "paga_importo":
                 return objectMapper.readValue(parametro, Importo.class);
         }
         return null;

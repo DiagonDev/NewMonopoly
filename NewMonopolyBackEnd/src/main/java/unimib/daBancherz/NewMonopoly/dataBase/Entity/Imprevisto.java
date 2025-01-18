@@ -58,26 +58,18 @@ public class Imprevisto {
             case "esci_prigione":
                 return null;
 
-            case "sposta_avanti":
+            case "vai_in_prigione", "sposta_avanti":
                 if (parametro.contains("id_casella")) {
                     return objectMapper.readValue(parametro, IdCasella.class);  // Tipo Casella
                 } else if (parametro.contains("tipo_casella")) {
                     return objectMapper.readValue(parametro, TipoCasella.class);  // Tipo Casella
                 }
                 break;
+
             case "paga_possedimenti":
                 return objectMapper.readValue(parametro, PagaPossedimenti.class);
 
-            case "vai_in_prigione":
-                return null;
-
-            case "ricevi_importo":
-                return objectMapper.readValue(parametro, Importo.class);
-
-            case "paga_importo_giocatore":
-                return objectMapper.readValue(parametro, Importo.class);
-
-            case "paga_importo":
+            case "ricevi_importo", "paga_importo_giocatore", "paga_importo":
                 return objectMapper.readValue(parametro, Importo.class);
         }
         return null;

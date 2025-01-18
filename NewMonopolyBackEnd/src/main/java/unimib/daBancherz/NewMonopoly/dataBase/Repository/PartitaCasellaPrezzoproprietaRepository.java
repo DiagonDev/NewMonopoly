@@ -203,11 +203,13 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
 
     @Modifying
     @Transactional
-    @Query("UPDATE Partita_Casella_Prezzoproprieta pcp " +
-            "SET pcp.idgiocatore = (SELECT g FROM Giocatore g WHERE g.nome = :playerName), " +
-            "pcp.idgiocatore.saldo = pcp.idgiocatore.saldo - pcp.prezzoCorrente " +
-            "WHERE pcp.posizione = :posizione AND pcp.idpartita.codiceInvito = :gameId")
-    void setGiocatoreESaldo(@Param("playerName") String playerName, @Param("gameId") String gameId, @Param("posizione") Integer posizione);
+    @Query(value = """
+        UPDATE Partita_Casella_Prezzoproprieta pcp
+        SET idgiocatore =  (SELECT g.id_giocatore FROM Giocatore g WHERE g.nome = :playerName)
+        WHERE pcp.idcasella = (SELECT c.id_casella FROM Casella c WHERE c.nome = :nomeCasella)
+        AND pcp.idpartita = :gameId
+    """, nativeQuery = true)
+    void setGiocatore(@Param("playerName") String playerName, @Param("gameId") String gameId, @Param("nomeCasella") String nomeCasella);
 
     // Metodo per trovare il costo di acquisto di una proprieta
     @Query(value = """
@@ -217,6 +219,15 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
           AND pcp.idpartita = (SELECT p.codice_invito FROM partita p WHERE p.codice_invito = :idPartita)
     """, nativeQuery = true)
     Integer prezzoCasella(@Param("posizione") Integer posizione, @Param("idPartita") String idPartita);
+
+    // Metodo per trovare il costo di acquisto di una proprieta
+    @Query(value = """
+        SELECT pcp.prezzo_corrente
+        FROM partita_casella_prezzoproprieta pcp
+        WHERE pcp.idcasella = (SELECT c.id_casella FROM  casella c WHERE c.nome = :nomeCasella)
+        AND pcp.idpartita = (SELECT p.codice_invito FROM partita p WHERE p.codice_invito = :idPartita)
+    """, nativeQuery = true)
+    Integer prezzoCasella2(@Param("nomeCasella") String nomeCasella, @Param("idPartita") String idPartita);
 
     // Metodo per trovare il costo di acquisto di una casa/albergo di una proprieta
     @Query(value = """
@@ -278,5 +289,19 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
         AND pcp.idpartita = :idPartita
     """, nativeQuery = true)
     int contaAlberghi(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
+
+
+    //Metodo per trovare c.tipo piu vicino alla posizione dove ci si trova
+    @Query(value = """
+        SELECT p.posizione
+        FROM Partita_Casella_Prezzoproprieta p
+        JOIN Casella c ON p.idcasella = c.id_casella
+        WHERE c.tipo = :tipoCasella
+        AND p.posizione > :posizioneCorrente
+        AND p.idpartita = :idPartita
+        ORDER BY p.posizione ASC
+        LIMIT 1
+    """, nativeQuery = true)
+    Integer findNextCasellaByTipo(@Param("tipoCasella") String tipoCasella, @Param("posizioneCorrente") Integer posizioneCorrente, @Param("idPartita") String idPartita);
 
 }

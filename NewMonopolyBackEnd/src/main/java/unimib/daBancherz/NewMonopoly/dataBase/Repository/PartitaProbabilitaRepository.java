@@ -49,6 +49,7 @@ public interface PartitaProbabilitaRepository extends JpaRepository<Partita_Prob
     @Query("UPDATE Partita_Probabilita pp SET pp.idgiocatore = (" +
             "SELECT g.idGiocatore FROM Giocatore g " +
             "WHERE g.nome = :nomeGiocatore " +
-            "AND g.idpartita=:idPartita) ")
-    void setGiocatore(@Param("idPartita") String idPartita, @Param("nomeGiocatore") String nomeGiocatore);
+            "AND g.idpartita.codiceInvito=:idPartita) " +
+            "WHERE pp.idprobabilita.tipoAzione = :tipoAzione")
+    void setGiocatore(@Param("idPartita") String idPartita, @Param("nomeGiocatore") String nomeGiocatore, @Param("tipoAzione") String tipoAzione);
 }
