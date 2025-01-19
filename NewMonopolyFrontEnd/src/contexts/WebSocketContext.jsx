@@ -37,25 +37,26 @@ export const WebSocketProvider = ({children}) => {
         pawnId: 0,
         playerName: 0,
         offset: 0,
-    })
+    });
     const [payment, setPayment] = useState({
         flag: false,
         description: '',
         destination: '',
         payment: 0,
-    })
+    });
     const [draw, setDraw] = useState({
         flag: false,
         card: '',
         description: '',
-    })
+    });
     const [buy, setBuy] = useState({
         flag: false,
         price: 0,
-    })
+    });
     //Casella in cui finisco dopo il tiro dei dadi
     const [nameBox, setNameBox] = useState('');
-    const [playerProperties, setPlayerProperties] = useState([])
+    const [playerProperties, setPlayerProperties] = useState([]);
+    const [allProperties, setAllProperties] = useState([]);
     useEffect(() => {
         const ws = new WebSocket("https://7559-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
         //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
@@ -204,6 +205,8 @@ export const WebSocketProvider = ({children}) => {
                     setNameBox(message.name);
                 } else if (message.type === 'propertiesOwned'){
                     setPlayerProperties(message.properties);
+                } else if (message.type === 'allPropertiesOwned'){
+                    setAllProperties(message.properties);
 
                 } else if (message.type === 'statsPlayer'){
                     console.log("statsPlayer",message.playerName,message.balance);
@@ -250,7 +253,8 @@ export const WebSocketProvider = ({children}) => {
                 draw,
                 buy,
                 nameBox,
-                playerProperties
+                playerProperties,
+                allProperties
             }}>
             {children}
         </WebSocketContext.Provider>

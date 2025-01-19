@@ -1,6 +1,6 @@
 
 // eslint-disable-next-line react/prop-types
-const PropertyOwned = ({buildingProperties, onPropertySelect}) => {
+const PropertyOwned = ({playerProperties, onPropertySelect}) => {
 
     // Funzione per aprire il modal e inviare i dati al padre
     const handleSquareClick = (property) => {
@@ -13,7 +13,7 @@ const PropertyOwned = ({buildingProperties, onPropertySelect}) => {
         <>
             <div className="propertyGrid">
                 {/* eslint-disable-next-line react/prop-types */}
-                {buildingProperties.map((property) => (
+                {playerProperties.map((property) => (
                     <div
                         key={property.id}
                         className="propertySquare"

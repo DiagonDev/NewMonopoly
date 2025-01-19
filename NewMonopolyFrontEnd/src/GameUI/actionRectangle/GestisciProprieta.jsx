@@ -7,7 +7,7 @@ import {WebSocketContext} from "../../contexts/WebSocketContext.jsx";
 
 
 const GestisciProprieta = () => {
-    const {playerProperties} = useContext(WebSocketContext);
+    const {socket, connected, playerProperties} = useContext(WebSocketContext);
     const [activeComponent, setActiveComponent] = useState('');
     const [buildingProperties, setBuildingProperties] = useState([]);
     /**
@@ -25,11 +25,27 @@ const GestisciProprieta = () => {
 
         // Filtra i gruppi con almeno 3 proprietà dello stesso colore
         const result = Object.values(groupedProperties).filter(group => group.length >= 3);
-        //TODO: cambiare result2
+        //TODO: cambiare result2, mi serve il colore di vicolo stretto e di parco della vittoria
         //const result2 = Object.values(result).filter(group => group.length === 2 && (group.color === 'coloreVicoloStretto' || group.color === 'coloreParcoVittoria'));
         //result.concat(result2);
         setBuildingProperties(result.flat());
     },[playerProperties]);
+
+    /**
+     * quando clicco su scambiaProprietà mando un "ping" al server, gli chiedo di prepararsi
+     * a inviarmi le proprietà possedute dagli altri giocatori
+     *
+     */
+    const handleScambiaProprieta = () => {
+        setActiveComponent("ScambiaProprieta")
+        if (socket && connected) {
+            // Invia un messaggio al server
+            socket.send(`PingScambiaProprietà:`);
+            console.log('Messaggio inviato: PingScambiaProprieta');
+        } else {
+            console.error('Connessione WebSocket non stabilita!');
+        }
+    }
     return (
         <>
             <div className="gestisciProprieta-container">
@@ -40,9 +56,9 @@ const GestisciProprieta = () => {
                         Costruisci Casa
                     </button>
                     <button
-                        onClick={() => setActiveComponent("ScambiaProprieta")}
+                        onClick={handleScambiaProprieta}
                     >
-                        ScambiaProprietà
+                        Scambia Proprietà
                     </button>
                     <button
                         onClick={() => setActiveComponent("IpotecaProprieta")}
