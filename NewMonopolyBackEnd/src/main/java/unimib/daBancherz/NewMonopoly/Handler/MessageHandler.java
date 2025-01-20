@@ -94,7 +94,7 @@ public class MessageHandler {
         }
     }
 
-    public void sendJoinMessage(String playerName, Map<String, List<WebSocketSession>> gameSessions, String role, String gameId) throws IOException {
+    public void sendJoinMessage(String playerName, Map<String, List<WebSocketSession>> gameSessions, String role, String gameId, WebSocketSession session) throws IOException {
 
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
 
@@ -106,11 +106,21 @@ public class MessageHandler {
                 "playerName", playerName,
                 "userRole", role
         ));
+        int balance = giocatoreRepository.saldoGiocatore(playerName,gameId);
+        String playerMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "playersList",
+                "playerName", playerName,
+                "balance", balance
+        ));
 
         for (WebSocketSession sessions : playersInGame) {
 
             sessions.sendMessage(new TextMessage(joinMessage));
+            sessions.sendMessage(new TextMessage(playerMessage));
         }
+
+
+
     }
 
     public void sendGameId(String gameId, WebSocketSession session) throws Exception {
@@ -138,8 +148,10 @@ public class MessageHandler {
         // Messaggi per il giocatore che si è unito e per tutti i partecipanti
         sendSystemMessage(gameId, "Ti sei unito alla partita con ID: " + gameId + " con successo!", gameSessions, session);
         sendSystemMessage(gameId, playerName + " si è unito alla partita!", gameSessions, session);
+
         sendPlayerAndBalance(gameId, playerName, session);
-        sendJoinMessage(playerName, gameSessions, role, gameId);
+        sendJoinMessage(playerName, gameSessions, role, gameId, session);
+
 
     }
 
@@ -149,7 +161,7 @@ public class MessageHandler {
             for(String player : playerJoined){
                 int balance = giocatoreRepository.saldoGiocatore(player,gameId);
                 String playerMessage = new ObjectMapper().writeValueAsString(Map.of(
-                        "type", "statsPlayer",
+                        "type", "playersList",
                         "playerName", player,
                         "balance", balance
                 ));
@@ -166,27 +178,18 @@ public class MessageHandler {
         }
     }
 
-    public void updateBalance(Map<String, List<WebSocketSession>> gameSessions, String gameId) throws IOException {
+    public void updateBalance(Map<String, List<WebSocketSession>> gameSessions, String gameId, String playerName) throws IOException {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
-        List<String> namePlayersInGame = giocatoreRepository.findGiocatori(gameId);
-        for(WebSocketSession sessions : playersInGame) {
-            for (String player : namePlayersInGame) {
-                int balance = giocatoreRepository.saldoGiocatore(player, gameId);
+
+            for (WebSocketSession session : playersInGame) {
+                int balance = giocatoreRepository.saldoGiocatore(playerName, gameId);
                 String playerMessage = new ObjectMapper().writeValueAsString(Map.of(
-                        "type", "statsPlayer",
-                        "playerName", player,
+                        "type", "playerBalance",
+                        "playerName", playerName,
                         "balance", balance
                 ));
-                sessions.sendMessage(new TextMessage(playerMessage));
-
-                try {
-                    Thread.sleep(100); //TODO: vedere se si può diminuire il tempo
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt(); // Ripristina lo stato di interruzione del thread
-                    System.out.println("Thread interrotto: " + e.getMessage());
-                }
+                session.sendMessage(new TextMessage(playerMessage));
             }
-        }
     }
 
     //posizione => il codice della cella dove il giocatore finisce dopo il lancio dadi
@@ -210,7 +213,7 @@ public class MessageHandler {
         if(viaPay){
             prezzoCasellaVia = pCPPRepository.prezzoCasella(1, gameId);
             giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoCasellaVia);
-            updateBalance(gameSessions, gameId);
+            updateBalance(gameSessions, gameId, playerName);
         }
 
         switch (typeBox){
@@ -219,7 +222,7 @@ public class MessageHandler {
             case "Tassa":
                 prezzoCasella = pCPPRepository.prezzoCasella(posizione, gameId);
                 giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoCasella);
-                updateBalance(gameSessions, gameId);
+                updateBalance(gameSessions, gameId, playerName);
                 break;
             case"Proprietà":
                 proprietario = pCPPRepository.findNomeGiocatoreByPosizioneAndGameId(posizione, gameId);
@@ -244,7 +247,8 @@ public class MessageHandler {
                             "payment", prezzoAffitto
                     ));
                     session.sendMessage(new TextMessage(payBoxMessage));
-                    updateBalance(gameSessions, gameId);
+                    updateBalance(gameSessions, gameId, playerName);
+                    updateBalance(gameSessions, gameId, proprietario);
                 }
                 break;
             case"Stazione", "Società":
@@ -264,13 +268,15 @@ public class MessageHandler {
                         prezzoAffitto = 25 * nStazione;
                         giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoAffitto);
                         giocatoreRepository.aggiornamentoSaldo(proprietario, gameId, -prezzoAffitto);
-                        updateBalance(gameSessions, gameId);
+                        updateBalance(gameSessions, gameId, playerName);
+                        updateBalance(gameSessions, gameId, proprietario);
                     }else{
                         nSocietà = pCPPRepository.countProprieta(playerName, typeBox, gameId);
                         prezzoAffitto = 100 * nSocietà;
                         giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoAffitto);
                         giocatoreRepository.aggiornamentoSaldo(proprietario, gameId, -prezzoAffitto);
-                        updateBalance(gameSessions, gameId);
+                        updateBalance(gameSessions, gameId, playerName);
+                        updateBalance(gameSessions, gameId, proprietario);
 
                     }
                 }
@@ -293,12 +299,6 @@ public class MessageHandler {
                     descrizione = partitaImprevistoRepository.findDescrizioneImprevsto(gameId);
                 }
 
-                Imprevisto imprevisto = imprevistoRepository.findByDescrizione(descrizione);
-                tipoAzione = imprevisto.getTipoAzione();
-                parametri = imprevisto.getParametroDeserializzato();
-                gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions, typeBox);
-                partitaImprevistoRepository.setUtilizzatoTrue(gameId, descrizione);
-
                 String imprevistoMessage = new ObjectMapper().writeValueAsString(Map.of(
                         "type", "draw",
                         "card", "imprevisto",
@@ -306,6 +306,11 @@ public class MessageHandler {
                 ));
                 session.sendMessage(new TextMessage(imprevistoMessage));
 
+                Imprevisto imprevisto = imprevistoRepository.findByDescrizione(descrizione);
+                tipoAzione = imprevisto.getTipoAzione();
+                parametri = imprevisto.getParametroDeserializzato();
+                gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions, typeBox, session);
+                partitaImprevistoRepository.setUtilizzatoTrue(gameId, descrizione);
                 break;
             case"Probabilità":
                 descrizione = partitaProbabilitaRepository.findDescrizioneProbabilita(gameId);
@@ -314,24 +319,24 @@ public class MessageHandler {
                     descrizione = partitaProbabilitaRepository.findDescrizioneProbabilita(gameId);
                 }
 
-                Probabilita probabilita = probabilitaRepository.findByDescrizione(descrizione);
-                tipoAzione = probabilita.getTipoAzione();
-                parametri = probabilita.getParametroDeserializzato();
-
-                gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions, typeBox);
-                partitaProbabilitaRepository.setUtilizzatoTrue(gameId, descrizione);
-
                 String probabilitaMessage = new ObjectMapper().writeValueAsString(Map.of(
                         "type", "draw",
                         "card", "probabilità",
                         "description", descrizione
                 ));
                 session.sendMessage(new TextMessage(probabilitaMessage));
+
+                Probabilita probabilita = probabilitaRepository.findByDescrizione(descrizione);
+                tipoAzione = probabilita.getTipoAzione();
+                parametri = probabilita.getParametroDeserializzato();
+
+                gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions, typeBox, session);
+                partitaProbabilitaRepository.setUtilizzatoTrue(gameId, descrizione);
                 break;
         }
     }
 
-    public void gestisciAzione(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Integer posizione, int pawnId, Map<String, List<WebSocketSession>> gameSessions, String typeBox) throws IOException {
+    public void gestisciAzione(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Integer posizione, int pawnId, Map<String, List<WebSocketSession>> gameSessions, String typeBox, WebSocketSession  session) throws Exception {
         Importo importo_deserializzato;
         int importo;
         int soldi;
@@ -342,7 +347,7 @@ public class MessageHandler {
                 importo_deserializzato = (Importo) parametri;
                 importo = importo_deserializzato.getImporto();
                 giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, importo);
-                updateBalance(gameSessions, idPartita);
+                updateBalance(gameSessions, idPartita, nomeGiocatore);
                 break;
 
             case "paga_importo_giocatore":
@@ -351,7 +356,7 @@ public class MessageHandler {
                 soldi = (giocatoreRepository.contaGiocatoriInPartita(idPartita)-1) * importo;
                 giocatoreRepository.pagaImportoGiocatori(importo, idPartita, nomeGiocatore);
                 giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, soldi);
-                updateBalance(gameSessions, idPartita);
+                updateBalance(gameSessions, idPartita, nomeGiocatore);
                 break;
 
             case "ricevi_importo_giocatore":
@@ -360,7 +365,7 @@ public class MessageHandler {
                 soldi = -((giocatoreRepository.contaGiocatoriInPartita(idPartita)-1) * importo);
                 giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, soldi);
                 giocatoreRepository.pagaImportoGiocatori(-importo, idPartita, nomeGiocatore);
-                updateBalance(gameSessions, idPartita);
+                updateBalance(gameSessions, idPartita, nomeGiocatore);
                 break;
 
             case "paga_possedimenti":
@@ -371,7 +376,7 @@ public class MessageHandler {
                 int numAlberghi = pCPPRepository.contaAlberghiTot(nomeGiocatore, idPartita);
                 int totaleDaPagare = (numCase * importoCasa) + (numAlberghi * importoAlbergo);
                 giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, totaleDaPagare);
-                updateBalance(gameSessions, idPartita);
+                updateBalance(gameSessions, idPartita, nomeGiocatore);
                 break;
 
             case "sposta_avanti":
@@ -379,15 +384,29 @@ public class MessageHandler {
                     id_casella = id_casellaDeserializzato.getId_casella();
                     if(posizione > id_casella) {
                         giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, -200);
-                        updateBalance(gameSessions, idPartita);
+                        updateBalance(gameSessions, idPartita, nomeGiocatore);
                     }
                     gameBoard.setPlayerPosition(idPartita, nomeGiocatore, id_casella);
                     sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSessions, idPartita);
+                    try {
+                        Thread.sleep(4000); //TODO: vedere se si può diminuire il tempo
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt(); // Ripristina lo stato di interruzione del thread
+                        System.out.println("Thread interrotto: " + e.getMessage());
+                    }
+                    sendBoxUsage(nomeGiocatore, session, id_casella, idPartita, gameSessions, pawnId, false);
                 } else if (parametri instanceof TipoCasella tipoCasellaDeserializzato) {
                     String tipoCasella = tipoCasellaDeserializzato.getTipo_casella();
                     id_casella = pCPPRepository.findNextCasellaByTipo(tipoCasella, posizione, idPartita);
                     gameBoard.setPlayerPosition(idPartita, nomeGiocatore, id_casella);
                     sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSessions, idPartita);
+                    try {
+                        Thread.sleep(4000); //TODO: vedere se si può diminuire il tempo
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt(); // Ripristina lo stato di interruzione del thread
+                        System.out.println("Thread interrotto: " + e.getMessage());
+                    }
+                    sendBoxUsage(nomeGiocatore, session, id_casella, idPartita, gameSessions, pawnId, false);
                 }
                 break;
 
