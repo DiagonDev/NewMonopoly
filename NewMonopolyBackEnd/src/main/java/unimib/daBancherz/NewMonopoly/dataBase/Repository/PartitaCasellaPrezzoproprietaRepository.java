@@ -7,9 +7,61 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.Partita_Casella_Prezzoproprieta;
+import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
+
+import java.util.List;
 
 @Repository
 public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<Partita_Casella_Prezzoproprieta, Long> {
+    @Query("""
+        SELECT new unimib.daBancherz.NewMonopoly.model.PlayerProperties(
+            pcp.prezzoCorrente,
+            pcp.idgiocatore.idGiocatore,
+            pcp.numCasa,
+            pcp.prezzoCasaCorrente,
+            c.nome,
+            c.colore,
+            p.affitto,
+            p.affitto1Casa,
+            p.affitto2Case,
+            p.affitto3Case,
+            p.affitto4Case,
+            p.affittoAlbergo,
+            p.ipoteca
+        )
+        FROM Partita_Casella_Prezzoproprieta pcp
+        JOIN pcp.idcasella c
+        JOIN pcp.idprezzoproprieta p
+        WHERE pcp.idpartita.codiceInvito = :idPartita
+        AND pcp.idgiocatore.nome = :nomeGiocatore
+    """)
+    List<PlayerProperties> findPlayerProperties(@Param("idPartita") String idPartita, @Param("nomeGiocatore") String nomeGiocatore);
+
+    @Query("""
+        SELECT new unimib.daBancherz.NewMonopoly.model.PlayerProperties(
+            pcp.prezzoCorrente,
+            pcp.idgiocatore.idGiocatore,
+            pcp.numCasa,
+            pcp.prezzoCasaCorrente,
+            c.nome,
+            c.colore,
+            p.affitto,
+            p.affitto1Casa,
+            p.affitto2Case,
+            p.affitto3Case,
+            p.affitto4Case,
+            p.affittoAlbergo,
+            p.ipoteca
+        )
+        FROM Partita_Casella_Prezzoproprieta pcp
+        JOIN pcp.idcasella c
+        JOIN pcp.idprezzoproprieta p
+        WHERE pcp.idpartita.codiceInvito = :idPartita
+        AND pcp.idgiocatore.nome <> :nomeGiocatore
+        AND pcp.idgiocatore.nome IS NOT NULL
+    """)
+    List<PlayerProperties> findOtherPlayerProperties(@Param("idPartita") String idPartita, @Param("nomeGiocatore") String nomeGiocatore);
+
     // Metodo per popolare la tabella quando non c'è la randomizzazione
     @Modifying
     @Transactional
@@ -243,7 +295,7 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     @Query(value = """
         SELECT
             CASE
-                  WHEN pcp.num_albergo = true THEN p.affitto_albergo
+                  WHEN pcp.num_casa = 5 THEN p.affitto_albergo
                   WHEN pcp.num_casa = 4 THEN p.affitto_4case
                   WHEN pcp.num_casa = 3 THEN p.affitto_3case
                   WHEN pcp.num_casa = 2 THEN p.affitto_2case
@@ -283,7 +335,8 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     @Query(value = """
         SELECT pcp.num_casa
         FROM partita_casella_prezzoproprieta pcp
-        WHERE pcp.posizione = :posizione;
+        WHERE pcp.posizione = :posizione
+        AND num_casa<>5
     """, nativeQuery = true)
     int contaCase(@Param("posizione") Integer posizione);
 
@@ -292,17 +345,22 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
         FROM partita_casella_prezzoproprieta  pcp
         JOIN giocatore g ON pcp.idgiocatore = g.id_giocatore
         WHERE g.nome= :nomeGiocatore
-        AND pcp.num_albergo=true
+        AND pcp.num_casa=5
         AND pcp.idpartita = :idPartita
     """, nativeQuery = true)
     int contaAlberghiTot(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
 
     @Query(value = """
-        SELECT pcp.num_albergo
+        SELECT CASE
+            WHEN COUNT(*) > 0 THEN true
+            ELSE false
+        END
         FROM partita_casella_prezzoproprieta pcp
-        WHERE pcp.posizione = :posizione;
+        WHERE pcp.posizione = :posizione
+        AND pcp.num_casa = 5
     """, nativeQuery = true)
     boolean contaAlbergo(@Param("posizione") Integer posizione);
+
 
     //Metodo per trovare c.tipo piu vicino alla posizione dove ci si trova
     @Query(value = """
@@ -323,11 +381,4 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
         WHERE posizione= :posizione;
     """, nativeQuery = true)
     void compraCasa(@Param("posizione") Integer posizione);
-
-    @Query(value = """
-        UPDATE partita_casella_prezzoproprieta pcp
-        SET num_albergo = true
-        WHERE posizione= :posizione;
-    """, nativeQuery = true)
-    void compraAlbergo(@Param("posizione") Integer posizione);
 }

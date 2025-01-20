@@ -35,8 +35,6 @@ public class Partita_Casella_Prezzoproprieta {
 
     @Column(name = "num_casa")
     private Integer numCasa;
-    @Column(name = "num_albergo")
-    private Boolean numAlbergo;
 
     public Giocatore getIdgiocatore() {
         return idgiocatore;
@@ -102,11 +100,4 @@ public class Partita_Casella_Prezzoproprieta {
         this.numCasa = numCasa;
     }
 
-    public Boolean getNumAlbergo() {
-        return numAlbergo;
-    }
-
-    public void setNumAlbergo(Boolean numAlbergo) {
-        this.numAlbergo = numAlbergo;
-    }
 }
