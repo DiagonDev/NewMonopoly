@@ -87,12 +87,6 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                 case "GestisciProprieta":
                     propertyHandler.gestisciProprieta(session, "GestisciProprieta");
                     break;
-                case "CostruisciCase":
-                    propertyHandler.costruisciCase(parts, session);
-                    break;
-                case "IpotecaProprieta":
-                    propertyHandler.ipotecaProprieta(parts, session);
-                    break;
                 default:
                     throw new IllegalArgumentException("Tipo di messaggio non supportato: " + parts[0]);
             }
@@ -120,6 +114,15 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                     offertaMonetaria = (Integer) data.get("offertaMonetaria");
                     boolean flag = (boolean) data.get("exchangeAccepted");
                     propertyHandler.rispostaScambio(property1, property2, offertaMonetaria, flag, session);
+                    break;
+                case "CostruisciCasa":
+                    PlayerProperties property = (PlayerProperties) data.get("property");
+                    Integer casine = (Integer) data.get("casine");
+                    propertyHandler.gestisciCase(property, casine, session);
+                    break;
+                case "IpotecaProprieta":
+                    PlayerProperties propertyIpotecata = (PlayerProperties) data.get("property");
+                    propertyHandler.ipotecaProprieta(propertyIpotecata, session);
                     break;
                 default:
                     throw new IllegalArgumentException("Tipo di messaggio non supportato: " + type);

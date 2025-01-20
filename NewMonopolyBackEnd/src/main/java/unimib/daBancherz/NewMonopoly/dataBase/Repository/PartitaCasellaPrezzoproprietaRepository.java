@@ -295,7 +295,7 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     @Query(value = """
         SELECT
             CASE
-                  WHEN pcp.num_albergo = true THEN p.affitto_albergo
+                  WHEN pcp.num_casa = 5 THEN p.affitto_albergo
                   WHEN pcp.num_casa = 4 THEN p.affitto_4case
                   WHEN pcp.num_casa = 3 THEN p.affitto_3case
                   WHEN pcp.num_casa = 2 THEN p.affitto_2case
@@ -335,7 +335,8 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     @Query(value = """
         SELECT pcp.num_casa
         FROM partita_casella_prezzoproprieta pcp
-        WHERE pcp.posizione = :posizione;
+        WHERE pcp.posizione = :posizione
+        AND num_casa<>5
     """, nativeQuery = true)
     int contaCase(@Param("posizione") Integer posizione);
 
@@ -344,17 +345,22 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
         FROM partita_casella_prezzoproprieta  pcp
         JOIN giocatore g ON pcp.idgiocatore = g.id_giocatore
         WHERE g.nome= :nomeGiocatore
-        AND pcp.num_albergo=true
+        AND pcp.num_casa=5
         AND pcp.idpartita = :idPartita
     """, nativeQuery = true)
     int contaAlberghiTot(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
 
     @Query(value = """
-        SELECT pcp.num_albergo
+        SELECT CASE
+            WHEN COUNT(*) > 0 THEN true
+            ELSE false
+        END
         FROM partita_casella_prezzoproprieta pcp
-        WHERE pcp.posizione = :posizione;
+        WHERE pcp.posizione = :posizione
+        AND pcp.num_casa = 5
     """, nativeQuery = true)
     boolean contaAlbergo(@Param("posizione") Integer posizione);
+
 
     //Metodo per trovare c.tipo piu vicino alla posizione dove ci si trova
     @Query(value = """
@@ -375,11 +381,4 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
         WHERE posizione= :posizione;
     """, nativeQuery = true)
     void compraCasa(@Param("posizione") Integer posizione);
-
-    @Query(value = """
-        UPDATE partita_casella_prezzoproprieta pcp
-        SET num_albergo = true
-        WHERE posizione= :posizione;
-    """, nativeQuery = true)
-    void compraAlbergo(@Param("posizione") Integer posizione);
 }

@@ -69,9 +69,13 @@ public class PropertyHandler {
         session.sendMessage(new TextMessage(playerPropertiesListMessage));
     }
 
-    public void gestisciCase(String nomeGiocatore, String idPartita, Integer posizione, WebSocketSession session) throws IOException {
-        int saldoGiocatore = giocatoreRepository.saldoGiocatore(nomeGiocatore, idPartita);
-        int costoCasa = pCPPRepository.prezzoCasa(posizione, idPartita);
+    public void gestisciCase(PlayerProperties property, Integer casine,  WebSocketSession session) throws IOException {
+        Integer idGiocatore = property.getIdGiocatore();
+        List<String> informazioniGiocatore = giocatoreRepository.findNomeAndIdpartitaByidGiocatore(idGiocatore);
+        int saldoGiocatore = giocatoreRepository.saldoGiocatore(informazioniGiocatore.get(0), informazioniGiocatore.get(1));
+        //TODO: finire tutto
+
+        /*int costoCasa = pCPPRepository.prezzoCasa(posizione, idPartita);
         int numCase = pCPPRepository.contaCase(posizione);
         if (saldoGiocatore > costoCasa && numCase < 4) {
             giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, costoCasa);
@@ -85,7 +89,7 @@ public class PropertyHandler {
                     "type", "acquistoFallito"
             ));
             session.sendMessage(new TextMessage(casaMessage));
-        }
+        }*/
     }
 
     public void effettuaScambio(PlayerProperties property1, PlayerProperties property2, Integer money,  WebSocketSession session) throws IOException {
@@ -104,10 +108,7 @@ public class PropertyHandler {
         session.sendMessage(new TextMessage(casaMessage));
     }
 
-    public void costruisciCase(String[] parts, WebSocketSession session) {
-    }
-
-    public void ipotecaProprieta(String[] parts, WebSocketSession session) {
+    public void ipotecaProprieta(PlayerProperties property, WebSocketSession session) {
 
     }
 
