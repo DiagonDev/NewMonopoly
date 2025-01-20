@@ -7,7 +7,10 @@ const BaseRectangle = () => {
     const [isPageOpen, setIsPageOpen] = useState(false);
 
     useEffect(() => {
-        setIsPageOpen(true);
+        if(exchangeRequest.flag){
+            setIsPageOpen(true);
+        }
+        
     },[exchangeRequest]);
     
     return (

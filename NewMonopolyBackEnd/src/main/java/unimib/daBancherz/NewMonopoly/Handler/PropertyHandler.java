@@ -40,7 +40,7 @@ public class PropertyHandler {
         if(saldoGiocatore > prezzoCasella){
             pCPPRepository.setGiocatore(playerName, gameId, messageParts[1]);
             giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoCasella);
-            messageHandler.updateBalance(gameHandler.getGameSessions(), gameId);
+            messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
             String proprietaMessage = new ObjectMapper().writeValueAsString(Map.of(
                     "type", "acquistoRiuscito"
             ));

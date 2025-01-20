@@ -8,16 +8,17 @@ const PlayersStatsRectangle = () => {
     const [players, setPlayers] = useState(
         Array(MAX_PLAYERS).fill({ name: "Player", balance: INITIAL_BALANCE })
     );
-    const { playerJoin, playerBalance } = useContext(WebSocketContext);
+    const { playerList, playerBalance } = useContext(WebSocketContext);
+
     // Aggiunge un nuovo giocatore quando arriva un messaggio di join
     useEffect(() => {
-        console.log("Nuovo join:", playerJoin.player);
-        if (playerJoin.player) {
+        console.log("Nuovo join:", playerList.player);
+        if (playerList.player) {
             setPlayers((prevPlayers) => {
                 const nextPlayers = [...prevPlayers];
                 // Verifica se il giocatore è già presente
                 const playerIndex = nextPlayers.findIndex(
-                    (player) => player.name === playerJoin.player
+                    (player) => player.name === playerList.player
                 );
 
                 if (playerIndex === -1) {
@@ -28,25 +29,25 @@ const PlayersStatsRectangle = () => {
 
                     if (emptySlotIndex !== -1) {
                         nextPlayers[emptySlotIndex] = {
-                            name: playerJoin.player, // Nome del giocatore dal messaggio
-                            balance: INITIAL_BALANCE,
+                            name: playerList.player, // Nome del giocatore dal messaggio
+                            balance: playerList.balance,
                         };
                     }
                 }
                 return nextPlayers;
             });
         }
-    }, [playerJoin]);
+    }, [playerList]);
 
     // Simula la modifica del bilancio quando arriva un messaggio dal server
     useEffect(() => {
         if (playerBalance) {
-            const { playerName, newBalance } = playerBalance;
-
+            
+            console.log(playerBalance.player, playerBalance.balance);
             setPlayers((prevPlayers) => {
                 return prevPlayers.map((player) =>
-                    player.name === playerName
-                        ? { ...player, balance: newBalance }
+                    player.name === playerBalance.player
+                        ? { ...player, balance: playerBalance.balance }
                         : player
                 );
             });

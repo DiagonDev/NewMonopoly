@@ -86,14 +86,13 @@ public class GameHandler {
 
         gameBoard.createGame(gameId);//crea il singleton per la partita con codicePartita = gameId
         gameBoard.setPlayerPosition(gameId, playerName, 1);//imposta nel signleton che il giocatore parte dalla casella 1
+        messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
+        gameService.createGameAndPlayer(playerName,difficulty, randomization, gameId);//crea la parita nel database, più informazioni in GameService
 
         //GESTIONE MESSAGGI
         messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella gameconsole
         messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "ADMIN");//invia a tutti i giocatori i messaggi di partecipazione alla partita
-        messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
         messageHandler.sendTypePlayer("ADMIN", session);//invia all'admin il tipo di giocatore che è
-
-        gameService.createGameAndPlayer(playerName,difficulty, randomization, gameId);//crea la parita nel database, più informazioni in GameService
 
         pedineNonUsate = pedinaRepository.findUnusedPedineByPartita(gameId);
         messageHandler.sendUnusedPedine(pedineNonUsate, gameSessions, gameId); //invia al giocatore la lista delle pedine disponibili
@@ -107,7 +106,6 @@ public class GameHandler {
         }
 
         gameBoard.setPlayerPosition(gameId, playerName, 1);
-        System.out.println("La posizione di: " + playerName + " di game: " + gameId + " è: " + gameBoard.getPlayerPosition(gameId, playerName));
 
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         playersInGame.add(session);//aggiunge la sessione del giocatore alla lista di sessioni della partita a cuoi vuole partecipare

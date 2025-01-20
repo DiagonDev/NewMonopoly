@@ -17,6 +17,11 @@ export const WebSocketProvider = ({children}) => {
         player: '',
         balance: 0,
     });
+    const [playerList, setPlayerList] = useState({
+        player: '',
+        balance: 0,
+    });
+    
     const [pawnsAvailable, setPawnsAvailable] = useState([]);
     const [diceResult, setdiceResult] = useState({
         dice1: 0,
@@ -28,6 +33,8 @@ export const WebSocketProvider = ({children}) => {
         flag: false,
         playername: ''
     });
+    const [prison, setPrison] = useState(false);
+    const [exitPrison, setExitPrison] = useState(0);
 
     const [playerPawn, setPlayerPawn] = useState({
         pawnId: 0,
@@ -49,10 +56,15 @@ export const WebSocketProvider = ({children}) => {
         flag: false,
         price: 0,
     })
+    const [buyReturn, setBuyReturn] = useState({
+        flag:false,
+        success: false,
+    })
     //Casella in cui finisco dopo il tiro dei dadi
     const [nameBox, setNameBox] = useState('');
     const [playerProperties, setPlayerProperties] = useState([])
     const [exchangeRequest, setExchangeRequest] = useState({
+        flag: false,
         properties1: '',
         properties2: '',
         playerName: '',
@@ -60,8 +72,8 @@ export const WebSocketProvider = ({children}) => {
     })
 
     useEffect(() => {
-        //const ws = new WebSocket("https://7559-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
-        const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
+        const ws = new WebSocket("https://a202-95-249-14-234.ngrok-free.app/ws/gameNewMonopoly");
+        //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
         ws.onopen = () => {
             setSocket(ws);
             setConnected(true);
@@ -120,12 +132,23 @@ export const WebSocketProvider = ({children}) => {
                 } else if (message.type === 'gameId') {
                     setGameId(message.content);
                 }
+
+                else if (message.type === 'playersList') {
+                    console.log("playerList", message.playerName, message.balance);
+                    setPlayerList((prevState) => ({
+                        ...prevState, // Mantieni le altre proprietà, se esistono
+                        player: message.playerName, // Aggiorna il nome del giocatore
+                        balance: message.balance, // Aggiorna il bilancio
+                    }));
+                }
+
                 /**
                  * type: balance
                  * content: newBalance (int/long)
                  */
-                else if (message.type === 'statsPlayer') {
-                    console.log("statsPlayer", message.playerName, message.balance);
+                else if (message.type === 'playerBalance') {
+                    
+
                     setPlayerBalance((prevState) => ({
                         ...prevState, // Mantieni le altre proprietà, se esistono
                         player: message.playerName, // Aggiorna il nome del giocatore
@@ -140,6 +163,9 @@ export const WebSocketProvider = ({children}) => {
                     console.log("pawns available", message.content);
                     setPawnsAvailable(message.content);
                 } else if (message.type === 'diceRolled') {
+                    if(message.dice1===message.dice2){
+                        setPrison(false);
+                    }
                     console.log("diceRolled", message.dice1, message.dice2);
                     setdiceResult((prevState) => ({
                         ...prevState, // Copia il vecchio stato
@@ -148,7 +174,11 @@ export const WebSocketProvider = ({children}) => {
                     }));
                     setDiceRolled(true);
                 } else if (message.type === 'turn') {
-
+                    setBuyReturn((prevState) => ({
+                        ...prevState,
+                        flag: false,
+                        success: true,
+                    }));
                     setStartTurn((prevState) => ({
                         ...prevState, // Copia il vecchio stato
                         flag: message.content, // Aggiorna solo content
@@ -212,14 +242,48 @@ export const WebSocketProvider = ({children}) => {
                 }
                 //Ricevi scambio -------------------------------------------------------------------
                 else if (message.type === 'exchangeRequest') {
-                    console.log("excance request", message.playerName, message.balance);
+                    console.log("sono Luca che prova");
                     setExchangeRequest((prevState) => ({
                         ...prevState,
+                        flag: true,
                         properties1: message.properties1,
                         properties2: message.properties2,
                         playerName: message.playerName,
                         money: message.money,
                     }));
+                }
+                else if (message.type === 'acquistoRiuscito') {
+                    setBuyReturn((prevState) => ({
+                        ...prevState,
+                        flag: true,
+                        success: true,
+                    }));
+                    setBuy((prevState) => ({
+                        ...prevState,
+                        flag: false,
+                    }));
+                    
+                }
+                else if (message.type === 'acquistoFallito') {
+                    setBuyReturn((prevState) => ({
+                        ...prevState,
+                        flag: true,
+                        success: false,
+                    }));
+                    setBuy((prevState) => ({
+                        ...prevState,
+                        flag: false,
+                    }));
+                }else if (message.type === 'prison') {
+                    setPrison(true);
+                    setExitPrison(0);
+                }else if (message.type === 'exitPrison') {
+                    if(message.flag){
+                        setPrison(false);
+                        setExitPrison(1);
+                    }else{
+                        setExitPrison(2);
+                    }
                 }
             };
 
@@ -259,7 +323,11 @@ export const WebSocketProvider = ({children}) => {
                 buy,
                 nameBox,
                 playerProperties,
-                exchangeRequest
+                exchangeRequest,
+                playerList,
+                buyReturn,
+                prison,
+                exitPrison
             }}>
             {children}
         </WebSocketContext.Provider>

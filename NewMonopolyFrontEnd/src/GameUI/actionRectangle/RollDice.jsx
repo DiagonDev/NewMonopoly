@@ -3,7 +3,7 @@ import { WebSocketContext } from '../../contexts/WebSocketContext';
 import {pawnColors} from "../../pages/pawnColors.jsx";
 
 const RollDice = () => {
-    const { socket, connected, diceResult, diceRolled, payment, draw, buy , nameBox} = useContext(WebSocketContext); // Accesso al WebSocket
+    const { socket, connected, diceResult, diceRolled, payment, draw, buy , nameBox, buyReturn, prison, exitPrison} = useContext(WebSocketContext); // Accesso al WebSocket
     const [isRolled, setIsRolled] = useState(diceRolled);
     //const [currentPosition, setCurrentPosition] = useState('Parco della vittoria'); // Posizione iniziale
    
@@ -42,6 +42,15 @@ const RollDice = () => {
             console.error('Connessione WebSocket non stabilita!');
         }
     };
+    const handleUscitaPrigione = () => {
+        if (socket && connected) {
+            // Invia un messaggio al server
+            socket.send(`PagaUscitaPrigione:`);
+            console.log(`Esci pagando`);
+        } else {
+            console.error('Connessione WebSocket non stabilita!');
+        }
+    };
 
     //Quello che fa quando non acquista la proprietà, per ora nulla
    
@@ -55,6 +64,8 @@ const RollDice = () => {
         setIsRolled(diceRolled);
     }, [diceRolled]);
 
+    
+    
     useEffect(() => {
         setIsPayment(payment.flag);
 
@@ -75,25 +86,48 @@ const RollDice = () => {
             {/* Se isRolled è true, mostra la scritta con il risultato, altrimenti mostra il bottone */}
             {isRolled ? (
                 <div>
-                    <p>Hai lanciato i dadi!</p>
+                    <p>Hai lanciato i dadi! Totale: {diceValue1+diceValue2}</p>
                     <p>Hai ottenuto un {diceValue1} con il primo dado e {diceValue2} con il secondo dado</p>
-                    <p>Totale: {diceValue1+diceValue2}</p>
-                    <p>Sei arrivato sulla casella: {nameBox}</p>
+                    {((prison && (diceValue1===diceValue2)) || !prison) &&(
+                        <p>Sei arrivato sulla casella: {nameBox}</p>
+                    )}
+                    {(prison) &&(
+                        <p>Sei ancora in prigione</p>
+                    )}
+                    
+                    
                 </div>
             ) : (
-                <button onClick={handleRoll}>
-                    Roll
-                </button>
-            )}
-            {isRolled && isPayment && (
                 <div>
-                    <p>Hai pagato: {payment.payment}€ a {payment.destination} per {payment.description}</p>
+                    <button onClick={handleRoll}>
+                        Roll
+                    </button>
+                    {(prison) &&(
+                        <button onClick={handleUscitaPrigione}>
+                            Paga 50$ per uscire di prigione
+                        </button>
+                    )}
+                    {(exitPrison===1) &&(
+                        <p>
+                            Sei uscito
+                        </p>
+                    )}
+                    {(exitPrison===2) &&(
+                        <p>
+                            Non hai piu soldi non lo puoi fare
+                        </p>
+                    )}
                 </div>
             )}
             {isRolled && isDraw && (
                 <div>
                     <p>Hai pescato una carta {draw.card} che dice:</p>
                     <p> {draw.description}</p>
+                </div>
+            )}
+            {isRolled && isPayment && (
+                <div>
+                    <p>Hai pagato: {payment.payment}€ a {payment.destination} per {payment.description}</p>
                 </div>
             )}
             {isRolled && isBuy &&(
@@ -106,9 +140,16 @@ const RollDice = () => {
                 </div>
                 
             )}
-             {isPurchased &&(
+            {(buyReturn.flag && buyReturn.success) &&(
                 <div>
                     <p>Hai acquistato la proprieta {nameBox} a {purchased} </p>
+                   
+                </div>
+                
+            )}
+            {(buyReturn.flag && !buyReturn.success) &&(
+                <div>
+                    <p>Non hai abbastanza soldi </p>
                    
                 </div>
                 
