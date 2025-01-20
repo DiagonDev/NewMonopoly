@@ -13,10 +13,6 @@ export const WebSocketProvider = ({children}) => {
         player: '',
         playerRole: '',
     });
-    const [statsPlayer, setStatsPlayer]= useState({
-        playerName: '',
-        balance: '',
-    });
     const [playerBalance, setPlayerBalance] = useState({
         player: '',
         balance: 0,
@@ -190,7 +186,14 @@ export const WebSocketProvider = ({children}) => {
                         payment: message.payment,
                     }));
 
-                } else if (message.type === 'draw') {
+                } else if (message.type === 'paymentFinished') {
+                    console.log(message.type);
+                    setPayment((prevState) => ({
+                        ...prevState,
+                        flag: false,
+                    }));
+
+                }else if (message.type === 'draw') {
                     console.log(message.type);
                     setDraw((prevState) => ({
                         ...prevState,
@@ -272,7 +275,6 @@ export const WebSocketProvider = ({children}) => {
                 buy,
                 nameBox,
                 playerProperties,
-                statsPlayer,
                 excangeRequest
             }}>
             {children}

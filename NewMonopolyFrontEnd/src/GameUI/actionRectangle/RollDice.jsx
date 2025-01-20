@@ -11,9 +11,11 @@ const RollDice = () => {
     const [diceValue2, setDiceValue2] = useState(null); // Valore del dado2
     
     //
+    const [purchased, setPurchased] = useState(false);
     const [isPayment, setIsPayment] = useState(payment.flag);
     const [isDraw, setIsDraw] = useState(draw.flag);
     const [isBuy, setIsBuy] = useState(buy.flag);
+    
     //const [finalPosition, setFinalPosition] = useState(''); // Posizione dopo il lancio
 
     // Funzione per gestire il click sul bottone
@@ -35,6 +37,7 @@ const RollDice = () => {
             // Invia un messaggio al server
             socket.send(`AcquistaProprieta:${nameBox}`);
             console.log(`Messaggio inviato: AcquistaProprieta:${nameBox}`);
+            setPurchased(true);
         } else {
             console.error('Connessione WebSocket non stabilita!');
         }
@@ -93,12 +96,19 @@ const RollDice = () => {
                     <p> {draw.description}</p>
                 </div>
             )}
-            {isRolled && isBuy && (
+            {isRolled && isBuy &&(
                 <div>
                     <p>Questa proprietà è libera e costa {buy.price} </p>
                     <button onClick={handleAcquista}>
                         Acquista
                     </button>
+                   
+                </div>
+                
+            )}
+             {isPurchased &&(
+                <div>
+                    <p>Hai acquistato la proprieta {nameBox} a {purchased} </p>
                    
                 </div>
                 
