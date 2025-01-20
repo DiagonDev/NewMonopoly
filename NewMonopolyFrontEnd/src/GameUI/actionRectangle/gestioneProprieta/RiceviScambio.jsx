@@ -7,28 +7,35 @@ import {WebSocketContext} from "../../../contexts/WebSocketContext.jsx";
 const RiceviScambio = ({ onClose }) => {
     const {socket, connected, exchangeRequest} = useContext(WebSocketContext);
     const [flag, setFlag] = useState(0);
+    const [exchangeAccepted, setExchangeAccepted] = useState(false);
 
     const handleAccetta = () => {
+        setExchangeAccepted(true);
+        sendMessage();
+    }
+
+    const sendMessage = () => {
         if (socket && connected) {
             // Invia un messaggio al server
-            socket.send(`AccettaScambio:${exchangeRequest.playerName}`);
+            socket.send(`RispostaScambio:${exchangeRequest.playerName}`);
             console.log('Messaggio inviato: AccettaScambio');
+            const message = {
+                type: "RispostaScambio",
+                property1:  exchangeRequest.property1,
+                property2: exchangeRequest.property2,
+                offertaMonetaria: exchangeRequest.money,
+                exchangeAccepted: exchangeAccepted,
+            };
+
+            socket.send(JSON.stringify(message));
+            setExchangeAccepted(false);
+            console.log('Messaggio inviato:', message);
         } else {
             console.error('Connessione WebSocket non stabilita!');
         }
         onClose();
     }
 
-    const handleRifiuta = () => {
-        if (socket && connected) {
-            // Invia un messaggio al server
-            socket.send(`RifiutaScambio:${exchangeRequest.playerName}`);
-            console.log('Messaggio inviato: RifiutaScambio');
-        } else {
-            console.error('Connessione WebSocket non stabilita!');
-        }
-        onClose();
-    }
 
     useEffect(() => {
         if(exchangeRequest.money===0){
@@ -48,21 +55,21 @@ const RiceviScambio = ({ onClose }) => {
                 {/* Quando non si aggiungono soldi all offerta */}
                 {(flag===0) && (
                     <>
-                        <p>Ha offerto {exchangeRequest.properties1} per {exchangeRequest.properties2}</p>
+                        <p>Ha offerto {exchangeRequest.property1} per {exchangeRequest.property2}</p>
                     </>
                 )}
 
                 {/* Quando ti richiede sodli aggiuntivi */}
                 {(flag===1) && (
                     <>
-                        <p>Ha offerto {exchangeRequest.properties1} per {exchangeRequest.properties2} + {Math.abs(exchangeRequest.money)}</p>
+                        <p>Ha offerto {exchangeRequest.property1} per {exchangeRequest.property2} + {Math.abs(exchangeRequest.money)}</p>
                     </>
                 )}
 
                 {/* Quando ti da sodli aggiuntivi */}
                 {(flag===2) && (
                     <>
-                        <p>Ha offerto {exchangeRequest.properties1} + {Math.abs(exchangeRequest.money)} per {exchangeRequest.properties2}</p>
+                        <p>Ha offerto {exchangeRequest.property1} + {Math.abs(exchangeRequest.money)} per {exchangeRequest.property2}</p>
                     </>
                 )}
 
@@ -70,7 +77,7 @@ const RiceviScambio = ({ onClose }) => {
                     <button onClick={handleAccetta}>
                         Accetta
                     </button>
-                    <button onClick={handleRifiuta}>
+                    <button onClick={sendMessage}>
                         Rifiuta
                     </button>
                 </div>

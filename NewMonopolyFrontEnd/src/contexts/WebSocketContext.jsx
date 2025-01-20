@@ -62,15 +62,16 @@ export const WebSocketProvider = ({children}) => {
     })
     //Casella in cui finisco dopo il tiro dei dadi
     const [nameBox, setNameBox] = useState('');
-    const [playerProperties, setPlayerProperties] = useState([])
+    const [playerProperties, setPlayerProperties] = useState([]);
+    const [allProperties, setAllProperties] = useState([]);
     const [exchangeRequest, setExchangeRequest] = useState({
         flag: false,
         properties1: '',
         properties2: '',
         playerName: '',
         money: 0,
-    })
-
+    });
+    const [rispostaScambio, setRispostaScambio] = useState();
     useEffect(() => {
         const ws = new WebSocket("https://a202-95-249-14-234.ngrok-free.app/ws/gameNewMonopoly");
         //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
@@ -234,20 +235,21 @@ export const WebSocketProvider = ({children}) => {
                     }));
 
                 } else if (message.type === 'nameBox') {
-
                     setNameBox(message.name);
+
                 } else if (message.type === 'propertiesOwned') {
                     setPlayerProperties(message.properties);
 
+                }else if (message.type === 'allProperties'){
+                    setAllProperties(message.properties);
                 }
                 //Ricevi scambio -------------------------------------------------------------------
                 else if (message.type === 'exchangeRequest') {
                     console.log("sono Luca che prova");
                     setExchangeRequest((prevState) => ({
                         ...prevState,
-                        flag: true,
-                        properties1: message.properties1,
-                        properties2: message.properties2,
+                        property1: message.property1,
+                        property2: message.property2,
                         playerName: message.playerName,
                         money: message.money,
                     }));
@@ -327,7 +329,10 @@ export const WebSocketProvider = ({children}) => {
                 playerList,
                 buyReturn,
                 prison,
-                exitPrison
+                exitPrison,
+                allProperties,
+                exchangeRequest,
+                rispostaScambio
             }}>
             {children}
         </WebSocketContext.Provider>

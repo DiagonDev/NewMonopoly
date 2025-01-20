@@ -1,3 +1,7 @@
+import {WebSocketContext} from "../../../contexts/WebSocketContext.jsx";
+import {useContext, useState} from "react";
+import PropertyOwned from "./PropertyOwned.jsx";
+
 const IpotecaProprieta = ({ playerProperties })  => {
     const {socket, connected} = useContext(WebSocketContext);
     const [selectedProperty, setSelectedProperty] = useState(null);
@@ -14,8 +18,13 @@ const IpotecaProprieta = ({ playerProperties })  => {
     }
     const handleIpoteca = () => {
         if (socket && connected) {
-            socket.send(`IpotecaProprieta:${selectedProperty}`);
-            console.log('Messaggio inviato: IpotecaProprieta');
+            const message = {
+                type: "IpotecaProprieta",
+                property: selectedProperty,
+            };
+
+            socket.send(JSON.stringify(message));
+            console.log('Messaggio inviato:', message);
             setIsModalOpen(false);
             setSelectedProperty(null);
         } else {
