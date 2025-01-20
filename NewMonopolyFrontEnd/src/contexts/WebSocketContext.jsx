@@ -33,6 +33,8 @@ export const WebSocketProvider = ({children}) => {
         flag: false,
         playername: ''
     });
+    const [prison, setPrison] = useState(false);
+    const [exitPrison, setExitPrison] = useState(0);
 
     const [playerPawn, setPlayerPawn] = useState({
         pawnId: 0,
@@ -161,6 +163,9 @@ export const WebSocketProvider = ({children}) => {
                     console.log("pawns available", message.content);
                     setPawnsAvailable(message.content);
                 } else if (message.type === 'diceRolled') {
+                    if(message.dice1===message.dice2){
+                        setPrison(false);
+                    }
                     console.log("diceRolled", message.dice1, message.dice2);
                     setdiceResult((prevState) => ({
                         ...prevState, // Copia il vecchio stato
@@ -263,12 +268,22 @@ export const WebSocketProvider = ({children}) => {
                     setBuyReturn((prevState) => ({
                         ...prevState,
                         flag: true,
-                        success: true,
+                        success: false,
                     }));
                     setBuy((prevState) => ({
                         ...prevState,
                         flag: false,
                     }));
+                }else if (message.type === 'prison') {
+                    setPrison(true);
+                    setExitPrison(0);
+                }else if (message.type === 'exitPrison') {
+                    if(message.flag){
+                        setPrison(false);
+                        setExitPrison(1);
+                    }else{
+                        setExitPrison(2);
+                    }
                 }
             };
 
@@ -310,7 +325,9 @@ export const WebSocketProvider = ({children}) => {
                 playerProperties,
                 exchangeRequest,
                 playerList,
-                buyReturn
+                buyReturn,
+                prison,
+                exitPrison
             }}>
             {children}
         </WebSocketContext.Provider>
