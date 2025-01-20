@@ -83,4 +83,16 @@ public class GameBoardSingleton {
         Game game = games.get(gameId);
         return game != null ? game.getPlayerCountRoll(playerName) : 0;
     }
+
+    public void setPlayerCountRollDoubleDice(String gameId, String playerName, int countRollDoubleDice) {
+        Game game = games.get(gameId);
+        if(game != null) {
+            game.setPlayerCountRollDoubleDice(playerName,countRollDoubleDice);
+        }
+    }
+
+    public int getPlayerCountRollDoubleDice(String gameId, String playerName) {
+        Game game = games.get(gameId);
+        return game != null ? game.getPlayerCountRollDoubleDice(playerName) : 0;
+    }
 }

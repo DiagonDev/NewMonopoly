@@ -52,12 +52,21 @@ class Game {
     public int getPlayerCountRoll(String playerName) {
         return players.getOrDefault(playerName, new Player()).getCountRoll();
     }
+
+    public void setPlayerCountRollDoubleDice(String playerName, int countRollDubleDice){
+        players.computeIfAbsent(playerName, k -> new Player()).setCountRollDoubleDice(countRollDubleDice);
+    }
+
+    public int getPlayerCountRollDoubleDice(String playerName){
+        return players.getOrDefault(playerName, new Player()).getCountRollDoubleDice();
+    }
 }
 
 class Player {
     private int position = 0;
     private boolean prison = false;
     private int countRoll = 0;
+    private int countRollDoubleDice = 0;
 
     public int getPosition() {
         return position;
@@ -81,5 +90,13 @@ class Player {
 
     public void setCountRoll(int countRoll) {
         this.countRoll = countRoll;
+    }
+
+    public int getCountRollDoubleDice() {
+        return countRollDoubleDice;
+    }
+
+    public void setCountRollDoubleDice(int countRollDoubleDice) {
+        this.countRollDoubleDice = countRollDoubleDice;
     }
 }

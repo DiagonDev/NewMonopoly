@@ -331,7 +331,6 @@ export const WebSocketProvider = ({children}) => {
                 prison,
                 exitPrison,
                 allProperties,
-                exchangeRequest,
                 rispostaScambio
             }}>
             {children}
