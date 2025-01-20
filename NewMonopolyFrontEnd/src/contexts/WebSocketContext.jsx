@@ -8,7 +8,7 @@ export const WebSocketProvider = ({children}) => {
     const [connected, setConnected] = useState(false);
     const [serverMessages, setServerMessages] = useState([]);
     const [userMessages, setUserMessages] = useState([]);
-    const [gameId, setGameId] = useState( '');
+    const [gameId, setGameId] = useState('');
     const [playerJoin, setPlayerJoin] = useState({
         player: '',
         playerRole: '',
@@ -52,13 +52,13 @@ export const WebSocketProvider = ({children}) => {
     //Casella in cui finisco dopo il tiro dei dadi
     const [nameBox, setNameBox] = useState('');
     const [playerProperties, setPlayerProperties] = useState([])
-    const [excangeRequest, setExcangeRequest] = useState({
+    const [exchangeRequest, setExchangeRequest] = useState({
         properties1: '',
         properties2: '',
         playerName: '',
         money: 0,
     })
-    
+
     useEffect(() => {
         //const ws = new WebSocket("https://7559-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
         const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
@@ -124,7 +124,8 @@ export const WebSocketProvider = ({children}) => {
                  * type: balance
                  * content: newBalance (int/long)
                  */
-                else if (message.type === 'balance') {
+                else if (message.type === 'statsPlayer') {
+                    console.log("statsPlayer", message.playerName, message.balance);
                     setPlayerBalance((prevState) => ({
                         ...prevState, // Mantieni le altre proprietà, se esistono
                         player: message.playerName, // Aggiorna il nome del giocatore
@@ -186,14 +187,7 @@ export const WebSocketProvider = ({children}) => {
                         payment: message.payment,
                     }));
 
-                } else if (message.type === 'paymentFinished') {
-                    console.log(message.type);
-                    setPayment((prevState) => ({
-                        ...prevState,
-                        flag: false,
-                    }));
-
-                }else if (message.type === 'draw') {
+                } else if (message.type === 'draw') {
                     console.log(message.type);
                     setDraw((prevState) => ({
                         ...prevState,
@@ -202,7 +196,7 @@ export const WebSocketProvider = ({children}) => {
                         description: message.description,
                     }));
                 } else if (message.type === 'buy') {
-                    console.log("Acquisto: ", message.type," price",);
+                    console.log("Acquisto: ", message.type, " price",);
                     setBuy((prevState) => ({
                         ...prevState,
                         flag: true,
@@ -210,26 +204,16 @@ export const WebSocketProvider = ({children}) => {
                     }));
 
                 } else if (message.type === 'nameBox') {
-                    
+
                     setNameBox(message.name);
-                } else if (message.type === 'propertiesOwned'){
+                } else if (message.type === 'propertiesOwned') {
                     setPlayerProperties(message.properties);
 
-                } 
-                
-                //Non so se message.type è giusto-----------------------------------------------------------
-                else if (message.type === 'statsPlayer'){
-                    console.log("statsPlayer",message.playerName,message.balance);
-                    setPlayerBalance((prevState) => ({
-                        ...prevState, // Mantieni le altre proprietà, se esistono
-                        player: message.playerName, // Aggiorna il nome del giocatore
-                        balance: message.balance, // Aggiorna il bilancio
-                    }));
-                } 
+                }
                 //Ricevi scambio -------------------------------------------------------------------
-                else if (message.type === 'excangeRequest'){
-                    console.log("excance request",message.playerName,message.balance);
-                    setExcangeRequest((prevState) => ({
+                else if (message.type === 'exchangeRequest') {
+                    console.log("excance request", message.playerName, message.balance);
+                    setExchangeRequest((prevState) => ({
                         ...prevState,
                         properties1: message.properties1,
                         properties2: message.properties2,
@@ -275,7 +259,7 @@ export const WebSocketProvider = ({children}) => {
                 buy,
                 nameBox,
                 playerProperties,
-                excangeRequest
+                exchangeRequest
             }}>
             {children}
         </WebSocketContext.Provider>

@@ -1,16 +1,14 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import RiceviScambio from './gestioneProprieta/RiceviScambio';
-
-
-
+import {WebSocketContext} from "../../contexts/WebSocketContext.jsx";
 
 const BaseRectangle = () => {
-    const {socket, connected, excangeRequest} = useContext(WebSocketContext);
+    const {exchangeRequest} = useContext(WebSocketContext);
     const [isPageOpen, setIsPageOpen] = useState(false);
 
     useEffect(() => {
         setIsPageOpen(true);
-    },[excangeRequest]);
+    },[exchangeRequest]);
     
     return (
         <div>
