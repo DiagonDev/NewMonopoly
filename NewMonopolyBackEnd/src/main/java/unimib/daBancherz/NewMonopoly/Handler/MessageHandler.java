@@ -407,4 +407,12 @@ public class MessageHandler {
                 break;
         }
     }
+
+    public void rispostaGestisciProprieta(String messaggioRisposta, WebSocketSession session) throws IOException {
+        String scambioMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "rispostaGestisciProprieta",
+                "content", messaggioRisposta
+        ));
+        session.sendMessage(new TextMessage(scambioMessage));
+    }
 }

@@ -1,5 +1,6 @@
 package unimib.daBancherz.NewMonopoly.WebSocket;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,7 @@ import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
 import unimib.daBancherz.NewMonopoly.Handler.PropertyHandler;
 import unimib.daBancherz.NewMonopoly.Handler.TurnHandler;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
+import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +25,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
     private final WebSocketReconnect reconnect;
     private final PropertyHandler propertyHandler;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
+    ObjectMapper objectMapper = new ObjectMapper();
 
     // Iniezione di GameHandler e ChatHandler tramite il costruttore
     @Autowired
@@ -43,52 +46,84 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+        if(message.getPayload().toString().contains(":")) {
+            String[] parts = (message.getPayload().toString()).split(":");
+            switch (parts[0]) {
+                case "Ping":
+                    String pongMessage = new ObjectMapper().writeValueAsString(Map.of(
+                            "type", "pong",
+                            "content", "pong"
 
-        String[] parts = (message.getPayload().toString()).split(":");
-        switch (parts[0]) {
-            case "Ping":
-                String pongMessage = new ObjectMapper().writeValueAsString(Map.of(
-                        "type", "pong",
-                        "content", "pong"
+                    ));
+                    session.sendMessage(new TextMessage(pongMessage));
+                    break;
+                case "Riconnetti":
 
-                ));
-                session.sendMessage(new TextMessage(pongMessage));
-                break;
-            case "Riconnetti":
+                    break;
+                case "LanciaDadi":
+                    turnHandler.rollDice(session);
+                    break;
+                case "FineTurno":
+                    turnHandler.endTurn(session);
+                    break;
+                case "InizioPartita": //TODO: controllare che il messaggio che mi arriva dal frontend sia uguale
+                    turnHandler.startTurn(session);
+                    break;
+                case "Create", "Partecipa":
+                    gameHandler.handleGameMessage(parts, session);
+                    break;
+                case "MessaggioUtente":
+                    chatHandler.chatHandler(parts, session);
+                    break;
+                case "SceltaPedina":
+                    gameHandler.choosePedina(parts, session);
+                    break;
+                case "AcquistaProprieta":
+                    propertyHandler.acquistaProprieta(parts, session);
+                    break;
+                case "PingScambiaProprieta":
+                    propertyHandler.gestisciProprieta(session, "PingScambiaProprieta");
+                    break;
+                case "GestisciProprieta":
+                    propertyHandler.gestisciProprieta(session, "GestisciProprieta");
+                    break;
+                case "CostruisciCase":
+                    propertyHandler.costruisciCase(parts, session);
+                    break;
+                case "IpotecaProprieta":
+                    propertyHandler.ipotecaProprieta(parts, session);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Tipo di messaggio non supportato: " + parts[0]);
+            }
+        } else {
 
-                break;
-            case "LanciaDadi":
-                turnHandler.rollDice(session);
-                break;
-            case "FineTurno":
-                turnHandler.endTurn(session);
-                break;
-            case "InizioPartita": //TODO: controllare che il messaggio che mi arriva dal frontend sia uguale
-                turnHandler.startTurn(session);
-                break;
-            case "Create", "Partecipa":
-                gameHandler.handleGameMessage(parts, session);
-                break;
-            case "MessaggioUtente":
-                chatHandler.chatHandler(parts, session);
-                break;
-            case "SceltaPedina":
-                gameHandler.choosePedina(parts, session);
-                break;
-            case "AcquistaProprieta":
-                propertyHandler.acquistaProprieta(parts, session);
-                break;
-            case  "IpotecaProprieta":
-                //gestire l'ipoteca della proprietà
-                break;
-            case "ScambiaProprieta":
-                //gestire lo scambio della proprietà
-                break;
-            case "GestisciProprieta":
+            String payload = message.getPayload().toString();
+            Map<String, Object> data = objectMapper.readValue(payload, new TypeReference<Map<String, Object>>() {});
 
-            break;
-            default:
-                throw new IllegalArgumentException("Tipo di messaggio non supportato: " + parts[0]);
+            String type = (String) data.get("type");
+            PlayerProperties property1;
+            PlayerProperties property2;
+            Integer offertaMonetaria;
+
+            switch (type) {
+                case "EffettuaScambio":
+                    property1 = (PlayerProperties) data.get("property1");
+                    property2 = (PlayerProperties) data.get("property2");
+                    offertaMonetaria = (Integer) data.get("offertaMonetaria");
+
+                    propertyHandler.effettuaScambio(property1, property2, offertaMonetaria, session);
+                    break;
+                case "RispostaScambio":
+                    property1 = (PlayerProperties) data.get("property1");
+                    property2 = (PlayerProperties) data.get("property2");
+                    offertaMonetaria = (Integer) data.get("offertaMonetaria");
+                    boolean flag = (boolean) data.get("exchangeAccepted");
+                    propertyHandler.rispostaScambio(property1, property2, offertaMonetaria, flag, session);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Tipo di messaggio non supportato: " + type);
+            }
         }
 
     }
