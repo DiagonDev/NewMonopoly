@@ -71,4 +71,16 @@ public class GameBoardSingleton {
         Game game = games.get(gameId);
         return game != null && game.isPlayerInPrison(playerName);
     }
+
+    public void setPlayerCountRoll(String gameId, String playerName, int countRoll) {
+        Game game = games.get(gameId);
+        if (game != null) {
+            game.setPlayerCountRoll(playerName, countRoll);
+        }
+    }
+
+    public int getPlayerCountRoll(String gameId, String playerName) {
+        Game game = games.get(gameId);
+        return game != null ? game.getPlayerCountRoll(playerName) : 0;
+    }
 }

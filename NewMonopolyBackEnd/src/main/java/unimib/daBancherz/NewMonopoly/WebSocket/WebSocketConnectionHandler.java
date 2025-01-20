@@ -87,6 +87,9 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                 case "GestisciProprieta":
                     propertyHandler.gestisciProprieta(session, "GestisciProprieta");
                     break;
+                case "PagaUscitaPrigione":
+                    turnHandler.payPrisonExit(session);
+                    break;
                 default:
                     throw new IllegalArgumentException("Tipo di messaggio non supportato: " + parts[0]);
             }

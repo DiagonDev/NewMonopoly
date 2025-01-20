@@ -38,6 +38,7 @@ public class TurnHandler {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
         List<WebSocketSession> playersInGame = gameHandler.getGameSessions().get(gameId);
+        boolean isInPrison = gameBoard.isPlayerInPrison(gameId, playerName);
 
         String yourTurnMessage = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "turn",
@@ -59,6 +60,25 @@ public class TurnHandler {
             }
             else{
                 session.sendMessage(new TextMessage(yourTurnMessage));
+            }
+        }
+
+        if(isInPrison){
+            boolean possiedeProbabilita = partitaProbabilitaRepository.possiedeCarta(gameId, playerName);
+            boolean possiedeImprevisto = partitaImprevistoRepository.possiedeCarta(gameId, playerName);
+            if(possiedeProbabilita){
+                gameBoard.setPlayerPrison(gameId, playerName, false);;
+                partitaProbabilitaRepository.setGiocatore(gameId, null, "esci_prigione");
+                messageHandler.sendSystemMessage(gameId, playerName + " è uscito di prigione", gameHandler.getGameSessions(), session);
+            } else if(possiedeImprevisto){
+                gameBoard.setPlayerPrison(gameId, playerName, false);
+                partitaImprevistoRepository.setGiocatore(gameId, null, "esci_prigione");
+                messageHandler.sendSystemMessage(gameId, playerName + " è uscito di prigione", gameHandler.getGameSessions(), session);
+            }else {
+                String prisonMessage = new ObjectMapper().writeValueAsString(Map.of(
+                        "type", "prison"
+                ));
+                session.sendMessage(new TextMessage(prisonMessage));
             }
         }
     }
@@ -88,6 +108,8 @@ public class TurnHandler {
         String playerName = gameHandler.getPlayerNameBySession(session);
         int playerPosition = gameBoard.getPlayerPosition(gameId, playerName);
         boolean isInPrison = gameBoard.isPlayerInPrison(gameId, playerName);
+        int countRoll = gameBoard.getPlayerCountRoll(gameId, playerName);
+        gameBoard.setPlayerCountRoll(gameId, playerName, countRoll+1 );
         int newPosition;
         boolean viaPay = false;
 
@@ -97,24 +119,16 @@ public class TurnHandler {
                 "dice2", diceR2
         ));
         session.sendMessage(new TextMessage(diceRolled));//invia il risultato dei dati al giocatore che li ha tirati
-        if(isInPrison){
-            boolean possiedeProbabilita = partitaProbabilitaRepository.possiedeCarta(gameId, playerName);
-            boolean possiedeImprevisto = partitaImprevistoRepository.possiedeCarta(gameId, playerName);
-            if(possiedeProbabilita){
-                isInPrison=false;
-                partitaProbabilitaRepository.setGiocatore(gameId, null, "esci_prigione");
-                String prigioneMessage = new ObjectMapper().writeValueAsString(Map.of(
-                        "type", "Uscito gratis grazie alla carta proabilità"
-                ));
-                session.sendMessage(new TextMessage(prigioneMessage));
-            } else if(possiedeImprevisto){
-                isInPrison=false;
-                partitaImprevistoRepository.setGiocatore(gameId, null, "esci_prigione");
-                String prigioneMessage = new ObjectMapper().writeValueAsString(Map.of(
-                        "type", "Uscito gratis grazie alla carta imprevisto"
-                ));
-                session.sendMessage(new TextMessage(prigioneMessage));
-            }
+
+
+        if(gameBoard.getPlayerCountRoll(gameId, playerName) == 4){
+            gameBoard.setPlayerPrison(gameId, playerName, false);
+            gameBoard.setPlayerCountRoll(gameId, playerName, 0);
+            String exitPrisonMEssage = new ObjectMapper().writeValueAsString(Map.of(
+                    "type", "exitPrison",
+                    "flag", true
+            ));
+            session.sendMessage(new TextMessage(exitPrisonMEssage));
         }
         if(!isInPrison || (diceR1 == diceR2)) {
             gameBoard.setPlayerPrison(gameId, playerName, false);
@@ -132,6 +146,27 @@ public class TurnHandler {
 
             //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
             messageHandler.sendBoxUsage(playerName, session, newPosition, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
+        }
+    }
+
+    public void payPrisonExit(WebSocketSession session) throws Exception {
+        String gameId = gameHandler.getGameIdBySession(session);
+        String playerName = gameHandler.getPlayerNameBySession(session);
+        gameBoard.setPlayerPrison(gameId, playerName, false);
+        if(giocatoreRepository.saldoGiocatore(playerName, gameId) < 50) {
+            String exitPrisonMEssage = new ObjectMapper().writeValueAsString(Map.of(
+                    "type", "exitPrison",
+                    "flag", false
+            ));
+            session.sendMessage(new TextMessage(exitPrisonMEssage));
+        }else {
+            giocatoreRepository.aggiornamentoSaldo(playerName, gameId, 50);
+            messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
+            String exitPrisonMEssage = new ObjectMapper().writeValueAsString(Map.of(
+                    "type", "exitPrison",
+                    "flag", true
+            ));
+            session.sendMessage(new TextMessage(exitPrisonMEssage));
         }
     }
 }

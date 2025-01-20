@@ -43,11 +43,21 @@ class Game {
     public boolean isPlayerInPrison(String playerName) {
         return players.getOrDefault(playerName, new Player()).isInPrison();
     }
+
+    public void setPlayerCountRoll(String playerName, int countRoll) {
+        players.computeIfAbsent(playerName, k -> new Player()).setCountRoll(countRoll);
+    }
+
+    // Metodo per ottenere il numero di lanci di dado di un giocatore
+    public int getPlayerCountRoll(String playerName) {
+        return players.getOrDefault(playerName, new Player()).getCountRoll();
+    }
 }
 
 class Player {
     private int position = 0;
     private boolean prison = false;
+    private int countRoll = 0;
 
     public int getPosition() {
         return position;
@@ -63,5 +73,13 @@ class Player {
 
     public void setPrison(boolean prison) {
         this.prison = prison;
+    }
+
+    public int getCountRoll() {
+        return countRoll;
+    }
+
+    public void setCountRoll(int countRoll) {
+        this.countRoll = countRoll;
     }
 }
