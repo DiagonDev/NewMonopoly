@@ -31,32 +31,33 @@ public class GameHandler {
     private PartitaRepository partitaRepository;
     @Autowired
     private PedinaRepository pedinaRepository;
-
     private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
     private static AtomicLong idCounter = new AtomicLong();
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
-
     List<Integer> pedineNonUsate = new ArrayList<>();
 
+    //gestisce i messaggi per la creazione e la partecipazione dei giocatori alla partita
     public void handleGameMessage(String[] messageParts, WebSocketSession session) throws Exception {
 
         String playerName = messageParts[1];
         switch (messageParts[0]){
             case "Create":
                 String difficulty = messageParts[2];
-                System.out.println(difficulty);
                 String randomization = messageParts[3];
                 playerNameList.put(playerName, session);
+                //metodo che crea la partita
                 createGame(playerName, difficulty, randomization, session);
                 break;
             case "Partecipa":
-                // Decodifica i dati per partecipare a una partita
                 String gameId = messageParts[2];
 
                 if (giocatoreRepository.existsByNomeAndIdpartita_CodiceInvito(playerName, gameId)) {
                     // TODO: Gestire il messaggio frontend per non mandarlo all'altra pagina
-                    session.sendMessage(new TextMessage("Errore: Il nome del giocatore è già presente in questa partita."));
+                    String duplicatePlayerNameMessage = new ObjectMapper().writeValueAsString(Map.of(
+                            "type", "errorName"
+                    ));
+                    session.sendMessage(new TextMessage(duplicatePlayerNameMessage));
                     return; // Esce dalla funzione senza aggiungere il giocatore
                 }
 
@@ -65,6 +66,7 @@ public class GameHandler {
                     return;
                 }
                 playerNameList.put(playerName, session);
+                //metodo per aggiungere il giocatore alla partita
                 joinGame(playerName, gameId, session);
                 break;
         }
@@ -82,9 +84,8 @@ public class GameHandler {
                                                  //per fa si che la prima sessione sia quella dell'ADMIN
         }
 
-        gameBoard.createGame(gameId);
-        gameBoard.setPlayerPosition(gameId, playerName, 1);
-        System.out.println("La posizione di: " + playerName + " di game: " + gameId + " è: " + gameBoard.getPlayerPosition(gameId, playerName));
+        gameBoard.createGame(gameId);//crea il singleton per la partita con codicePartita = gameId
+        gameBoard.setPlayerPosition(gameId, playerName, 1);//imposta nel signleton che il giocatore parte dalla casella 1
 
         //GESTIONE MESSAGGI
         messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella gameconsole

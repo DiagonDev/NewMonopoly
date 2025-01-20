@@ -1,7 +1,9 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
@@ -31,7 +33,7 @@ public class MessageHandler {
     private final ImprevistoRepository imprevistoRepository;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
-    public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, ProbabilitaRepository probabilitaRepository, PartitaImprevistoRepository partitaImprevistoRepository, ProbabilitaRepository probabilitaRepository1, PartitaImprevistoRepository partitaImprevistoRepository1, ImprevistoRepository imprevistoRepository) {
+    public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, ProbabilitaRepository probabilitaRepository, PartitaImprevistoRepository partitaImprevistoRepository, ImprevistoRepository imprevistoRepository) {
         this.gameService = gameService;
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;
@@ -318,6 +320,7 @@ public class MessageHandler {
 
                 gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions, typeBox);
                 partitaProbabilitaRepository.setUtilizzatoTrue(gameId, descrizione);
+
                 String probabilitaMessage = new ObjectMapper().writeValueAsString(Map.of(
                         "type", "draw",
                         "card", "probabilità",

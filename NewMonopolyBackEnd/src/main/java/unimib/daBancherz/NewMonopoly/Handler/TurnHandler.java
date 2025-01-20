@@ -1,8 +1,9 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
@@ -25,30 +26,12 @@ public class TurnHandler {
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     int counterRollDice = 0;
 
-    @Autowired
     public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, PartitaImprevistoRepository partitaImprevistoRepository) {
         this.gameHandler = gameHandler;
         this.messageHandler = messageHandler;
         this.giocatoreRepository = giocatoreRepository;
         this.partitaProbabilitaRepository = partitaProbabilitaRepository;
         this.partitaImprevistoRepository = partitaImprevistoRepository;
-    }
-
-    public void endTurn( WebSocketSession session ) throws Exception {
-        String gameId = gameHandler.getGameIdBySession(session);
-        String playerName = gameHandler.getPlayerNameBySession(session);
-        List<WebSocketSession> playersInGame = gameHandler.getGameSessions().get(gameId);
-        messageHandler.sendSystemMessage(gameId, playerName + " ha concluso il turno", gameHandler.getGameSessions(), session);
-        int currentIndex = playersInGame.indexOf(session);
-
-        // Calcola l'indice della prossima sessione in modo circolare
-        int nextIndex = (currentIndex + 1) % playersInGame.size();
-
-        // Assegna la sessione successiva
-        WebSocketSession nextPlayer = playersInGame.get(nextIndex);
-
-        // Avvia il turno per la prossima sessione
-        startTurn(nextPlayer);
     }
 
     public void startTurn( WebSocketSession session ) throws Exception {
@@ -80,6 +63,23 @@ public class TurnHandler {
         }
     }
 
+    public void endTurn( WebSocketSession session ) throws Exception {
+        String gameId = gameHandler.getGameIdBySession(session);
+        String playerName = gameHandler.getPlayerNameBySession(session);
+        List<WebSocketSession> playersInGame = gameHandler.getGameSessions().get(gameId);
+        messageHandler.sendSystemMessage(gameId, playerName + " ha concluso il turno", gameHandler.getGameSessions(), session);
+        int currentIndex = playersInGame.indexOf(session);
+
+        // Calcola l'indice della prossima sessione in modo circolare
+        int nextIndex = (currentIndex + 1) % playersInGame.size();
+
+        // Assegna la sessione successiva
+        WebSocketSession nextPlayer = playersInGame.get(nextIndex);
+
+        // Avvia il turno per la prossima sessione
+        startTurn(nextPlayer);
+    }
+
     public void rollDice(WebSocketSession session) throws Exception {
         int diceR1 = ThreadLocalRandom.current().nextInt(1, 7);  // Valore da 1 a 6 per il primo dado
         int diceR2 = ThreadLocalRandom.current().nextInt(1, 7);  // Valore da 1 a 6 per il secondo dado
@@ -90,7 +90,6 @@ public class TurnHandler {
         boolean isInPrison = gameBoard.isPlayerInPrison(gameId, playerName);
         int newPosition;
         boolean viaPay = false;
-
 
         String diceRolled = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "diceRolled",
