@@ -1,4 +1,4 @@
-const IpotecaProprieta = () => {
+const IpotecaProprieta = ({ playerProperties })  => {
     const {socket, connected} = useContext(WebSocketContext);
     const [selectedProperty, setSelectedProperty] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -7,7 +7,7 @@ const IpotecaProprieta = () => {
         setIsModalOpen(true);
         console.log("Proprietà selezionata:", property);
     };
-
+    
     const closeModal = () => {
         setIsModalOpen(false);
         setSelectedProperty(null);
@@ -31,7 +31,7 @@ const IpotecaProprieta = () => {
     return (
         <>
             <PropertyOwned
-                buildingProperties={buildingProperties}
+                playerProperties={playerProperties}
                 onPropertySelect={handleSelectedProperty}
             />
             {isModalOpen && (

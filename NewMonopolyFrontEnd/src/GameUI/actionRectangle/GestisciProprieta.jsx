@@ -7,9 +7,10 @@ import {WebSocketContext} from "../../contexts/WebSocketContext.jsx";
 
 
 const GestisciProprieta = () => {
-    const {socket, connected, playerProperties} = useContext(WebSocketContext);
+    const {socket, connected, playerProperties, excangeRequest} = useContext(WebSocketContext);
     const [activeComponent, setActiveComponent] = useState('');
     const [buildingProperties, setBuildingProperties] = useState([]);
+    const [isPageOpen, setIsPageOpen] = React.useState(false);
     /**
      * .reduce itera sull' array
      *  acc è inizialmente vuota, se possiede il colore corrente pusho
