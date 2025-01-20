@@ -211,8 +211,7 @@ public class MessageHandler {
 
         //aggiorna i soldi quando passi dal via anche senza fermarti sopra
         if(viaPay){
-            prezzoCasellaVia = pCPPRepository.prezzoCasella(1, gameId);
-            giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoCasellaVia);
+            giocatoreRepository.aggiornamentoSaldo(playerName, gameId, -200);
             updateBalance(gameSessions, gameId, playerName);
         }
 
@@ -220,11 +219,10 @@ public class MessageHandler {
             case "Via":
                 break;
             case "Tassa":
-                prezzoCasella = pCPPRepository.prezzoCasella(posizione, gameId);
-                giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoCasella);
+                giocatoreRepository.aggiornamentoSaldo(playerName, gameId, 200);
                 updateBalance(gameSessions, gameId, playerName);
                 break;
-            case"Proprietà":
+            case "Proprietà", "Stazione", "Società":
                 proprietario = pCPPRepository.findNomeGiocatoreByPosizioneAndGameId(posizione, gameId);
                 prezzoCasella = pCPPRepository.prezzoCasella(posizione, gameId);
                 if(proprietario == null){
@@ -236,7 +234,9 @@ public class MessageHandler {
                     session.sendMessage(new TextMessage(buyBoxMessage));
 
                 }else if(!playerName.equals(proprietario)){
-                    prezzoAffitto = pCPPRepository.affittoProprieta(gameId, posizione);
+                    Integer idProprietario = giocatoreRepository.findIdByNomeAndPartitaCodiceInvito(proprietario, gameId);
+                    Integer count = pCPPRepository.countProprieta(proprietario, typeBox, gameId);
+                    prezzoAffitto = pCPPRepository.calcolaAffitto(gameId, posizione, idProprietario, count);
                     giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoAffitto);
                     giocatoreRepository.aggiornamentoSaldo(proprietario, gameId, -prezzoAffitto);
 
@@ -251,7 +251,7 @@ public class MessageHandler {
                     updateBalance(gameSessions, gameId, proprietario);
                 }
                 break;
-            case"Stazione", "Società":
+            /* case"Stazione", "Società":
                 proprietario = pCPPRepository.findNomeGiocatoreByPosizioneAndGameId(posizione, gameId);
                 prezzoCasella = pCPPRepository.prezzoCasella(posizione, gameId);
                 if(proprietario == null){
@@ -280,7 +280,7 @@ public class MessageHandler {
 
                     }
                 }
-                break;
+                break; */
             case"InPrigione":
                 gameBoard.setPlayerPosition(gameId, playerName, 11);//aggiorna la posizione del giocatore
                 try {

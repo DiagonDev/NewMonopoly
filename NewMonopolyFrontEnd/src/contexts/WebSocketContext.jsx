@@ -73,8 +73,8 @@ export const WebSocketProvider = ({children}) => {
     });
     const [rispostaScambio, setRispostaScambio] = useState();
     useEffect(() => {
-        const ws = new WebSocket("https://a202-95-249-14-234.ngrok-free.app/ws/gameNewMonopoly");
-        //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
+        //const ws = new WebSocket("https://a202-95-249-14-234.ngrok-free.app/ws/gameNewMonopoly");
+        const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
         ws.onopen = () => {
             setSocket(ws);
             setConnected(true);
@@ -325,7 +325,7 @@ export const WebSocketProvider = ({children}) => {
                 buy,
                 nameBox,
                 playerProperties,
-                exchangeRequest,
+                //exchangeRequest,
                 playerList,
                 buyReturn,
                 prison,
