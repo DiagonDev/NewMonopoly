@@ -85,17 +85,18 @@ const RollDice = () => {
                     Roll
                 </button>
             )}
-            {isRolled && isPayment && (
-                <div>
-                    <p>Hai pagato: {payment.payment}€ a {payment.destination} per {payment.description}</p>
-                </div>
-            )}
             {isRolled && isDraw && (
                 <div>
                     <p>Hai pescato una carta {draw.card} che dice:</p>
                     <p> {draw.description}</p>
                 </div>
             )}
+            {isRolled && isPayment && (
+                <div>
+                    <p>Hai pagato: {payment.payment}€ a {payment.destination} per {payment.description}</p>
+                </div>
+            )}
+            
             {isRolled && isBuy &&(
                 <div>
                     <p>Questa proprietà è libera e costa {buy.price} </p>
