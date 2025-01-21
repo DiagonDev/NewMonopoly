@@ -349,7 +349,8 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
         LEFT JOIN partita_casella_prezzoproprieta pcp
         ON pcp.idgiocatore = g.id_giocatore
         AND pcp.idpartita = :idPartita
-        WHERE g.nome = :nomeGiocatore;
+        WHERE g.nome = :nomeGiocatore
+        AND num_casa<>5
     """, nativeQuery = true)
     int contaCaseTot(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
 

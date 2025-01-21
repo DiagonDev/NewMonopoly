@@ -341,6 +341,7 @@ public class MessageHandler {
         int importo;
         int soldi;
         int id_casella=1;
+        List<String> giocatoriPartita;
 
         switch (tipoAzione){
             case "ricevi_importo", "paga_importo":
@@ -356,7 +357,9 @@ public class MessageHandler {
                 soldi = (giocatoreRepository.contaGiocatoriInPartita(idPartita)-1) * importo;
                 giocatoreRepository.pagaImportoGiocatori(importo, idPartita, nomeGiocatore);
                 giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, soldi);
-                updateBalance(gameSessions, idPartita, nomeGiocatore);
+                giocatoriPartita = giocatoreRepository.findGiocatori(idPartita);
+                for(String nome : giocatoriPartita)
+                    updateBalance(gameSessions, idPartita, nome);
                 break;
 
             case "ricevi_importo_giocatore":
@@ -365,7 +368,9 @@ public class MessageHandler {
                 soldi = -((giocatoreRepository.contaGiocatoriInPartita(idPartita)-1) * importo);
                 giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, soldi);
                 giocatoreRepository.pagaImportoGiocatori(-importo, idPartita, nomeGiocatore);
-                updateBalance(gameSessions, idPartita, nomeGiocatore);
+                giocatoriPartita = giocatoreRepository.findGiocatori(idPartita);
+                for(String nome : giocatoriPartita)
+                    updateBalance(gameSessions, idPartita, nome);
                 break;
 
             case "paga_possedimenti":
