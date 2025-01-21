@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class WebSocketConnectionHandler implements WebSocketHandler {
 
-    private final Map<String, WebSocketSession> playerSessions = new ConcurrentHashMap<>();
+    public final Map<String, WebSocketSession> playerSessions = new ConcurrentHashMap<>();
     private final GameHandler gameHandler;
     private final ChatHandler chatHandler;
     private final TurnHandler turnHandler;

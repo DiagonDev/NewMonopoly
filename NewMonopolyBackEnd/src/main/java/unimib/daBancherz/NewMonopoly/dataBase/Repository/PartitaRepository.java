@@ -10,7 +10,7 @@ public interface PartitaRepository extends JpaRepository<Partita, String> {
     Partita findByCodiceInvito(String codiceInvito);
     void deleteByCodiceInvito(String codiceInvito);
 
-    @Query("SELECT p.codiceInvito FROM Partita p ORDER BY p.codiceInvito DESC")
+    @Query("SELECT p.codiceInvito FROM Partita p ORDER BY p.codiceInvito DESC LIMIT 1")
     String findLastCodiceInvito();
 
 }

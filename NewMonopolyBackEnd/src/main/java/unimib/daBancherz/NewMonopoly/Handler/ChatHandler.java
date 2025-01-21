@@ -27,15 +27,19 @@ public class ChatHandler {
             String gameId = gameHandler.getGameIdBySession(session);
             String nameChat = gameHandler.getPlayerNameBySession(session);
 
+            if (gameId == null) {
+                // Non inviare nessun messaggio se non c'è un gameId associato
+                return;
+            }
             //invia il messaggio a tutti gli utenti collegati allo stesso gameID sotto forma di messaggioChat
-            sendChatMessage(gameId,nameChat+ ": " + chatMessage);
+            sendChatMessage(gameId,nameChat + ": " + chatMessage);
             //broadcastChatMessage(gameId, session, chatMessage);
         }
 
     }
 
     //serve a creare un messaggio in Json per far si che il forntend riesca a capire chè per la game chat
-    private void sendChatMessage(String gameId, String content) throws Exception {
+    public void sendChatMessage(String gameId, String content) throws Exception {
         List<WebSocketSession> playersInGame = gameHandler.getGameSessions().get(gameId);
         if (playersInGame == null) return;
 

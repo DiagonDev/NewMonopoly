@@ -148,14 +148,14 @@ public class MessageHandler {
         // Messaggi per il giocatore che si è unito e per tutti i partecipanti
         sendSystemMessage(gameId, "Ti sei unito alla partita con ID: " + gameId + " con successo!", gameSessions, session);
         sendSystemMessage(gameId, playerName + " si è unito alla partita!", gameSessions, session);
-
-        sendPlayerAndBalance(gameId, playerName, session);
+        int pawnId = giocatoreRepository.findPedinaFromGiocatore(gameId, playerName);
+        sendPlayerAndBalance(gameId, playerName, session, pawnId);
         sendJoinMessage(playerName, gameSessions, role, gameId, session);
 
 
     }
 
-    public void sendPlayerAndBalance(String gameId, String playerName, WebSocketSession session) throws Exception {
+    public void sendPlayerAndBalance(String gameId, String playerName, WebSocketSession session, int pawnId) throws Exception {
         List<String> playerJoined = gameService.getPlayersWithIdLowerThan(gameId, playerName);
         if(!playerJoined.isEmpty()){
             for(String player : playerJoined){
@@ -163,7 +163,8 @@ public class MessageHandler {
                 String playerMessage = new ObjectMapper().writeValueAsString(Map.of(
                         "type", "playersList",
                         "playerName", player,
-                        "balance", balance
+                        "balance", balance,
+                        "pawn", pawnId
                 ));
                 session.sendMessage(new TextMessage(playerMessage));
 

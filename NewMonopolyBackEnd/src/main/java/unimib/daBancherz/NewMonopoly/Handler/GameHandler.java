@@ -33,7 +33,6 @@ public class GameHandler {
     private PedinaRepository pedinaRepository;
     private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
-    private static AtomicLong idCounter = new AtomicLong();
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     List<Integer> pedineNonUsate = new ArrayList<>();
 
@@ -174,7 +173,13 @@ public class GameHandler {
     //genera il codice gameID in modo incrementale partendo da game-0
     //TODO: devo controllare dal databese quale game ci sono già e restituire l'ID successivo a l'ultimo presente
     private String generateGameId() {
-        return "game-" + String.valueOf(idCounter.getAndIncrement());
+        int Counter = 0;
+
+        if(partitaRepository.findLastCodiceInvito() != null) {
+            String[] lastGame = (partitaRepository.findLastCodiceInvito()).split("-");
+            Counter = Integer.parseInt(lastGame[1]);
+        }
+        return "game-" + ++Counter;
     }
 
     @Transactional
