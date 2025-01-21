@@ -107,16 +107,16 @@ public class PropertyHandler {
         session.sendMessage(new TextMessage(casaMessage));
     }
 
-    public void ipotecaProprieta(PlayerProperties property, WebSocketSession session) {
-        Integer idProprietario = property.getIdGiocatore();
+    public void ipotecaProprieta(PlayerProperties property, WebSocketSession session) throws IOException {
         String nomeCasella = property.getNome();
-        List<String> proprietario = giocatoreRepository.findNomeAndIdpartitaByidGiocatore(idProprietario);
-        Integer posizione = pCPPRepository.findPosizioneByNomeCasellaAndIdpartita(nomeCasella, proprietario.get(1));
-        Integer prezzo = pCPPRepository.prezzoCasella(posizione, proprietario.get(1));
-        pCPPRepository.setPrezzoCorrente(prezzo/2, proprietario.get(1), posizione );
-        giocatoreRepository.aggiornamentoSaldo(proprietario.get(0), proprietario.get(1), - (prezzo/2) );
-        pCPPRepository.setGiocatore(null, proprietario.get(1), nomeCasella);
-        //Messaggio
+        String gameId= gameHandler.getGameIdBySession(session);
+        String nomeGiocatore = gameHandler.getPlayerNameBySession(session);
+        Integer prezzo = property.getPrezzoCorrente()/2;
+        Integer posizione = pCPPRepository.findPosizioneByNomeCasellaAndIdpartita(nomeCasella, gameId);
+        pCPPRepository.setPrezzoCorrente(prezzo, gameId, posizione);
+        giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, gameId, - (prezzo) );
+        pCPPRepository.setGiocatore(null, gameId, nomeCasella);
+        messageHandler.rispostaAggiornaProprieta(gameId, nomeGiocatore, session);   //Messaggio al frontend
     }
 
     public void rispostaScambio(PlayerProperties property1, PlayerProperties property2, Integer offertaMonetaria, boolean flag, WebSocketSession session) throws IOException {

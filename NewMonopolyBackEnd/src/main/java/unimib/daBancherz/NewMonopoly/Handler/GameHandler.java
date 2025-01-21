@@ -226,12 +226,11 @@ public class GameHandler {
     public void choosePedina(String[] messageParts, WebSocketSession session) throws Exception {
         String idPedina = messageParts[1];
         String gameId = getGameIdBySession(session);
-
         String playerName = getPlayerNameBySession(session);    //tropo il giocatore associato alla sessione
-        pedineNonUsate.remove(Integer.valueOf(Integer.parseInt(idPedina)));
-        messageHandler.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);
 
         giocatoreRepository.updatePedinaForGiocatore(playerName, Integer.parseInt(idPedina), gameId);  //Assegna la pedina al giocatore nel database
+        pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
+        messageHandler.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);
 
         messageHandler.sendPawnMove(Integer.parseInt(idPedina), playerName, 1, gameSessions, gameId);   // Invia un messaggio per spostare la pedina sul via
     }

@@ -15,6 +15,7 @@ import unimib.daBancherz.NewMonopoly.dataBase.Entity.Imprevisto;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.Probabilita;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.*;
 import unimib.daBancherz.NewMonopoly.dataBase.Service.GameService;
+import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -252,36 +253,6 @@ public class MessageHandler {
                     updateBalance(gameSessions, gameId, proprietario);
                 }
                 break;
-            /* case"Stazione", "Società":
-                proprietario = pCPPRepository.findNomeGiocatoreByPosizioneAndGameId(posizione, gameId);
-                prezzoCasella = pCPPRepository.prezzoCasella(posizione, gameId);
-                if(proprietario == null){
-                    String buyBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
-                            "type", "buy",
-                            "price", prezzoCasella,
-                            "nameBox", nomeCasella
-                    ));
-                    session.sendMessage(new TextMessage(buyBoxMessage));
-
-                }else if(!playerName.equals(proprietario)){
-                    if(typeBox.equals("Stazione")){
-                        nStazione = pCPPRepository.countProprieta(playerName, typeBox, gameId);
-                        prezzoAffitto = 25 * nStazione;
-                        giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoAffitto);
-                        giocatoreRepository.aggiornamentoSaldo(proprietario, gameId, -prezzoAffitto);
-                        updateBalance(gameSessions, gameId, playerName);
-                        updateBalance(gameSessions, gameId, proprietario);
-                    }else{
-                        nSocietà = pCPPRepository.countProprieta(playerName, typeBox, gameId);
-                        prezzoAffitto = 100 * nSocietà;
-                        giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoAffitto);
-                        giocatoreRepository.aggiornamentoSaldo(proprietario, gameId, -prezzoAffitto);
-                        updateBalance(gameSessions, gameId, playerName);
-                        updateBalance(gameSessions, gameId, proprietario);
-
-                    }
-                }
-                break; */
             case"InPrigione":
                 gameBoard.setPlayerPosition(gameId, playerName, 11);//aggiorna la posizione del giocatore
                 try {
@@ -439,5 +410,14 @@ public class MessageHandler {
                 "content", messaggioRisposta
         ));
         session.sendMessage(new TextMessage(scambioMessage));
+    }
+
+    public void rispostaAggiornaProprieta(String gameId, String playerName, WebSocketSession session) throws IOException {
+        List<PlayerProperties> playerPropertiesList = pCPPRepository.findPlayerProperties(gameId,playerName);
+        String playerPropertiesListMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "rispostaAggiornaProprieta",
+                "properties", playerPropertiesList
+        ));
+        session.sendMessage(new TextMessage(playerPropertiesListMessage));
     }
 }

@@ -53,12 +53,10 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                     String pongMessage = new ObjectMapper().writeValueAsString(Map.of(
                             "type", "pong",
                             "content", "pong"
-
                     ));
                     session.sendMessage(new TextMessage(pongMessage));
                     break;
                 case "Riconnetti":
-
                     break;
                 case "LanciaDadi":
                     turnHandler.rollDice(session);
