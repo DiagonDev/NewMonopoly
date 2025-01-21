@@ -22,7 +22,7 @@ const CostruisciCasa = ({ buildingProperties }) => {
 
         if (socket && connected) {
             const message = {
-                type: "CostruisciCasa",
+                type: "!CostruisciCasa",
                 property:  selectedProperty,
                 casine: casine,
             };

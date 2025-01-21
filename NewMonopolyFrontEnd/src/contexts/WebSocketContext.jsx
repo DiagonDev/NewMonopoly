@@ -262,7 +262,7 @@ export const WebSocketProvider = ({children}) => {
 
                 }else if (message.type === 'allProperties') {
                     setAllProperties(message.properties);
-                }
+                }else if (message.type === 'RispostaAggiornaProprieta')
                 //Ricevi scambio -------------------------------------------------------------------
                 else if (message.type === 'exchangeRequest') {
                     console.log("sono Luca che prova");

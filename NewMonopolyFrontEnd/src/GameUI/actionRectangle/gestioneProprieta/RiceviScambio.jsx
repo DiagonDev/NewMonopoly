@@ -17,10 +17,8 @@ const RiceviScambio = ({ onClose }) => {
     const sendMessage = () => {
         if (socket && connected) {
             // Invia un messaggio al server
-            socket.send(`RispostaScambio:${exchangeRequest.playerName}`);
-            console.log('Messaggio inviato: AccettaScambio');
             const message = {
-                type: "RispostaScambio",
+                type: "!RispostaScambio",
                 property1:  exchangeRequest.property1,
                 property2: exchangeRequest.property2,
                 offertaMonetaria: exchangeRequest.money,

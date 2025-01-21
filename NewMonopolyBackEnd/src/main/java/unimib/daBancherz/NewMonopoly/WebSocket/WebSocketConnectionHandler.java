@@ -46,7 +46,8 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-        if(message.getPayload().toString().contains(":")) {
+
+        if(!message.getPayload().toString().contains("!") ) {
             String[] parts = (message.getPayload().toString()).split(":");
             switch (parts[0]) {
                 case "Ping":
@@ -102,32 +103,36 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
             Integer offertaMonetaria;
 
             switch (type) {
-                case "EffettuaScambio":
-                    property1 = (PlayerProperties) data.get("property1");
-                    property2 = (PlayerProperties) data.get("property2");
+                case "!EffettuaScambio":
+                    property1 = objectMapper.convertValue(data.get("property1"), PlayerProperties.class);
+                    property2 = objectMapper.convertValue(data.get("property2"), PlayerProperties.class);
                     offertaMonetaria = (Integer) data.get("offertaMonetaria");
 
                     propertyHandler.effettuaScambio(property1, property2, offertaMonetaria, session);
                     break;
-                case "RispostaScambio":
-                    property1 = (PlayerProperties) data.get("property1");
-                    property2 = (PlayerProperties) data.get("property2");
+                case "!RispostaScambio":
+                    property1 = objectMapper.convertValue(data.get("property1"), PlayerProperties.class);
+                    property2 = objectMapper.convertValue(data.get("property2"), PlayerProperties.class);
                     offertaMonetaria = (Integer) data.get("offertaMonetaria");
                     boolean flag = (boolean) data.get("exchangeAccepted");
+
                     propertyHandler.rispostaScambio(property1, property2, offertaMonetaria, flag, session);
                     break;
-                case "CostruisciCasa":
-                    PlayerProperties property = (PlayerProperties) data.get("property");
+                case "!CostruisciCasa":
+                    PlayerProperties property = objectMapper.convertValue(data.get("property"), PlayerProperties.class);
                     Integer casine = (Integer) data.get("casine");
+
                     propertyHandler.gestisciCase(property, casine, session);
                     break;
-                case "IpotecaProprieta":
-                    PlayerProperties propertyIpotecata = (PlayerProperties) data.get("property");
+                case "!IpotecaProprieta":
+                    PlayerProperties propertyIpotecata = objectMapper.convertValue(data.get("property"), PlayerProperties.class);
+
                     propertyHandler.ipotecaProprieta(propertyIpotecata, session);
                     break;
                 default:
                     throw new IllegalArgumentException("Tipo di messaggio non supportato: " + type);
             }
+
         }
 
     }

@@ -15,6 +15,8 @@ public class PlayerProperties {
     private Integer affitto4Case;
     private Integer affittoAlbergo;
 
+    public PlayerProperties() {}
+
     public PlayerProperties(Integer prezzoCorrente, Integer idGiocatore, Integer numCasa, Integer prezzoCasaCorrente,
                             String nome, String colore, Integer affitto, Integer affitto1Casa, Integer affitto2Case,
                             Integer affitto3Case, Integer affitto4Case, Integer affittoAlbergo, Integer ipoteca) {
