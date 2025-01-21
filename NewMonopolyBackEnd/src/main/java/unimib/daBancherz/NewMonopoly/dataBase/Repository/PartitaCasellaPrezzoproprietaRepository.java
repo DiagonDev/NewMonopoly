@@ -283,15 +283,6 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     """, nativeQuery = true)
     Integer prezzoCasella2(@Param("nomeCasella") String nomeCasella, @Param("idPartita") String idPartita);
 
-    // Metodo per trovare il costo di acquisto di una casa/albergo di una proprieta
-    @Query(value = """
-        SELECT pcp.prezzo_casa_corrente
-        FROM partita_casella_prezzoproprieta pcp
-        WHERE pcp.posizione = :posizione
-        AND pcp.idpartita = (SELECT p.codice_invito FROM partita p WHERE p.codice_invito = :idPartita)
-    """, nativeQuery = true)
-    Integer prezzoCasa(@Param("posizione") Integer posizione, @Param("idPartita") String idPartita);
-
     //Seleziona il costo dell'affitto
     @Query(value = """
         SELECT
@@ -355,14 +346,6 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     int contaCaseTot(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
 
     @Query(value = """
-        SELECT pcp.num_casa
-        FROM partita_casella_prezzoproprieta pcp
-        WHERE pcp.posizione = :posizione
-        AND num_casa<>5
-    """, nativeQuery = true)
-    int contaCase(@Param("posizione") Integer posizione);
-
-    @Query(value = """
         SELECT COUNT(*) 
         FROM partita_casella_prezzoproprieta  pcp
         JOIN giocatore g ON pcp.idgiocatore = g.id_giocatore
@@ -371,18 +354,6 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
         AND pcp.idpartita = :idPartita
     """, nativeQuery = true)
     int contaAlberghiTot(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
-
-    @Query(value = """
-        SELECT CASE
-            WHEN COUNT(*) > 0 THEN true
-            ELSE false
-        END
-        FROM partita_casella_prezzoproprieta pcp
-        WHERE pcp.posizione = :posizione
-        AND pcp.num_casa = 5
-    """, nativeQuery = true)
-    boolean contaAlbergo(@Param("posizione") Integer posizione);
-
 
     //Metodo per trovare c.tipo piu vicino alla posizione dove ci si trova
     @Query(value = """

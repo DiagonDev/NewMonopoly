@@ -75,15 +75,16 @@ public class PropertyHandler {
     }
 
     public void gestisciCase(PlayerProperties property, Integer casine,  WebSocketSession session) {
+        String gameId = gameHandler.getGameIdBySession(session);
         Integer idGiocatore = property.getIdGiocatore();
         String coloreCasella = property.getColore();
         int numCase = property.getNumCasa();
         int costoCasa = property.getPrezzoCasaCorrente();
-        List<String> informazioniGiocatore = giocatoreRepository.findNomeAndIdpartitaByidGiocatore(idGiocatore);
-        int saldoGiocatore = giocatoreRepository.saldoGiocatore(informazioniGiocatore.get(0), informazioniGiocatore.get(1));
+        String nomeGiocatore = giocatoreRepository.findNomeByidGiocatore(idGiocatore);
+        int saldoGiocatore = giocatoreRepository.saldoGiocatore(nomeGiocatore, gameId);
         int countColore = casellaRepository.countByColore(coloreCasella);
         if(numCase<5 && saldoGiocatore > (casine * countColore* costoCasa)){
-            giocatoreRepository.aggiornamentoSaldo(informazioniGiocatore.get(0), informazioniGiocatore.get(1), (casine * countColore* costoCasa));
+            giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, gameId, (casine * countColore * costoCasa));
             pCPPRepository.aggiungiCase(coloreCasella, casine);
             // Messaggio aggiornamento
         } else {
@@ -92,19 +93,18 @@ public class PropertyHandler {
     }
 
     public void effettuaScambio(PlayerProperties property1, PlayerProperties property2, Integer money,  WebSocketSession session) throws IOException {
-        Integer idProprietario2 = property2.getIdGiocatore();
-        Integer idProprietario1 = property1.getIdGiocatore();
-        List<String> proprietario = giocatoreRepository.findNomeAndIdpartitaByidGiocatore(idProprietario2);
-        List<String> richiedente = giocatoreRepository.findNomeAndIdpartitaByidGiocatore(idProprietario1);
-        gameHandler.getSessionByPlayerName(proprietario.get(0), proprietario.get(1));
+        String nomeRichiedente = giocatoreRepository.findNomeByidGiocatore(property1.getIdGiocatore());
+        String nomeProprietario  = giocatoreRepository.findNomeByidGiocatore(property2.getIdGiocatore());
+        String gameId = gameHandler.getGameIdBySession(session);
+        WebSocketSession session2 = gameHandler.getSessionByPlayerName(nomeProprietario, gameId);
         String casaMessage = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "exchangeRequest",
                 "property1", property1,
                 "property2", property2,
                 "money", money,
-                "playerName", richiedente.get(0)
+                "playerName", nomeRichiedente
         ));
-        session.sendMessage(new TextMessage(casaMessage));
+        session2.sendMessage(new TextMessage(casaMessage));
     }
 
     public void ipotecaProprieta(PlayerProperties property, WebSocketSession session) throws IOException {
@@ -125,32 +125,33 @@ public class PropertyHandler {
             Integer idProprietario1 = property1.getIdGiocatore();
             String nomeCasella1 = property1.getNome();
             String nomeCasella2 = property2.getNome();
-            List<String> proprietario = giocatoreRepository.findNomeAndIdpartitaByidGiocatore(idProprietario2);
-            List<String> richiedente = giocatoreRepository.findNomeAndIdpartitaByidGiocatore(idProprietario1);
+            String nomeProprietario = giocatoreRepository.findNomeByidGiocatore(idProprietario2);
+            String nomeRichiedente = giocatoreRepository.findNomeByidGiocatore(idProprietario1);
+            String gameId= gameHandler.getGameIdBySession(session);
 
             Integer soldi;
             // se offerta > 0 toglie i soldi al richiedente
             // se offerta < 0 toglie i soldi al proprietario
             if(offertaMonetaria>0){
-                soldi = giocatoreRepository.saldoGiocatore(richiedente.get(0), richiedente.get(1));
+                soldi = giocatoreRepository.saldoGiocatore(nomeRichiedente, gameId);
                 if (soldi>offertaMonetaria)
-                    giocatoreRepository.aggiornamentoSaldo(richiedente.get(0), richiedente.get(1), offertaMonetaria);
+                    giocatoreRepository.aggiornamentoSaldo(nomeRichiedente, gameId, offertaMonetaria);
                 else {
                     // Messaggio per dire che sei povero
                     return;
                 }
             } else {
                 offertaMonetaria = - offertaMonetaria;
-                soldi = giocatoreRepository.saldoGiocatore(proprietario.get(0), proprietario.get(1));
+                soldi = giocatoreRepository.saldoGiocatore(nomeProprietario, gameId);
                 if (soldi>offertaMonetaria)
-                    giocatoreRepository.aggiornamentoSaldo(proprietario.get(0), proprietario.get(1), offertaMonetaria);
+                    giocatoreRepository.aggiornamentoSaldo(nomeProprietario, gameId, offertaMonetaria);
                 else {
                     // Messaggio per dire che sei povero
                     return;
                 }
             }
-            pCPPRepository.setGiocatore(richiedente.get(0), richiedente.get(1), nomeCasella2);
-            pCPPRepository.setGiocatore(proprietario.get(0), proprietario.get(1), nomeCasella1);
+            pCPPRepository.setGiocatore(nomeRichiedente, gameId, nomeCasella2);
+            pCPPRepository.setGiocatore(nomeProprietario, gameId, nomeCasella1);
 
             messageHandler.rispostaGestisciProprieta("Scambio accettato", session);
         } else {
