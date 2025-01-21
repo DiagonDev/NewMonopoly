@@ -164,6 +164,18 @@ export const WebSocketProvider = ({children}) => {
                     console.log("pawns available", message.content);
                     setPawnsAvailable(message.content);
                 } else if (message.type === 'diceRolled') {
+                    setBuy((prevState) => ({
+                        ...prevState, // Copia il vecchio stato
+                        flag: false, // Aggiorna solo dice1  
+                    }));
+                    setPayment((prevState) => ({
+                        ...prevState, // Copia il vecchio stato
+                        flag: false, // Aggiorna solo dice1  
+                    }));
+                    setDraw((prevState) => ({
+                        ...prevState, // Copia il vecchio stato
+                        flag: false, // Aggiorna solo dice1  
+                    }));
                     if((message.dice1===message.dice2)&&(!prison)){
                         setDiceRolled2(false);
                     }else {

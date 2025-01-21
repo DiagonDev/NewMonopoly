@@ -16,13 +16,16 @@ const GameBoard = () => {
         gameId,
         startTurn,
         playerPawn,
-        diceRolled
+        diceRolled,
+        diceRolled2
     } = useContext(WebSocketContext); // Accesso al WebSocket
     const [isPlayerJoined, setIsPlayerJoined] = useState(false);
     const [activeComponent, setActiveComponent] = useState("GestisciProprieta");
     const [pawnSelected, setSelectedPawn] = useState(false);
     const [isMyTurn, setIsMyTurn] = useState(false); // Stato per il turno del giocatore
     const [isGameStarted, setIsGameStarted] = useState(false); // Stato per la partita
+    const [isRolled, setIsRolled] = useState(diceRolled);
+    const [isRolled2, setIsRolled2] = useState(diceRolled2);
 
     /**
      * tiene la posizione dei player, quando scelgo una pedina, setto la posizione a 1. Ma dove?
@@ -85,6 +88,14 @@ const GameBoard = () => {
         }
         console.log(isGameStarted);
     }, [playerJoin]);
+    
+    useEffect(() => {
+        setIsRolled(diceRolled);
+    }, [diceRolled]);
+
+    useEffect(() => {
+        setIsRolled2(diceRolled2);
+    }, [diceRolled2]);
 
     //Riceve il messaggio di inizio di un turno
     useEffect(() => {
@@ -157,7 +168,7 @@ const GameBoard = () => {
                                     </button>
                                     <button
                                         onClick={handleEnd}
-                                        disabled={!isMyTurn || !diceRolled} // Disabilitato di default
+                                        disabled={(!isMyTurn || !isRolled || !isRolled2)} // Disabilitato di default
                                     >
                                         Termina il turno
                                     </button>
