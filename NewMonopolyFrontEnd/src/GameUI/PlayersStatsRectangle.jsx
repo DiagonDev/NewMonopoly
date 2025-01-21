@@ -1,15 +1,22 @@
 import React, { useState, useEffect, useContext } from "react";
 import { WebSocketContext } from "../contexts/WebSocketContext";
-
 const MAX_PLAYERS = 6; // Numero massimo di giocatori
 const INITIAL_BALANCE = 0; // Saldo iniziale per ogni giocatore
 
 const PlayersStatsRectangle = () => {
     const [players, setPlayers] = useState(
-        Array(MAX_PLAYERS).fill({ name: "Player", balance: INITIAL_BALANCE })
+        Array(MAX_PLAYERS).fill({ name: "Player", balance: INITIAL_BALANCE, color: "gray" })
     );
     const { playerList, playerBalance } = useContext(WebSocketContext);
-
+    const colors = {
+        0: "gray",
+        1: "red",
+        2: "blue",
+        3: "green",
+        4: "cyan",
+        5: "purple",
+        6: "orange",
+    };
     // Aggiunge un nuovo giocatore quando arriva un messaggio di join
     useEffect(() => {
         console.log("Nuovo join:", playerList.player);
@@ -31,6 +38,7 @@ const PlayersStatsRectangle = () => {
                         nextPlayers[emptySlotIndex] = {
                             name: playerList.player, // Nome del giocatore dal messaggio
                             balance: playerList.balance,
+                            color: colors[playerList.pawn] || "gray", // Assegna il colore
                         };
                     }
                 }
@@ -57,7 +65,7 @@ const PlayersStatsRectangle = () => {
     return (
         <div className="player-container">
             {players.map((player, index) => (
-                <div key={index} className="player">
+                <div key={index} className="player"  style={{ backgroundColor: player.color }} >
                     <p id={`playerId${index + 1}`}>{player.name}</p>
                     <p id={`playerSaldo${index + 1}`}>{player.balance}€</p>
                 </div>

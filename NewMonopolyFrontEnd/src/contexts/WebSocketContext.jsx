@@ -20,6 +20,7 @@ export const WebSocketProvider = ({children}) => {
     const [playerList, setPlayerList] = useState({
         player: '',
         balance: 0,
+        pawn: 0,
     });
     
     const [pawnsAvailable, setPawnsAvailable] = useState([]);
@@ -141,6 +142,7 @@ export const WebSocketProvider = ({children}) => {
                         ...prevState, // Mantieni le altre proprietà, se esistono
                         player: message.playerName, // Aggiorna il nome del giocatore
                         balance: message.balance, // Aggiorna il bilancio
+                        pawn: message.pawn,
                     }));
                 }
 
@@ -262,9 +264,9 @@ export const WebSocketProvider = ({children}) => {
 
                 }else if (message.type === 'allProperties') {
                     setAllProperties(message.properties);
-                }else if (message.type === 'RispostaAggiornaProprieta')
+                }else if (message.type === 'RispostaAggiornaProprieta'){
                 //Ricevi scambio -------------------------------------------------------------------
-                else if (message.type === 'exchangeRequest') {
+                }else if (message.type === 'exchangeRequest') {
                     console.log("sono Luca che prova");
                     setExchangeRequest((prevState) => ({
                         ...prevState,
