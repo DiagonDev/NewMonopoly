@@ -3,8 +3,9 @@ import { WebSocketContext } from '../../contexts/WebSocketContext';
 import {pawnColors} from "../../pages/pawnColors.jsx";
 
 const RollDice = () => {
-    const { socket, connected, diceResult, diceRolled, payment, draw, buy , nameBox, buyReturn, prison, exitPrison} = useContext(WebSocketContext); // Accesso al WebSocket
+    const { socket, connected, diceResult, diceRolled, diceRolled2, payment, draw, buy , nameBox, buyReturn, prison, exitPrison} = useContext(WebSocketContext); // Accesso al WebSocket
     const [isRolled, setIsRolled] = useState(diceRolled);
+    const [isRolled2, setIsRolled2] = useState(diceRolled);
     //const [currentPosition, setCurrentPosition] = useState('Parco della vittoria'); // Posizione iniziale
    
     const [diceValue1, setDiceValue1] = useState(null); // Valore del dado
@@ -28,6 +29,7 @@ const RollDice = () => {
         } else {
             console.error('Connessione WebSocket non stabilita!');
         }
+        
         
     };
     
@@ -63,7 +65,10 @@ const RollDice = () => {
     useEffect(() => {
         setIsRolled(diceRolled);
     }, [diceRolled]);
-
+    useEffect(() => {
+        setIsRolled2(diceRolled2);
+        
+    }, [diceRolled2]);
     
     
     useEffect(() => {
@@ -84,7 +89,7 @@ const RollDice = () => {
         <div className='rollDiceDiv'>
             <p id='posizioneAttuale'>Posizione Attuale: Pos1</p>
             {/* Se isRolled è true, mostra la scritta con il risultato, altrimenti mostra il bottone */}
-            {isRolled ? (
+            {isRolled && (
                 <div>
                     <p>Hai lanciato i dadi! Totale: {diceValue1+diceValue2}</p>
                     <p>Hai ottenuto un {diceValue1} con il primo dado e {diceValue2} con il secondo dado</p>
@@ -97,7 +102,8 @@ const RollDice = () => {
                     
                     
                 </div>
-            ) : (
+            )}
+            {(!isRolled || !isRolled2) && (
                 <div>
                     <button onClick={handleRoll}>
                         Roll
@@ -117,6 +123,11 @@ const RollDice = () => {
                             Non hai piu soldi non lo puoi fare
                         </p>
                     )}
+                </div>
+            )}
+            {(isRolled && !isRolled2) && (
+                <div>
+                    <p>Hai fatto doppi dadi, rigioca un altro turno</p>
                 </div>
             )}
             {isRolled && isDraw && (
