@@ -20,10 +20,9 @@ const IpotecaProprieta = ({ playerProperties })  => {
     const handleIpoteca = () => {
         if (socket && connected) {
             const message = {
-                type: "IpotecaProprieta",
+                type: "!IpotecaProprieta",
                 property: selectedProperty,
             };
-
             socket.send(JSON.stringify(message));
             console.log('Messaggio inviato:', message);
             setIsModalOpen(false);

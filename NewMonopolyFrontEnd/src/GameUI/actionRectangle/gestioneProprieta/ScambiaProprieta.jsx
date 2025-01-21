@@ -29,7 +29,7 @@ const ScambiaProprieta = ({playerProperties}) => {
         } else if (step === 1) {
             if (socket && connected) {
                 const message = {
-                    type: "EffettuaScambio",
+                    type: "!EffettuaScambio",
                     property1: tempProperty,
                     property2: selectedProperty,
                     offertaMonetaria: offertaMonetaria,
