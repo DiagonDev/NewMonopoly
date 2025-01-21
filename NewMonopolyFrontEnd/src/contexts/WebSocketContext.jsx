@@ -28,6 +28,7 @@ export const WebSocketProvider = ({children}) => {
         dice2: 0,
     });
     const [diceRolled, setDiceRolled] = useState(false);
+    const [diceRolled2, setDiceRolled2] = useState(false);
 
     const [startTurn, setStartTurn] = useState({
         flag: false,
@@ -62,16 +63,15 @@ export const WebSocketProvider = ({children}) => {
     })
     //Casella in cui finisco dopo il tiro dei dadi
     const [nameBox, setNameBox] = useState('');
-    const [playerProperties, setPlayerProperties] = useState([]);
-    const [allProperties, setAllProperties] = useState([]);
+    const [playerProperties, setPlayerProperties] = useState([])
     const [exchangeRequest, setExchangeRequest] = useState({
         flag: false,
         properties1: '',
         properties2: '',
         playerName: '',
         money: 0,
-    });
-    const [rispostaScambio, setRispostaScambio] = useState();
+    })
+
     useEffect(() => {
         const ws = new WebSocket("https://49a9-79-54-77-140.ngrok-free.app/ws/gameNewMonopoly");
         //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
@@ -164,6 +164,12 @@ export const WebSocketProvider = ({children}) => {
                     console.log("pawns available", message.content);
                     setPawnsAvailable(message.content);
                 } else if (message.type === 'diceRolled') {
+                    if((message.dice1===message.dice2)&&(!prison)){
+                        setDiceRolled2(false);
+                    }else {
+                        setDiceRolled2(true);
+                    }
+                    setDiceRolled(true);
                     if(message.dice1===message.dice2){
                         setPrison(false);
                     }
@@ -173,12 +179,13 @@ export const WebSocketProvider = ({children}) => {
                         dice1: message.dice1, // Aggiorna solo dice1
                         dice2: message.dice2, // Aggiorna solo dice2
                     }));
-                    setDiceRolled(true);
+                    
                 } else if (message.type === 'turn') {
+                    setExitPrison(0);
                     setBuyReturn((prevState) => ({
                         ...prevState,
                         flag: false,
-                        success: true,
+                        success: false,
                     }));
                     setStartTurn((prevState) => ({
                         ...prevState, // Copia il vecchio stato
@@ -227,7 +234,7 @@ export const WebSocketProvider = ({children}) => {
                         description: message.description,
                     }));
                 } else if (message.type === 'buy') {
-                    console.log("Acquisto: ", message.type, " price",);
+                    console.log("Acquisto: ", message.type, message.price,);
                     setBuy((prevState) => ({
                         ...prevState,
                         flag: true,
@@ -235,21 +242,20 @@ export const WebSocketProvider = ({children}) => {
                     }));
 
                 } else if (message.type === 'nameBox') {
-                    setNameBox(message.name);
 
+                    setNameBox(message.name);
                 } else if (message.type === 'propertiesOwned') {
                     setPlayerProperties(message.properties);
 
-                }else if (message.type === 'allProperties'){
-                    setAllProperties(message.properties);
                 }
                 //Ricevi scambio -------------------------------------------------------------------
                 else if (message.type === 'exchangeRequest') {
                     console.log("sono Luca che prova");
                     setExchangeRequest((prevState) => ({
                         ...prevState,
-                        property1: message.property1,
-                        property2: message.property2,
+                        flag: true,
+                        properties1: message.properties1,
+                        properties2: message.properties2,
                         playerName: message.playerName,
                         money: message.money,
                     }));
@@ -319,6 +325,7 @@ export const WebSocketProvider = ({children}) => {
                 diceResult,
                 startTurn,
                 diceRolled,
+                diceRolled2,
                 playerPawn,
                 payment,
                 draw,
@@ -329,9 +336,7 @@ export const WebSocketProvider = ({children}) => {
                 playerList,
                 buyReturn,
                 prison,
-                exitPrison,
-                allProperties,
-                rispostaScambio
+                exitPrison
             }}>
             {children}
         </WebSocketContext.Provider>

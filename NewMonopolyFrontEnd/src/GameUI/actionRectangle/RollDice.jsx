@@ -142,8 +142,7 @@ const RollDice = () => {
             )}
             {(buyReturn.flag && buyReturn.success) &&(
                 <div>
-                    <p>Hai acquistato la proprieta {nameBox} a {purchased} </p>
-                   
+                    <p>Hai acquistato la proprieta {nameBox} </p>
                 </div>
                 
             )}
