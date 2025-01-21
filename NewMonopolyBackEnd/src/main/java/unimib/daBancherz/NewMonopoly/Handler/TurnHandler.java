@@ -103,8 +103,6 @@ public class TurnHandler {
     public void rollDice(WebSocketSession session) throws Exception {
         int diceR1 = ThreadLocalRandom.current().nextInt(1, 7);  // Valore da 1 a 6 per il primo dado
         int diceR2 = ThreadLocalRandom.current().nextInt(1, 7);  // Valore da 1 a 6 per il secondo dado
-        /*int diceR1 = 3;
-        int diceR2 = 3;*/
         int totDice = diceR1 + diceR2;
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
@@ -135,6 +133,7 @@ public class TurnHandler {
         if(gameBoard.getPlayerCountRollDoubleDice(gameId, playerName) == 3) {
             gameBoard.setPlayerPrison(gameId, playerName, true);
             gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, 0);
+            gameBoard.setPlayerCountRoll(gameId, playerName, 0);
             gameBoard.setPlayerPosition(gameId, playerName, 11);//aggiorna la posizione del giocatore
             //invia a tutti i giocatori che il "playername" si è postato di tot caselle "newPosition"
             messageHandler.sendPawnMove(pawnId, playerName, 11, gameHandler.getGameSessions(), gameId);
@@ -144,7 +143,7 @@ public class TurnHandler {
 
         }
         else {
-            if (gameBoard.getPlayerCountRoll(gameId, playerName) == 3) {
+            if (gameBoard.getPlayerCountRoll(gameId, playerName) == 4) {
                 gameBoard.setPlayerPrison(gameId, playerName, false);
                 gameBoard.setPlayerCountRoll(gameId, playerName, 0);
                 //bisogna vedere se mandare il messaggio, perchè in teoria dal prossio turno lui sara furoi e non dal terzo
@@ -153,6 +152,7 @@ public class TurnHandler {
                         "flag", true
                 ));
                 session.sendMessage(new TextMessage(exitPrisonMEssage));
+                isInPrison = false;
             }
             if(!isInPrison && (diceR1 != diceR2)){
                 gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, 0);
@@ -205,6 +205,7 @@ public class TurnHandler {
                     "flag", false
             ));
             session.sendMessage(new TextMessage(exitPrisonMEssage));
+            gameBoard.setPlayerCountRoll(gameId, playerName, 0);
         }else {
             giocatoreRepository.aggiornamentoSaldo(playerName, gameId, 50);
             messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
