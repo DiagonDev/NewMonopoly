@@ -19,7 +19,7 @@ const GameBoard = () => {
         diceRolled
     } = useContext(WebSocketContext); // Accesso al WebSocket
     const [isPlayerJoined, setIsPlayerJoined] = useState(false);
-    const [activeComponent, setActiveComponent] = useState("BaseRectangle");
+    const [activeComponent, setActiveComponent] = useState("GestisciProprieta");
     const [pawnSelected, setSelectedPawn] = useState(false);
     const [isMyTurn, setIsMyTurn] = useState(false); // Stato per il turno del giocatore
     const [isGameStarted, setIsGameStarted] = useState(false); // Stato per la partita
@@ -29,6 +29,7 @@ const GameBoard = () => {
      * Ad esempio se player sceglie pedina green(id 3) playerPositions sarà = [0,0,1,0,0,0]
      */
     const [playerPositions, setPlayerPositions] = useState([0, 0, 0, 0, 0, 0]); // max 6 giocatori
+    // LASCIARE WARNING
     useEffect(() => {
         if (playerPawn) { // Supponendo che playerMove arrivi dal WebSocket
             setPlayerPositions((prevPositions) => {

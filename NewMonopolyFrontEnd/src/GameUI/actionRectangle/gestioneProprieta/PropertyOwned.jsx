@@ -1,3 +1,5 @@
+// eslint-disable-next-line react/prop-types
+import {mockPlayerProperties} from "./PlayerPropertyMock.jsx";
 
 // eslint-disable-next-line react/prop-types
 const PropertyOwned = ({playerProperties, onPropertySelect}) => {
@@ -8,18 +10,18 @@ const PropertyOwned = ({playerProperties, onPropertySelect}) => {
             onPropertySelect(property); // Passa il valore al padre
         }
     };
-
+    // eslint-disable-next-line react/prop-types
+    const propertiesToUse = playerProperties.length > 0 ? playerProperties : mockPlayerProperties;
     return (
         <>
             <div className="propertyGrid">
-                {/* eslint-disable-next-line react/prop-types */}
-                {playerProperties.map((property) => (
+                {propertiesToUse.map((property, index) => (
                     <div
-                        key={property.id}
+                        key={index}
                         className="propertySquare"
                         onClick={() => handleSquareClick(property)}
                     >
-                        {property.name}
+                        {property.nome}
                     </div>
                 ))}
 

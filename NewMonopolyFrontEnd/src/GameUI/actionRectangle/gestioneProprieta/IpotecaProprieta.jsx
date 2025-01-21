@@ -9,6 +9,7 @@ const IpotecaProprieta = ({ playerProperties })  => {
     // Funzione per gestire la proprietà selezionata
     const handleSelectedProperty = (property) => {
         setIsModalOpen(true);
+        setSelectedProperty(property);
         console.log("Proprietà selezionata:", property);
     };
     
@@ -46,10 +47,10 @@ const IpotecaProprieta = ({ playerProperties })  => {
             {isModalOpen && (
                 <div className="modal">
                     <div className="modalContent">
-                        <h2>{selectedProperty.name}</h2>
-                        <p>{selectedProperty.rendita}</p>
-                        <p>{selectedProperty.costo}</p>
-                        
+                        <h2>Proprietà: {selectedProperty.nome}</h2>
+                        <p>Rendita: {selectedProperty.affitto}</p>
+                        <p>Costo: {selectedProperty.prezzoCorrente}</p>
+                        <p>Ipoteca: {selectedProperty.ipoteca}</p>
                         <button onClick={handleIpoteca}>Ipoteca</button>
                         <button onClick={closeModal}>Indietro</button>
                     </div>

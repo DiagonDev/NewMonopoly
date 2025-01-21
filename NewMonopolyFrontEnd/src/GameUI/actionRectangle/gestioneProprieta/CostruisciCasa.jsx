@@ -58,24 +58,24 @@ const CostruisciCasa = ({ buildingProperties }) => {
     return (
         <>
             <PropertyOwned
-                buildingProperties={buildingProperties}
+                playerProperties={buildingProperties}
                 onPropertySelect={handleSelectedProperty}
             />
             {isModalOpen && (
                 <div className="modal">
                     <div className="modalContent">
-                        <h2>{selectedProperty?.name}</h2>
+                        <h2>{selectedProperty?.nome}</h2>
                         <p>Rendita: {selectedProperty?.affitto}</p>
                         <br/>
-                        <p>con 1 casa: {selectedProperty?.affitto}</p>
+                        <p>con 1 casa: {selectedProperty?.affitto1Casa}</p>
                         <br/>
-                        <p>con 2 case: {selectedProperty?.affitto}</p>
+                        <p>con 2 case: {selectedProperty?.affitto2Case}</p>
                         <br/>
-                        <p>con 3 case: {selectedProperty?.affitto}</p>
+                        <p>con 3 case: {selectedProperty?.affitto3Case}</p>
                         <br/>
-                        <p>con 4 case: {selectedProperty?.affitto}</p>
+                        <p>con 4 case: {selectedProperty?.affitto4Case}</p>
                         <br/>
-                        <p>con Albergo: {selectedProperty?.affitto}</p>
+                        <p>con Albergo: {selectedProperty?.affittoAlbergo}</p>
                         <br/>
                         <p>Costo per ogni casa (1 casa per ogni proprietà): {selectedProperty?.prezzoCasaCorrente}</p>
                         <label>

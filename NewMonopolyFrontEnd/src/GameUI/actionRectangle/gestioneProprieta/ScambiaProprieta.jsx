@@ -60,9 +60,9 @@ const ScambiaProprieta = ({playerProperties}) => {
                     <div className="modalContent">
                         {step === 0 && (
                             <>
-                                <h2>{selectedProperty.name}</h2>
-                                <p>Rendita: {selectedProperty.rendita}</p>
-                                <p>Costo: {selectedProperty.costo}</p>
+                                <h2>Proprietà: {selectedProperty.nome}</h2>
+                                <p>Rendita: {selectedProperty.affitto}</p>
+                                <p>Costo: {selectedProperty.prezzoCorrente}</p>
                                 <button onClick={handleScambia}>Seleziona</button>
                                 <button onClick={closeModal}>Indietro</button>
                             </>
@@ -70,8 +70,8 @@ const ScambiaProprieta = ({playerProperties}) => {
                         {step === 1 && (
                             <>
                                 <h2>Proprietà selezionate:</h2>
-                                <p>{tempProperty.name} (Rendita: {tempProperty.rendita}, Costo: {tempProperty.costo})</p>
-                                <p>{selectedProperty.name} (Rendita: {selectedProperty.rendita}, Costo: {selectedProperty.costo})</p>
+                                <p>{tempProperty.nome} (Rendita: {tempProperty.affitto}, Costo: {tempProperty.prezzoCorrente})</p>
+                                <p>{selectedProperty.nome} (Rendita: {selectedProperty.affitto}, Costo: {selectedProperty.prezzoCorrente})</p>
                                 <label>
                                     Offerta monetaria:
                                     <input

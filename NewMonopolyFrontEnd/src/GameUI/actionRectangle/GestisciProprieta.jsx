@@ -21,15 +21,15 @@ const GestisciProprieta = () => {
                     acc[property.color] = [];
                 }
                 acc[property.color].push(property);
-                return acc;
             }
+            return acc;
         }, {});
 
         // Filtra i gruppi con almeno 3 proprietà dello stesso colore
         const result = Object.values(groupedProperties).filter(group => group.length >= 3);
         const result2 = Object.values(result).filter(group => group.length === 2 && (group.color === 'Marrone' || group.color === 'Blu'));
-        result.concat(result2);
-        setBuildingProperties(result.flat());
+
+        setBuildingProperties(result.concat(result2).flat());
     }, [playerProperties]);
 
     /**
