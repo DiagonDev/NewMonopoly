@@ -38,7 +38,7 @@ const PlayersStatsRectangle = () => {
                         nextPlayers[emptySlotIndex] = {
                             name: playerList.player, // Nome del giocatore dal messaggio
                             balance: playerList.balance,
-                            color: colors[playerList.pawn] || "gray", // Assegna il colore
+                            //color: colors[playerList.pawn] || "gray", // Assegna il colore
                         };
                     }
                 }
