@@ -59,13 +59,16 @@ public class PropertyHandler {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
         List<PlayerProperties> playerPropertiesList = new ArrayList<>();
+        String type = "";
         if (useCase.equals("GestisciProprieta")){
+            type = "propertiesOwned";
             playerPropertiesList = pCPPRepository.findPlayerProperties(gameId,playerName);
         } else if(useCase.equals("PingScambiaProprieta")){
+            type = "allProperties";
             playerPropertiesList = pCPPRepository.findOtherPlayerProperties(gameId,playerName);
         }
         String playerPropertiesListMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "propertiesOwned",
+                "type", type,
                 "properties", playerPropertiesList
         ));
         session.sendMessage(new TextMessage(playerPropertiesListMessage));

@@ -5,7 +5,7 @@ NyThemeData.set(2, { name: "Vicolo Corto" });
 NyThemeData.set(4, { name: "Vicolo Stretto" });
 NyThemeData.set(5, { name: "Tassa Patrimoniale" });
 NyThemeData.set(6, { name: "Stazione Sud" });
-NyThemeData.set(7, { name: "Bastoni Grand Sasso" });
+NyThemeData.set(7, { name: "Bastoni Gran Sasso" });
 NyThemeData.set(9, { name: "Viale MonteRosa" });
 NyThemeData.set(10, { name: "Viale Vesuvio" });
 NyThemeData.set(12, { name: "Via Accademia" });

@@ -6,8 +6,8 @@ import ScambiaProprieta from "./gestioneProprieta/ScambiaProprieta.jsx";
 import {WebSocketContext} from "../../contexts/WebSocketContext.jsx";
 
 
-const GestisciProprieta = () => {
-    const {socket, connected, playerProperties} = useContext(WebSocketContext);
+const GestisciProprieta = ({playerProperties}) => {
+    const {socket, connected} = useContext(WebSocketContext);
     const [activeComponent, setActiveComponent] = useState('');
     const [buildingProperties, setBuildingProperties] = useState([]);
     /**
@@ -21,8 +21,9 @@ const GestisciProprieta = () => {
                     acc[property.color] = [];
                 }
                 acc[property.color].push(property);
+                return acc;
             }
-            return acc;
+
         }, {});
 
         // Filtra i gruppi con almeno 3 proprietà dello stesso colore

@@ -17,10 +17,11 @@ const GameBoard = () => {
         startTurn,
         playerPawn,
         diceRolled,
-        diceRolled2
+        diceRolled2,
+        playerProperties
     } = useContext(WebSocketContext); // Accesso al WebSocket
     const [isPlayerJoined, setIsPlayerJoined] = useState(false);
-    const [activeComponent, setActiveComponent] = useState("GestisciProprieta");
+    const [activeComponent, setActiveComponent] = useState("BaseRectangle");
     const [pawnSelected, setSelectedPawn] = useState(false);
     const [isMyTurn, setIsMyTurn] = useState(false); // Stato per il turno del giocatore
     const [isGameStarted, setIsGameStarted] = useState(false); // Stato per la partita
@@ -188,9 +189,9 @@ const GameBoard = () => {
             <div className="horizontal-line"></div>
             <div className="rectangle-top-right">
                 <div className="grid-item">
-                    {activeComponent === "BaseRectangle" && <BaseRectangle/>}
+                    {activeComponent === "BaseRectangle" && <BaseRectangle playerProperties = {playerProperties} />}
                     {activeComponent === "RollDice" && <RollDice/>}
-                    {activeComponent === "GestisciProprieta" && <GestisciProprieta/>}
+                    {activeComponent === "GestisciProprieta" && <GestisciProprieta playerProperties = {playerProperties} />}
                 </div>
             </div>
             <div className="rectangle-bot-left">

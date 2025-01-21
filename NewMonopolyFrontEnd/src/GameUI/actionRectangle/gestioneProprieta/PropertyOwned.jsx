@@ -21,7 +21,15 @@ const PropertyOwned = ({playerProperties, onPropertySelect}) => {
                         className="propertySquare"
                         onClick={() => handleSquareClick(property)}
                     >
-                        {property.nome}
+                        <div
+                            className="propertyColorBar"
+                            style={{backgroundColor: property.colore}}
+                        >
+                            <br/>
+                            <div className="propertyContent">
+                                {property.nome}
+                            </div>
+                        </div>
                     </div>
                 ))}
 

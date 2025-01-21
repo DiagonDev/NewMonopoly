@@ -920,19 +920,33 @@ button:focus-visible {
     height: 100%;
     box-sizing: border-box;
 }
-
 .propertySquare {
     flex: 0 0 calc(30% - 10px); /* Ogni quadrato occupa circa il 30% della riga, meno il gap */
     aspect-ratio: 1; /* Mantiene un rapporto 1:1 per altezza e larghezza */
     background-color: #f0f0f0;
     border: 1px solid #ccc;
     display: flex;
+    flex-direction: column; /* Dispone gli elementi in colonna */
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    overflow: hidden; /* Impedisce che i contenuti escano dal quadrato */
+}
+.propertyColorBar {
+    width: 100%; /* Occupa l'intera larghezza del quadrato */
+    height: 15%; /* Occupa il 10% dell'altezza */
+    border-bottom: 1px solid #ccc; /* Opzionale: una linea per separare */
 }
 
+.propertyContent {
+    flex: 1; /* Occupa il resto dello spazio disponibile */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 5px;
+}
 .propertySquare:hover {
     background-color: #ddd;
 }

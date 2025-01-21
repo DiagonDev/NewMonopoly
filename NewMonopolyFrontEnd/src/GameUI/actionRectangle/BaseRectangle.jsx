@@ -1,8 +1,9 @@
 import { useContext, useState, useEffect } from 'react';
 import RiceviScambio from './gestioneProprieta/RiceviScambio';
 import {WebSocketContext} from "../../contexts/WebSocketContext.jsx";
+import PropertyOwned from "./gestioneProprieta/PropertyOwned.jsx";
 
-const BaseRectangle = () => {
+const BaseRectangle = ({playerProperties} ) => {
     const {exchangeRequest} = useContext(WebSocketContext);
     const [isPageOpen, setIsPageOpen] = useState(false);
 
@@ -18,8 +19,9 @@ const BaseRectangle = () => {
             {isPageOpen ? (
                 <RiceviScambio onClose={() => setIsPageOpen(false)} />
             ) : (
-                <h1>Base Rectangle</h1>
+                <PropertyOwned playerProperties={playerProperties} />
             )}
+
         </div>
     );
 };
