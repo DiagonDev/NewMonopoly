@@ -6,37 +6,39 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java CI with Maven
-
-# Questo workflow viene eseguito su push o pull request nel branch 'gitAction'.
+name: SonarQube
 on:
   push:
-    branches: [gitAction]
+    branches:
+      - master
   pull_request:
-    branches: [gitAction]
-
+    types: [opened, synchronize, reopened]
 jobs:
   build:
+    name: Build and analyze
     runs-on: ubuntu-latest
-
     steps:
-      # Controlla il codice dal repository GitHub
       - uses: actions/checkout@v4
-
-      # Configura JDK 17
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin' # Usa la distribuzione Temurin
-          cache: maven # Abilita il caching delle dipendenze Maven
-
-      # Costruisce il progetto usando Maven
-      - name: Build with Maven
-        working-directory: NewMonopolyBackEnd # Specifica la directory contenente il pom.xml
-        run: mvn -B package --file pom.xml # Opzione -B per modalità batch (senza input)
-
-      # Sposta il working directory e aggiorna il grafo delle dipendenze
-      - name: Update dependency graph
-        run: mvn com.github.ferstl:depgraph-maven-plugin:4.0.1:graph -DgraphFormat=json
-        working-directory: NewMonopolyBackEnd
+          java-version: 17
+          distribution: 'zulu' # Alternative distribution options are available.
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Build and analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=newmonopoly-teruzzi-tentori-ronchi-alessandro-da-bancherz
