@@ -8,33 +8,35 @@
 
 name: Java CI with Maven
 
+# Questo workflow viene eseguito su push o pull request nel branch 'gitAction'.
 on:
   push:
-    branches: [ gitAction ]
+    branches: [gitAction]
   pull_request:
-    branches: [ gitAction ]
+    branches: [gitAction]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
-     # Build con Maven specificando il percorso del pom.xml
-    - name: Build with Maven
-      run: mvn -B -f NewMonopolyBackEnd/pom.xml clean package
+      # Controlla il codice dal repository GitHub
+      - uses: actions/checkout@v4
 
-    # Generazione del grafo delle dipendenze (opzionale)
-    - name: Generate dependency graph
-      run: mvn -B -f NewMonopolyBackEnd/pom.xml com.github.ferstl:depgraph-maven-plugin:4.0.1:graph -DgraphFormat=json
+      # Configura JDK 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin' # Usa la distribuzione Temurin
+          cache: maven # Abilita il caching delle dipendenze Maven
 
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    - name: Update dependency graph
-      uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+      # Costruisce il progetto usando Maven
+      - name: Build with Maven
+        working-directory: NewMonopolyBackEnd # Specifica la directory contenente il pom.xml
+        run: mvn -B package --file pom.xml # Opzione -B per modalità batch (senza input)
+
+      # Aggiorna il grafo delle dipendenze
+      - name: Update dependency graph
+        working-directory: NewMonopolyBackEnd # Esegue Maven nella directory corretta
+        uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
