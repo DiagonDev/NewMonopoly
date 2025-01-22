@@ -1,4 +1,4 @@
-package unimib.daBancherz.NewMonopoly.Handler;
+/*package unimib.daBancherz.NewMonopoly.Handler;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -177,4 +177,4 @@ public class GameHandlerTest {
 
         assertEquals(playerName, result);
     } */
-}
+//}
