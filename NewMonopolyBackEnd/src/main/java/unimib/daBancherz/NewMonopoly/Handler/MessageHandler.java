@@ -266,10 +266,10 @@ public class MessageHandler {
                 gameBoard.setPlayerPrison(gameId, playerName, true);
                 break;
             case"Imprevisto":
-                descrizione = partitaImprevistoRepository.findDescrizioneImprevsto(gameId);
+                descrizione = partitaImprevistoRepository.findDescrizioneImprevisto(gameId);
                 if (descrizione==null) {
                     partitaImprevistoRepository.setUtilizzatoFalse(gameId);
-                    descrizione = partitaImprevistoRepository.findDescrizioneImprevsto(gameId);
+                    descrizione = partitaImprevistoRepository.findDescrizioneImprevisto(gameId);
                 }
 
                 String imprevistoMessage = new ObjectMapper().writeValueAsString(Map.of(

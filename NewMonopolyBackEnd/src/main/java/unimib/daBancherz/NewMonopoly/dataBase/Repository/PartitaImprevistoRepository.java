@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.Partita_Imprevisto;
 
+@SuppressWarnings("java:S1192") // Ignora la regola di duplicazione
 @Repository
 public interface PartitaImprevistoRepository extends JpaRepository<Partita_Imprevisto, Long> {
     //Metodo per trovare la descrizione di imprevisto
@@ -21,7 +22,7 @@ public interface PartitaImprevistoRepository extends JpaRepository<Partita_Impre
         ORDER BY RANDOM()
         LIMIT 1
     """, nativeQuery = true)
-    String findDescrizioneImprevsto(@Param("idPartita") String idPartita);
+    String findDescrizioneImprevisto(@Param("idPartita") String idPartita);
 
     //metodo per settare a true l'utilizzo
     @Transactional
@@ -36,11 +37,11 @@ public interface PartitaImprevistoRepository extends JpaRepository<Partita_Impre
     @Modifying
     @Query("""
         UPDATE Partita_Imprevisto pii
-        SET pii.utilizzato = CASE 
-            WHEN pii.idgiocatore IS NOT NULL THEN true 
-            ELSE false 
+        SET pii.utilizzato = CASE
+            WHEN pii.idgiocatore IS NOT NULL THEN true
+            ELSE false
         END
-        WHERE pii.idpartita.codiceInvito = :idPartita 
+        WHERE pii.idpartita.codiceInvito = :idPartita
     """)
     void setUtilizzatoFalse(@Param("idPartita") String idPartita);
 

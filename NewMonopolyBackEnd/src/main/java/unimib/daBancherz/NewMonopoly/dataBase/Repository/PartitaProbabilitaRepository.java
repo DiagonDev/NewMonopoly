@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.Partita_Probabilita;
 
+@SuppressWarnings("java:S1192") // Ignora la regola di duplicazione
 @Repository
 public interface PartitaProbabilitaRepository extends JpaRepository<Partita_Probabilita, Long> {
     //Metodo per trovare la descrizione di probabilita
@@ -37,10 +38,10 @@ public interface PartitaProbabilitaRepository extends JpaRepository<Partita_Prob
     @Query("""
         UPDATE Partita_Probabilita pp
         SET pp.utilizzato = CASE
-            WHEN pp.idgiocatore IS NOT NULL THEN true 
-            ELSE false 
+            WHEN pp.idgiocatore IS NOT NULL THEN true
+            ELSE false
         END
-        WHERE pp.idpartita.codiceInvito = :idPartita 
+        WHERE pp.idpartita.codiceInvito = :idPartita
     """)
     void setUtilizzatoFalse(@Param("idPartita") String idPartita);
 
