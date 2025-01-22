@@ -2,7 +2,6 @@ package unimib.daBancherz.NewMonopoly.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -16,25 +15,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class GameHandler {
 
-    @Autowired
-    private MessageHandler messageHandler;  // Iniezione del bean MessageSender
-    @Autowired
-    private GameService gameService;
-    @Autowired
-    private GiocatoreRepository giocatoreRepository;
-    @Autowired
-    private PartitaRepository partitaRepository;
-    @Autowired
-    private PedinaRepository pedinaRepository;
+    private final MessageHandler messageHandler;
+    private final GameService gameService;
+    private final GiocatoreRepository giocatoreRepository;
+    private final PartitaRepository partitaRepository;
+    private final PedinaRepository pedinaRepository;
+
     private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
-    GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
-    List<Integer> pedineNonUsate = new ArrayList<>();
+
+    private final GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
+    private List<Integer> pedineNonUsate = new ArrayList<>();
+
+    // **Constructor Injection**
+    public GameHandler(MessageHandler messageHandler,
+                       GameService gameService,
+                       GiocatoreRepository giocatoreRepository,
+                       PartitaRepository partitaRepository,
+                       PedinaRepository pedinaRepository) {
+        this.messageHandler = messageHandler;
+        this.gameService = gameService;
+        this.giocatoreRepository = giocatoreRepository;
+        this.partitaRepository = partitaRepository;
+        this.pedinaRepository = pedinaRepository;
+    }
 
     //gestisce i messaggi per la creazione e la partecipazione dei giocatori alla partita
     public void handleGameMessage(String[] messageParts, WebSocketSession session) throws Exception {
