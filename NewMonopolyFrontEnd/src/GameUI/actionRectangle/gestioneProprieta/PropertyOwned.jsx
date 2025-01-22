@@ -1,4 +1,4 @@
-// eslint-disable-next-line react/prop-types
+
 import {mockPlayerProperties} from "./PlayerPropertyMock.jsx";
 
 // eslint-disable-next-line react/prop-types
