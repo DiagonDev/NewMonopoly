@@ -1,9 +1,7 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
@@ -18,7 +16,6 @@ import unimib.daBancherz.NewMonopoly.dataBase.Service.GameService;
 import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -210,7 +207,7 @@ public class MessageHandler {
 
         //aggiorna i soldi quando passi dal via anche senza fermarti sopra
         if(viaPay){
-            giocatoreRepository.aggiornamentoSaldo(playerName, gameId, -200);
+            giocatoreRepository.setSaldoGiocatore(playerName, gameId, -200);
             updateBalance(gameSessions, gameId, playerName);
         }
 
@@ -218,7 +215,7 @@ public class MessageHandler {
             case "Via":
                 break;
             case "Tassa":
-                giocatoreRepository.aggiornamentoSaldo(playerName, gameId, 200);
+                giocatoreRepository.setSaldoGiocatore(playerName, gameId, 200);
                 updateBalance(gameSessions, gameId, playerName);
                 break;
             case "Proprietà", "Stazione", "Società":
@@ -236,8 +233,8 @@ public class MessageHandler {
                     Integer idProprietario = giocatoreRepository.findIdByNomeAndPartitaCodiceInvito(proprietario, gameId);
                     Integer count = pCPPRepository.countProprieta(proprietario, typeBox, gameId);
                     prezzoAffitto = pCPPRepository.calcolaAffitto(gameId, posizione, idProprietario, count);
-                    giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoAffitto);
-                    giocatoreRepository.aggiornamentoSaldo(proprietario, gameId, -prezzoAffitto);
+                    giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzoAffitto);
+                    giocatoreRepository.setSaldoGiocatore(proprietario, gameId, -prezzoAffitto);
 
                     String payBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
                             "type", "payment",
@@ -253,7 +250,7 @@ public class MessageHandler {
             case"InPrigione":
                 gameBoard.setPlayerPosition(gameId, playerName, 11);//aggiorna la posizione del giocatore
                 try {
-                    Thread.sleep(1000); //TODO: vedere se si può diminuire il tempo
+                    Thread.sleep(1500); //TODO: vedere se si può diminuire il tempo
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Ripristina lo stato di interruzione del thread
                     System.out.println("Thread interrotto: " + e.getMessage());
@@ -316,7 +313,7 @@ public class MessageHandler {
             case "ricevi_importo", "paga_importo":
                 importo_deserializzato = (Importo) parametri;
                 importo = importo_deserializzato.getImporto();
-                giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, importo);
+                giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, importo);
                 updateBalance(gameSessions, idPartita, nomeGiocatore);
                 break;
 
@@ -325,7 +322,7 @@ public class MessageHandler {
                 importo = importo_deserializzato.getImporto();
                 soldi = (giocatoreRepository.contaGiocatoriInPartita(idPartita)-1) * importo;
                 giocatoreRepository.pagaImportoGiocatori(importo, idPartita, nomeGiocatore);
-                giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, soldi);
+                giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, soldi);
                 giocatoriPartita = giocatoreRepository.findGiocatori(idPartita);
                 for(String nome : giocatoriPartita)
                     updateBalance(gameSessions, idPartita, nome);
@@ -335,7 +332,7 @@ public class MessageHandler {
                 importo_deserializzato = (Importo) parametri;
                 importo = importo_deserializzato.getImporto();
                 soldi = -((giocatoreRepository.contaGiocatoriInPartita(idPartita)-1) * importo);
-                giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, soldi);
+                giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, soldi);
                 giocatoreRepository.pagaImportoGiocatori(-importo, idPartita, nomeGiocatore);
                 giocatoriPartita = giocatoreRepository.findGiocatori(idPartita);
                 for(String nome : giocatoriPartita)
@@ -349,7 +346,7 @@ public class MessageHandler {
                 int numCase = pCPPRepository.contaCaseTot(nomeGiocatore, idPartita);
                 int numAlberghi = pCPPRepository.contaAlberghiTot(nomeGiocatore, idPartita);
                 int totaleDaPagare = (numCase * importoCasa) + (numAlberghi * importoAlbergo);
-                giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, totaleDaPagare);
+                giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, totaleDaPagare);
                 updateBalance(gameSessions, idPartita, nomeGiocatore);
                 break;
 
@@ -357,7 +354,7 @@ public class MessageHandler {
                 if(parametri instanceof IdCasella id_casellaDeserializzato) {
                     id_casella = id_casellaDeserializzato.getId_casella();
                     if(posizione > id_casella) {
-                        giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, idPartita, -200);
+                        giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, -200);
                         updateBalance(gameSessions, idPartita, nomeGiocatore);
                     }
                     gameBoard.setPlayerPosition(idPartita, nomeGiocatore, id_casella);

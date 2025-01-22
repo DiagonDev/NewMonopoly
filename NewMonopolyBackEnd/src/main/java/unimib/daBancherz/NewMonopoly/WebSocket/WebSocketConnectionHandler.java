@@ -60,7 +60,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                 case "Riconnetti":
                     break;
                 case "LanciaDadi":
-                    turnHandler.rollDice(session);
+                    turnHandler.spostaPedina(session);
                     break;
                 case "FineTurno":
                     turnHandler.endTurn(session);

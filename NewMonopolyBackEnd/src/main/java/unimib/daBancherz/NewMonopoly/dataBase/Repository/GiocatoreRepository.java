@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.Giocatore;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
@@ -56,7 +55,7 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
                 WHERE nome = :nomeGiocatore
         		AND idpartita= :idPartita
     """, nativeQuery = true)
-    Integer aggiornamentoSaldo(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("soldi") Integer soldi);
+    void setSaldoGiocatore(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("soldi") Integer soldi);
 
     @Modifying
     @Transactional
@@ -66,7 +65,7 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
         WHERE idpartita = :idPartita
         AND nome <> :nomeGiocatoreEscluso
     """, nativeQuery = true)
-    Integer pagaImportoGiocatori(@Param("importo") Integer importo, @Param("idPartita") String idPartita, @Param("nomeGiocatoreEscluso") String nomeGiocatoreEscluso);
+    void pagaImportoGiocatori(@Param("importo") Integer importo, @Param("idPartita") String idPartita, @Param("nomeGiocatoreEscluso") String nomeGiocatoreEscluso);
 
     @Query(value = """
         SELECT COUNT(*) 

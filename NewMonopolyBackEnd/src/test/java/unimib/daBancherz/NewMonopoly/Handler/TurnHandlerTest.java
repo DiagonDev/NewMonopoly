@@ -197,7 +197,7 @@ public class TurnHandlerTest {
         assertEquals(expectedMap, actualMap);
 
         // Verifica che non venga aggiornata la saldo del giocatore
-        verify(giocatoreRepository, never()).aggiornamentoSaldo(PLAYER_NAME, GAME_ID, 50);
+        verify(giocatoreRepository, never()).setSaldoGiocatore(PLAYER_NAME, GAME_ID, 50);
         verify(messageHandler, never()).updateBalance(any(), any(), any());
     }
 
@@ -228,7 +228,7 @@ public class TurnHandlerTest {
         assertEquals(expectedMap, actualMap);
 
         // Verifica che il saldo del giocatore venga aggiornato
-        verify(giocatoreRepository).aggiornamentoSaldo(PLAYER_NAME, GAME_ID, 50);
+        verify(giocatoreRepository).setSaldoGiocatore(PLAYER_NAME, GAME_ID, 50);
         verify(messageHandler).updateBalance(gameHandler.getGameSessions(), GAME_ID, PLAYER_NAME);
     }
 
@@ -259,7 +259,7 @@ public class TurnHandlerTest {
         assertEquals(expectedMap, actualMap);
 
         // Verifica che il saldo del giocatore venga aggiornato
-        verify(giocatoreRepository).aggiornamentoSaldo(PLAYER_NAME, GAME_ID, 50);
+        verify(giocatoreRepository).setSaldoGiocatore(PLAYER_NAME, GAME_ID, 50);
         verify(messageHandler).updateBalance(gameHandler.getGameSessions(), GAME_ID, PLAYER_NAME);
     }
 
