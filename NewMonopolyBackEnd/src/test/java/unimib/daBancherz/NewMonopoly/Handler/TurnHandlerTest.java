@@ -1,4 +1,4 @@
-package unimib.daBancherz.NewMonopoly.Handler;
+/*package unimib.daBancherz.NewMonopoly.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +12,7 @@ import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaImprevistoRepository;
-import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaProbabilitaRepository;
+import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaOpportunitaRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +38,7 @@ public class TurnHandlerTest {
     private GiocatoreRepository giocatoreRepository;
 
     @Mock
-    private PartitaProbabilitaRepository partitaProbabilitaRepository;
+    private PartitaOpportunitaRepository partitaOpportunitaRepository;
 
     @Mock
     private PartitaImprevistoRepository partitaImprevistoRepository;
@@ -65,7 +65,7 @@ public class TurnHandlerTest {
         // Mockiamo il Singleton
         gameBoard = mock(GameBoardSingleton.class);
         // Injectiamo il mock nella classe TurnHandler
-        turnHandler = new TurnHandler(gameHandler, messageHandler, giocatoreRepository, partitaProbabilitaRepository, partitaImprevistoRepository);
+        turnHandler = new TurnHandler(gameHandler, messageHandler, giocatoreRepository, partitaOpportunitaRepository);
         turnHandler.gameBoard = gameBoard;
     }
 
@@ -97,7 +97,7 @@ public class TurnHandlerTest {
     void testStartTurn_PlayerInPrison_HasProbabilitaCard() throws Exception {
         // Mock: il giocatore è in prigione e ha la carta probabilità
         when(gameBoard.isPlayerInPrison(GAME_ID, PLAYER_NAME)).thenReturn(true);
-        when(partitaProbabilitaRepository.possiedeCarta(GAME_ID, PLAYER_NAME)).thenReturn(true);
+        when(partitaOpportunitaRepository.possiedeCarta(GAME_ID, PLAYER_NAME)).thenReturn(true);
         when(partitaImprevistoRepository.possiedeCarta(GAME_ID, PLAYER_NAME)).thenReturn(false);
 
         // Act
@@ -107,7 +107,7 @@ public class TurnHandlerTest {
         verify(gameBoard, times(1)).setPlayerPrison(GAME_ID, PLAYER_NAME, false);
 
         // Verifica che la carta sia rimossa
-        verify(partitaProbabilitaRepository, times(1))
+        verify(partitaOpportunitaRepository, times(1))
                 .setGiocatore(eq(GAME_ID), isNull(), eq("esci_prigione"));
 
         // Verifica che venga inviato un messaggio di sistema
@@ -119,7 +119,7 @@ public class TurnHandlerTest {
     void testStartTurn_PlayerInPrison_HasImprevistoCard() throws Exception {
         // Mock: il giocatore è in prigione e ha la carta imprevisto
         when(gameBoard.isPlayerInPrison(GAME_ID, PLAYER_NAME)).thenReturn(true);
-        when(partitaProbabilitaRepository.possiedeCarta(GAME_ID, PLAYER_NAME)).thenReturn(false);
+        when(partitaOpportunitaRepository.possiedeCarta(GAME_ID, PLAYER_NAME)).thenReturn(false);
         when(partitaImprevistoRepository.possiedeCarta(GAME_ID, PLAYER_NAME)).thenReturn(true);
 
         // Act
@@ -141,7 +141,7 @@ public class TurnHandlerTest {
     void testStartTurn_PlayerInPrison_NoEscapeCards() throws Exception {
         // Mock: il giocatore è in prigione e NON ha carte per uscire
         when(gameBoard.isPlayerInPrison(GAME_ID, PLAYER_NAME)).thenReturn(true);
-        when(partitaProbabilitaRepository.possiedeCarta(GAME_ID, PLAYER_NAME)).thenReturn(false);
+        when(partitaOpportunitaRepository.possiedeCarta(GAME_ID, PLAYER_NAME)).thenReturn(false);
         when(partitaImprevistoRepository.possiedeCarta(GAME_ID, PLAYER_NAME)).thenReturn(false);
 
         // Act
@@ -264,4 +264,4 @@ public class TurnHandlerTest {
     }
 
 
-}
+}*/

@@ -106,16 +106,34 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                 case "!EffettuaScambio":
                     property1 = objectMapper.convertValue(data.get("property1"), PlayerProperties.class);
                     property2 = objectMapper.convertValue(data.get("property2"), PlayerProperties.class);
-                    offertaMonetaria = (Integer) data.get("offertaMonetaria");
+
+                    // Gestione sicura di offertaMonetaria
+                    Object offertaMonetariaObj = data.get("offertaMonetaria");
+                    if (offertaMonetariaObj instanceof String) {
+                        offertaMonetaria = Integer.parseInt((String) offertaMonetariaObj); // Converti da stringa
+                    } else if (offertaMonetariaObj instanceof Integer) {
+                        offertaMonetaria = (Integer) offertaMonetariaObj; // Già un Integer, usa direttamente
+                    } else {
+                        throw new IllegalArgumentException("Tipo non valido per offertaMonetaria: " + offertaMonetariaObj.getClass());
+                    }
 
                     propertyHandler.effettuaScambio(property1, property2, offertaMonetaria, session);
                     break;
                 case "!RispostaScambio":
                     property1 = objectMapper.convertValue(data.get("property1"), PlayerProperties.class);
                     property2 = objectMapper.convertValue(data.get("property2"), PlayerProperties.class);
-                    offertaMonetaria = (Integer) data.get("offertaMonetaria");
-                    boolean flag = (boolean) data.get("exchangeAccepted");
 
+                    // Gestione sicura di offertaMonetaria
+                    offertaMonetariaObj = data.get("offertaMonetaria");
+                    if (offertaMonetariaObj instanceof String) {
+                        offertaMonetaria = Integer.parseInt((String) offertaMonetariaObj); // Converti da stringa
+                    } else if (offertaMonetariaObj instanceof Integer) {
+                        offertaMonetaria = (Integer) offertaMonetariaObj; // Già un Integer, usa direttamente
+                    } else {
+                        throw new IllegalArgumentException("Tipo non valido per offertaMonetaria: " + offertaMonetariaObj.getClass());
+                    }
+
+                    boolean flag = (boolean) data.get("exchangeAccepted");
                     propertyHandler.rispostaScambio(property1, property2, offertaMonetaria, flag, session);
                     break;
                 case "!CostruisciCasa":

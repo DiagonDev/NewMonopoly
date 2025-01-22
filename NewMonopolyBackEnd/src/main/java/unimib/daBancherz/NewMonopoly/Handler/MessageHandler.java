@@ -9,8 +9,7 @@ import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.IdCasella;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.Importo;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.PagaPossedimenti;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.TipoCasella;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.Imprevisto;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.Probabilita;
+import unimib.daBancherz.NewMonopoly.dataBase.Entity.Opportunita;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.*;
 import unimib.daBancherz.NewMonopoly.dataBase.Service.GameService;
 import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
@@ -25,10 +24,8 @@ public class MessageHandler {
     private final GameService gameService;
     private final PartitaCasellaPrezzoproprietaRepository pCPPRepository;
     private final GiocatoreRepository giocatoreRepository;
-    private final PartitaProbabilitaRepository partitaProbabilitaRepository;
-    private final ProbabilitaRepository probabilitaRepository;
-    private final PartitaImprevistoRepository partitaImprevistoRepository;
-    private final ImprevistoRepository imprevistoRepository;
+    private final PartitaOpportunitaRepository partitaOpportunitaRepository;
+    private final OpportunitaRepository opportunitaRepository;
 
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     private static final String CONTENT_KEY = "content";
@@ -39,15 +36,15 @@ public class MessageHandler {
     private static final String DESCRIPTION_KEY = "description";
 
     private final String esciPrigione = "esci_prigione";
+    private final String imprevisto = "Imprevisto";
+    private final String probabilita = "Probabilità";
 
-    public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, ProbabilitaRepository probabilitaRepository, PartitaImprevistoRepository partitaImprevistoRepository, ImprevistoRepository imprevistoRepository) {
+    public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, OpportunitaRepository opportunitaRepository) {
         this.gameService = gameService;
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;
-        this.partitaProbabilitaRepository = partitaProbabilitaRepository;
-        this.probabilitaRepository = probabilitaRepository;
-        this.partitaImprevistoRepository = partitaImprevistoRepository;
-        this.imprevistoRepository = imprevistoRepository;
+        this.partitaOpportunitaRepository = partitaOpportunitaRepository;
+        this.opportunitaRepository = opportunitaRepository;
     }
 
     //serve per creare un messaggio di sistema in Json così che il forntend lo metta nella game console
@@ -199,7 +196,7 @@ public class MessageHandler {
 
     //posizione => il codice della cella dove il giocatore finisce dopo il lancio dadi
     public void sendBoxUsage(String playerName, WebSocketSession session, int posizione, String gameId, Map<String, List<WebSocketSession>> gameSessions ,Integer pawnId, boolean viaPay) throws Exception{
-
+        Opportunita opportunita;
         String typeBox = pCPPRepository.findTipoByPosizione(posizione, gameId);
         String nomeCasella = pCPPRepository.findNomeCasellaByPosizioneAndGameId(posizione, gameId);
         String proprietario;
@@ -221,7 +218,7 @@ public class MessageHandler {
         }
 
         switch (typeBox){
-            case "Via":
+            case "Via", "Posteggio", "Prigione":
                 break;
             case "Tassa":
                 giocatoreRepository.setSaldoGiocatore(playerName, gameId, 200);
@@ -268,10 +265,10 @@ public class MessageHandler {
                 gameBoard.setPlayerPrison(gameId, playerName, true);
                 break;
             case"Imprevisto":
-                descrizione = partitaImprevistoRepository.findDescrizioneImprevisto(gameId);
+                descrizione = partitaOpportunitaRepository.findDescrizione(gameId, imprevisto);
                 if (descrizione==null) {
-                    partitaImprevistoRepository.setUtilizzatoFalse(gameId);
-                    descrizione = partitaImprevistoRepository.findDescrizioneImprevisto(gameId);
+                    partitaOpportunitaRepository.setUtilizzatoFalse(gameId, imprevisto);
+                    descrizione = partitaOpportunitaRepository.findDescrizione(gameId, imprevisto);
                 }
 
                 String imprevistoMessage = new ObjectMapper().writeValueAsString(Map.of(
@@ -281,17 +278,17 @@ public class MessageHandler {
                 ));
                 session.sendMessage(new TextMessage(imprevistoMessage));
 
-                Imprevisto imprevisto = imprevistoRepository.findByDescrizione(descrizione);
-                tipoAzione = imprevisto.getTipoAzione();
-                parametri = imprevisto.getParametroDeserializzato();
+                opportunita = opportunitaRepository.findByDescrizioneAndTipo(descrizione, imprevisto);
+                tipoAzione = opportunita.getTipoAzione();
+                parametri = opportunita.getParametroDeserializzato();
                 gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, typeBox,session);
-                partitaImprevistoRepository.setUtilizzatoTrue(gameId, descrizione);
+                partitaOpportunitaRepository.setUtilizzatoTrue(gameId, descrizione, imprevisto);
                 break;
             case"Probabilità":
-                descrizione = partitaProbabilitaRepository.findDescrizioneProbabilita(gameId);
+                descrizione = partitaOpportunitaRepository.findDescrizione(gameId, probabilita);
                 if (descrizione==null) {
-                    partitaProbabilitaRepository.setUtilizzatoFalse(gameId);
-                    descrizione = partitaProbabilitaRepository.findDescrizioneProbabilita(gameId);
+                    partitaOpportunitaRepository.setUtilizzatoFalse(gameId, probabilita);
+                    descrizione = partitaOpportunitaRepository.findDescrizione(gameId, probabilita);
                 }
 
                 String probabilitaMessage = new ObjectMapper().writeValueAsString(Map.of(
@@ -301,12 +298,12 @@ public class MessageHandler {
                 ));
                 session.sendMessage(new TextMessage(probabilitaMessage));
 
-                Probabilita probabilita = probabilitaRepository.findByDescrizione(descrizione);
-                tipoAzione = probabilita.getTipoAzione();
-                parametri = probabilita.getParametroDeserializzato();
+                opportunita = opportunitaRepository.findByDescrizioneAndTipo(descrizione, probabilita);
+                tipoAzione = opportunita.getTipoAzione();
+                parametri = opportunita.getParametroDeserializzato();
 
                 gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, typeBox, session);
-                partitaProbabilitaRepository.setUtilizzatoTrue(gameId, descrizione);
+                partitaOpportunitaRepository.setUtilizzatoTrue(gameId, descrizione, probabilita);
                 break;
             default:
                 throw new IllegalArgumentException("Tipo di messaggio non supportato: " + typeBox);
@@ -343,7 +340,7 @@ public class MessageHandler {
 
     private void gestisciImporto(Object parametri, String idPartita, String nomeGiocatore, Map<String, List<WebSocketSession>> gameSessions) throws IOException {
         Importo importoDeserializzato = (Importo) parametri;
-        int importo = importoDeserializzato.getImportoSoldi();
+        int importo = importoDeserializzato.getImporto();
 
         giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, importo);
         updateBalance(gameSessions, idPartita, nomeGiocatore);
@@ -351,7 +348,7 @@ public class MessageHandler {
 
     private void gestisciPagamentoGiocatori(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Map<String, List<WebSocketSession>> gameSessions) throws IOException {
         Importo importoDeserializzato = (Importo) parametri;
-        int importo = importoDeserializzato.getImportoSoldi();
+        int importo = importoDeserializzato.getImporto();
         int soldi = (giocatoreRepository.contaGiocatoriInPartita(idPartita) - 1) * importo;
 
         if (tipoAzione.equals("paga_importo_giocatore")) {
@@ -414,9 +411,9 @@ public class MessageHandler {
 
     private void gestisciUscitaPrigione(String idPartita, String nomeGiocatore, String typeBox) {
         if (typeBox.equals("Probabilità")) {
-            partitaProbabilitaRepository.setGiocatore(idPartita, nomeGiocatore, esciPrigione);
+            partitaOpportunitaRepository.setGiocatore(idPartita, nomeGiocatore, esciPrigione, probabilita);
         } else {
-            partitaImprevistoRepository.setGiocatore(idPartita, nomeGiocatore, esciPrigione);
+            partitaOpportunitaRepository.setGiocatore(idPartita, nomeGiocatore, esciPrigione,imprevisto);
         }
     }
 

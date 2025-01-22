@@ -368,6 +368,7 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     """, nativeQuery = true)
     Integer findNextCasellaByTipo(@Param("tipoCasella") String tipoCasella, @Param("posizioneCorrente") Integer posizioneCorrente, @Param("idPartita") String idPartita);
 
+    @Transactional
     @Modifying
     @Query(value = """
         UPDATE partita_casella_prezzoproprieta pcp

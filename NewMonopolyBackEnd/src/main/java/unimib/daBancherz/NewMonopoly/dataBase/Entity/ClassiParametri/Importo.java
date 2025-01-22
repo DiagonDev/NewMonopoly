@@ -1,13 +1,13 @@
 package unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri;
 
 public class Importo {
-    Integer importoSoldi;
+    Integer importo;
 
-    public Integer getImportoSoldi() {
-        return importoSoldi;
+    public Integer getImporto() {
+        return importo;
     }
 
-    public void setImportoSoldi(Integer importoSoldi) {
-        this.importoSoldi = importoSoldi;
+    public void setImporto(Integer importo) {
+        this.importo = importo;
     }
 }

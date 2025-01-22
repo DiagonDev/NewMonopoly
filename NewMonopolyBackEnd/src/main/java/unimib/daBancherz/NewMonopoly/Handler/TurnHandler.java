@@ -6,8 +6,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
-import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaImprevistoRepository;
-import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaProbabilitaRepository;
+import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaOpportunitaRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -19,16 +18,17 @@ public class TurnHandler {
     private final GameHandler gameHandler;
     private final MessageHandler messageHandler;
     private final GiocatoreRepository giocatoreRepository;
-    private final PartitaProbabilitaRepository partitaProbabilitaRepository;
-    private final PartitaImprevistoRepository partitaImprevistoRepository;
+    private final PartitaOpportunitaRepository partitaOpportunitaRepository;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     private final String exitPrison = "exitPrison";
-    public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, PartitaImprevistoRepository partitaImprevistoRepository) {
+    private final String imprevisto = "Imprevisto";
+    private final String probabilita = "Probabilità";
+
+    public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository) {
         this.gameHandler = gameHandler;
         this.messageHandler = messageHandler;
         this.giocatoreRepository = giocatoreRepository;
-        this.partitaProbabilitaRepository = partitaProbabilitaRepository;
-        this.partitaImprevistoRepository = partitaImprevistoRepository;
+        this.partitaOpportunitaRepository = partitaOpportunitaRepository;
     }
 
     public void startTurn( WebSocketSession session ) throws Exception {
@@ -61,15 +61,15 @@ public class TurnHandler {
         }
 
         if(isInPrison){
-            boolean possiedeProbabilita = partitaProbabilitaRepository.possiedeCarta(gameId, playerName);
-            boolean possiedeImprevisto = partitaImprevistoRepository.possiedeCarta(gameId, playerName);
+            boolean possiedeProbabilita = partitaOpportunitaRepository.possiedeCarta(gameId, playerName,probabilita);
+            boolean possiedeImprevisto = partitaOpportunitaRepository.possiedeCarta(gameId, playerName,imprevisto);
             if(possiedeProbabilita){
                 gameBoard.setPlayerPrison(gameId, playerName, false);
-                partitaProbabilitaRepository.setGiocatore(gameId, null, "esci_prigione");
+                partitaOpportunitaRepository.setGiocatore(gameId, null, "esci_prigione", probabilita);
                 messageHandler.sendSystemMessage(gameId, playerName + " è uscito di prigione", gameHandler.getGameSessions(), session);
             } else if(possiedeImprevisto){
                 gameBoard.setPlayerPrison(gameId, playerName, false);
-                partitaImprevistoRepository.setGiocatore(gameId, null, "esci_prigione");
+                partitaOpportunitaRepository.setGiocatore(gameId, null, "esci_prigione", imprevisto);
                 messageHandler.sendSystemMessage(gameId, playerName + " è uscito di prigione", gameHandler.getGameSessions(), session);
             }else {
                 String prisonMessage = new ObjectMapper().writeValueAsString(Map.of(

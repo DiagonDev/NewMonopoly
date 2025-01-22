@@ -1,19 +1,19 @@
 package unimib.daBancherz.NewMonopoly.dataBase.Entity;
 
 import jakarta.persistence.*;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.IdClass.Partita_ProbabilitaId;
+import unimib.daBancherz.NewMonopoly.dataBase.Entity.IdClass.Partita_OpportunitaId;
 
 @Entity
-@IdClass(Partita_ProbabilitaId.class) // Definisce la chiave primaria composta
-public class Partita_Probabilita {
+@IdClass(Partita_OpportunitaId.class) // Definisce la chiave primaria composta
+public class Partita_Opportunita {
     @Id
     @ManyToOne
     @JoinColumn(name = "idpartita")
     private Partita idpartita;
 
     @Id @ManyToOne
-    @JoinColumn(name = "idprobabilita")
-    private Probabilita idprobabilita;
+    @JoinColumn(name = "idopportunita")
+    private Opportunita idopportunita;
 
     @OneToOne
     @JoinColumn(name = "idgiocatore")
@@ -29,12 +29,12 @@ public class Partita_Probabilita {
         this.idpartita = idpartita;
     }
 
-    public Probabilita getIdprobabilita() {
-        return idprobabilita;
+    public Opportunita getIdopportunita() {
+        return idopportunita;
     }
 
-    public void setIdprobabilita(Probabilita idprobabilita) {
-        this.idprobabilita = idprobabilita;
+    public void setIdopportunita(Opportunita idopportunita) {
+        this.idopportunita = idopportunita;
     }
 
     public Giocatore getIdgiocatore() {

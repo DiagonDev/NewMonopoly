@@ -15,10 +15,8 @@ public class GameService {
     private final PartitaRepository partitaRepository;
     private final GiocatoreRepository giocatoreRepository;
     private final PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository;
-    private final ProbabilitaRepository probabilitaRepository;
-    private final PartitaProbabilitaRepository partitaProbabilitaRepository;
-    private final ImprevistoRepository imprevistoRepository;
-    private final PartitaImprevistoRepository partitaImprevistoRepository;
+    private final OpportunitaRepository opportunitaRepository;
+    private final PartitaOpportunitaRepository partitaOpportunitaRepository;
     private final PedinaRepository pedinaRepository;
     private final RegolafedeltaRepository regolafedeltaRepository;
     private final PartitaRegolafedeltaRepository partitaRegolafedeltaRepository;
@@ -26,14 +24,12 @@ public class GameService {
     private final String errorePartita = "Partita non trovata";
 
     @Autowired
-    public GameService(PartitaRepository partitaRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository, ProbabilitaRepository probabilitaRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, ImprevistoRepository imprevistoRepository, PartitaImprevistoRepository partitaImprevistoRepository, PedinaRepository pedinaRepository, RegolafedeltaRepository regolafedeltaRepository, PartitaRegolafedeltaRepository partitaRegolafedeltaRepository) {
+    public GameService(PartitaRepository partitaRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository, OpportunitaRepository opportunitaRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, PedinaRepository pedinaRepository, RegolafedeltaRepository regolafedeltaRepository, PartitaRegolafedeltaRepository partitaRegolafedeltaRepository) {
         this.partitaRepository = partitaRepository;
         this.giocatoreRepository = giocatoreRepository;
         this.partitaCasellaPrezzoproprietaRepository = partitaCasellaPrezzoproprietaRepository;
-        this.probabilitaRepository = probabilitaRepository;
-        this.partitaProbabilitaRepository = partitaProbabilitaRepository;
-        this.imprevistoRepository = imprevistoRepository;
-        this.partitaImprevistoRepository = partitaImprevistoRepository;
+        this.opportunitaRepository = opportunitaRepository;
+        this.partitaOpportunitaRepository = partitaOpportunitaRepository;
         this.pedinaRepository = pedinaRepository;
         this.regolafedeltaRepository = regolafedeltaRepository;
         this.partitaRegolafedeltaRepository = partitaRegolafedeltaRepository;
@@ -64,8 +60,7 @@ public class GameService {
         nuovoGiocatore.setPuntiFedelta(0);
         giocatoreRepository.save(nuovoGiocatore);   // Salva il giocatore nel database
 
-        populateGameUnexpected(gameId);     //popola imprevisto
-        populateGameProbability(gameId);    //popola probabilita
+        populateGameOpportunity(gameId);    //popola probabilita e imprevisto
         populateGameRoule(gameId);     //popola regolafedelta
     }
 
@@ -85,36 +80,20 @@ public class GameService {
         giocatoreRepository.save(nuovoGiocatore);
     }
 
-    public void populateGameProbability(String gameId) {
+    public void populateGameOpportunity(String gameId) {
         // Recupera tutte le probabilità
-        List<Probabilita> listaProbabilita = probabilitaRepository.findAll();
+        List<Opportunita> listaOpportunita = opportunitaRepository.findAll();
         Partita partita = partitaRepository.findById(gameId)
                 .orElseThrow(() -> new RuntimeException(errorePartita));
 
         // Per ogni probabilità, crea un nuovo record in Partita_Probabilita
-        for (Probabilita probabilita : listaProbabilita) {
-            Partita_Probabilita partitaProbabilita = new Partita_Probabilita();
-            partitaProbabilita.setIdpartita(partita);
-            partitaProbabilita.setIdprobabilita(probabilita);
-            partitaProbabilita.setUtilizzato(false);  // Impostiamo "utilizzato" a false
-            partitaProbabilita.setIdgiocatore(null);  // Impostiamo "idgiocatore" a null
-            partitaProbabilitaRepository.save(partitaProbabilita);
-        }
-    }
-
-    public void populateGameUnexpected(String gameId) {
-        // Recupera tutte gli imprevisti
-        List<Imprevisto> listaImprevisti = imprevistoRepository.findAll();
-        Partita partita = partitaRepository.findById(gameId)
-                .orElseThrow(() -> new RuntimeException(errorePartita));
-
-        for (Imprevisto imprevisto : listaImprevisti) {
-            Partita_Imprevisto partitaImprevisto = new Partita_Imprevisto();
-            partitaImprevisto.setIdpartita(partita);
-            partitaImprevisto.setIdimprevisto(imprevisto);
-            partitaImprevisto.setUtilizzato(false);  // Impostiamo "utilizzato" a false
-            partitaImprevisto.setIdgiocatore(null);  // Impostiamo "idgiocatore" a null
-            partitaImprevistoRepository.save(partitaImprevisto);
+        for (Opportunita opportunita : listaOpportunita) {
+            Partita_Opportunita partitaOpportunita = new Partita_Opportunita();
+            partitaOpportunita.setIdpartita(partita);
+            partitaOpportunita.setIdopportunita(opportunita);
+            partitaOpportunita.setUtilizzato(false);  // Impostiamo "utilizzato" a false
+            partitaOpportunita.setIdgiocatore(null);  // Impostiamo "idgiocatore" a null
+            partitaOpportunitaRepository.save(partitaOpportunita);
         }
     }
 

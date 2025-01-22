@@ -1,16 +1,31 @@
 package unimib.daBancherz.NewMonopoly.dataBase.Entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.*;
+import jakarta.persistence.*;
+import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.IdCasella;
+import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.Importo;
+import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.PagaPossedimenti;
+import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.TipoCasella;
 
-@MappedSuperclass
-public abstract class Azione {
+@Entity
+public class Opportunita {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_probabilita")
+    private Integer idProbabilita;
     private String descrizione;
     @Column(name = "tipo_azione")
     private String tipoAzione;
     private String parametro;
+    private String tipo;
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
 
     public String getDescrizione() {
         return descrizione;
@@ -44,15 +59,28 @@ public abstract class Azione {
                 return null;
 
             case "vai_in_prigione", "sposta_avanti":
-                return objectMapper.readValue(parametro, IdCasella.class);
+                if (parametro.contains("id_casella")) {
+                    return objectMapper.readValue(parametro, IdCasella.class);  // Id Casella
+                } else if (parametro.contains("tipo_casella")) {
+                    return objectMapper.readValue(parametro, TipoCasella.class);  // Tipo Casella
+                }
 
             case "paga_possedimenti":
                 return objectMapper.readValue(parametro, PagaPossedimenti.class);
 
-            case "ricevi_importo", "ricevi_importo_giocatore", "paga_importo":
+            case "ricevi_importo", "ricevi_importo_giocatore", "paga_importo_giocatore", "paga_importo":
                 return objectMapper.readValue(parametro, Importo.class);
+
             default:
                 throw new IllegalArgumentException("Tipo azione non riconosciuto: " + tipoAzione);
         }
+    }
+
+    public Integer getIdProbabilita() {
+        return idProbabilita;
+    }
+
+    public void setIdProbabilita(Integer idProbabilita) {
+        this.idProbabilita = idProbabilita;
     }
 }
