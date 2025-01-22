@@ -27,8 +27,13 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+     # Build con Maven specificando il percorso del pom.xml
     - name: Build with Maven
-      run: mvn -B package --file NewMonopolyBackEnd/pom.xml
+      run: mvn -B -f NewMonopolyBackEnd/pom.xml clean package
+
+    # Generazione del grafo delle dipendenze (opzionale)
+    - name: Generate dependency graph
+      run: mvn -B -f NewMonopolyBackEnd/pom.xml com.github.ferstl:depgraph-maven-plugin:4.0.1:graph -DgraphFormat=json
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
