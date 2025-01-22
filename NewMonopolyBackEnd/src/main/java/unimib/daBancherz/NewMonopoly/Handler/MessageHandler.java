@@ -37,6 +37,7 @@ public class MessageHandler {
     private static final String THREADINTERRIPT_KEY = "Thread interrotto: ";
     private static final String DESCRIPTION_KEY = "description";
 
+    private final String esciPrigione = "esci_prigione";
 
     public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, ProbabilitaRepository probabilitaRepository, PartitaImprevistoRepository partitaImprevistoRepository, ImprevistoRepository imprevistoRepository) {
         this.gameService = gameService;
@@ -99,7 +100,7 @@ public class MessageHandler {
         }
     }
 
-    public void sendJoinMessage(String playerName, Map<String, List<WebSocketSession>> gameSessions, String role, String gameId, WebSocketSession session) throws IOException {
+    public void sendJoinMessage(String playerName, Map<String, List<WebSocketSession>> gameSessions, String role, String gameId) throws IOException {
 
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
 
@@ -154,7 +155,7 @@ public class MessageHandler {
         sendSystemMessage(gameId, "Ti sei unito alla partita con ID: " + gameId + " con successo!", gameSessions, session);
         sendSystemMessage(gameId, playerName + " si è unito alla partita!", gameSessions, session);
         sendPlayerAndBalance(gameId, playerName, session);
-        sendJoinMessage(playerName, gameSessions, role, gameId, session);
+        sendJoinMessage(playerName, gameSessions, role, gameId);
 
     }
 
@@ -204,7 +205,7 @@ public class MessageHandler {
         String descrizione;
         String tipoAzione;
         Object parametri;
-        int prezzoCasella, prezzoAffitto, prezzoCasellaVia, nStazione, nSocietà;
+        int prezzoCasella, prezzoAffitto;
 
         String nameBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
                 TYPE_KEY, "nameBox",
@@ -315,7 +316,7 @@ public class MessageHandler {
     public void gestisciAzione(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Integer posizione, int pawnId, Map<String, List<WebSocketSession>> gameSessions, String typeBox, WebSocketSession session) throws Exception {
         switch (tipoAzione) {
             case "ricevi_importo", "paga_importo":
-                gestisciImporto(tipoAzione, parametri, idPartita, nomeGiocatore, gameSessions);
+                gestisciImporto(parametri, idPartita, nomeGiocatore, gameSessions);
                 break;
             case "paga_importo_giocatore", "ricevi_importo_giocatore":
                 gestisciPagamentoGiocatori(tipoAzione, parametri, idPartita, nomeGiocatore, gameSessions);
@@ -329,7 +330,7 @@ public class MessageHandler {
             case "vai_in_prigione":
                 gestisciPrigione(parametri, idPartita, nomeGiocatore, pawnId, gameSessions);
                 break;
-            case "esci_prigione":
+            case esciPrigione:
                 gestisciUscitaPrigione(idPartita, nomeGiocatore, typeBox);
                 break;
             default:
@@ -337,7 +338,7 @@ public class MessageHandler {
         }
     }
 
-    private void gestisciImporto(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Map<String, List<WebSocketSession>> gameSessions) throws IOException {
+    private void gestisciImporto(Object parametri, String idPartita, String nomeGiocatore, Map<String, List<WebSocketSession>> gameSessions) throws IOException {
         Importo importoDeserializzato = (Importo) parametri;
         int importo = importoDeserializzato.getImporto();
 
@@ -410,9 +411,9 @@ public class MessageHandler {
 
     private void gestisciUscitaPrigione(String idPartita, String nomeGiocatore, String typeBox) {
         if (typeBox.equals("Probabilità")) {
-            partitaProbabilitaRepository.setGiocatore(idPartita, nomeGiocatore, "esci_prigione");
+            partitaProbabilitaRepository.setGiocatore(idPartita, nomeGiocatore, esciPrigione);
         } else {
-            partitaImprevistoRepository.setGiocatore(idPartita, nomeGiocatore, "esci_prigione");
+            partitaImprevistoRepository.setGiocatore(idPartita, nomeGiocatore, esciPrigione);
         }
     }
 

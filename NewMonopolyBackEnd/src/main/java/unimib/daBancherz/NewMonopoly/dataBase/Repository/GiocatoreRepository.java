@@ -51,10 +51,10 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
     @Transactional
     @Query(value = """
         UPDATE giocatore
-                SET saldo = saldo - :soldi
+            SET saldo = saldo - :soldi
                 WHERE nome = :nomeGiocatore
-        		AND idpartita= :idPartita
-    """, nativeQuery = true)
+                      AND idpartita= :idPartita
+        """, nativeQuery = true)
     void setSaldoGiocatore(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("soldi") Integer soldi);
 
     @Modifying
@@ -68,8 +68,8 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
     void pagaImportoGiocatori(@Param("importo") Integer importo, @Param("idPartita") String idPartita, @Param("nomeGiocatoreEscluso") String nomeGiocatoreEscluso);
 
     @Query(value = """
-        SELECT COUNT(*) 
-        FROM giocatore 
+        SELECT COUNT(*)
+        FROM giocatore
         WHERE idpartita = :idPartita
     """, nativeQuery = true)
     Integer contaGiocatoriInPartita(@Param("idPartita") String idPartita);

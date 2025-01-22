@@ -22,7 +22,7 @@ public class TurnHandler {
     private final PartitaProbabilitaRepository partitaProbabilitaRepository;
     private final PartitaImprevistoRepository partitaImprevistoRepository;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
-
+    private final String exitPrison = "exitPrison";
     public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, PartitaImprevistoRepository partitaImprevistoRepository) {
         this.gameHandler = gameHandler;
         this.messageHandler = messageHandler;
@@ -64,7 +64,7 @@ public class TurnHandler {
             boolean possiedeProbabilita = partitaProbabilitaRepository.possiedeCarta(gameId, playerName);
             boolean possiedeImprevisto = partitaImprevistoRepository.possiedeCarta(gameId, playerName);
             if(possiedeProbabilita){
-                gameBoard.setPlayerPrison(gameId, playerName, false);;
+                gameBoard.setPlayerPrison(gameId, playerName, false);
                 partitaProbabilitaRepository.setGiocatore(gameId, null, "esci_prigione");
                 messageHandler.sendSystemMessage(gameId, playerName + " è uscito di prigione", gameHandler.getGameSessions(), session);
             } else if(possiedeImprevisto){
@@ -109,7 +109,7 @@ public class TurnHandler {
             gameBoard.setPlayerPrison(gameId, playerName, false);
             gameBoard.setPlayerCountRoll(gameId, playerName, 0);
             String exitPrisonMessage = new ObjectMapper().writeValueAsString(Map.of(
-                    "type", "exitPrison",
+                    "type", exitPrison,
                     "flag", true
             ));
             session.sendMessage(new TextMessage(exitPrisonMessage));
@@ -125,7 +125,7 @@ public class TurnHandler {
         gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, 0);
         if(giocatoreRepository.saldoGiocatore(playerName, gameId) < 50) {
             String exitPrisonMessage = new ObjectMapper().writeValueAsString(Map.of(
-                    "type", "exitPrison",
+                    "type", exitPrison,
                     "flag", false
             ));
             session.sendMessage(new TextMessage(exitPrisonMessage));
@@ -135,7 +135,7 @@ public class TurnHandler {
             messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
             gameBoard.setPlayerCountRoll(gameId, playerName, 0);
             String exitPrisonMessage = new ObjectMapper().writeValueAsString(Map.of(
-                    "type", "exitPrison",
+                    "type", exitPrison,
                     "flag", true
             ));
             session.sendMessage(new TextMessage(exitPrisonMessage));

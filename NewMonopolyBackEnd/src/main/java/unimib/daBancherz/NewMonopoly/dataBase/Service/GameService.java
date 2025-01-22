@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.*;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.Importo;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.*;
 
 import java.util.Collections;
@@ -24,8 +23,10 @@ public class GameService {
     private final RegolafedeltaRepository regolafedeltaRepository;
     private final PartitaRegolafedeltaRepository partitaRegolafedeltaRepository;
 
+    private final String errorePartita = "Partita non trovata";
+
     @Autowired
-    public GameService(PartitaRepository partitaRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository, CasellaRepository casellaRepository, ProbabilitaRepository probabilitaRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, ImprevistoRepository imprevistoRepository, PartitaImprevistoRepository partitaImprevistoRepository, PedinaRepository pedinaRepository, RegolafedeltaRepository regolafedeltaRepository, PartitaRegolafedeltaRepository partitaRegolafedeltaRepository) {
+    public GameService(PartitaRepository partitaRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository, ProbabilitaRepository probabilitaRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, ImprevistoRepository imprevistoRepository, PartitaImprevistoRepository partitaImprevistoRepository, PedinaRepository pedinaRepository, RegolafedeltaRepository regolafedeltaRepository, PartitaRegolafedeltaRepository partitaRegolafedeltaRepository) {
         this.partitaRepository = partitaRepository;
         this.giocatoreRepository = giocatoreRepository;
         this.partitaCasellaPrezzoproprietaRepository = partitaCasellaPrezzoproprietaRepository;
@@ -44,10 +45,7 @@ public class GameService {
         Partita nuovaPartita = new Partita();
         nuovaPartita.setLivelloDifficolta(difficulty);
         nuovaPartita.setStato("nonIniziata");
-        if (randomization.equals("true"))
-            nuovaPartita.setRandomizzazione(true);
-        else
-            nuovaPartita.setRandomizzazione(false);
+        nuovaPartita.setRandomizzazione(randomization.equals("true"));
         nuovaPartita.setCodiceInvito(gameId);
         partitaRepository.save(nuovaPartita);       // Salva la partita nel database
 
@@ -91,7 +89,7 @@ public class GameService {
         // Recupera tutte le probabilità
         List<Probabilita> listaProbabilita = probabilitaRepository.findAll();
         Partita partita = partitaRepository.findById(gameId)
-                .orElseThrow(() -> new RuntimeException("Partita non trovata"));
+                .orElseThrow(() -> new RuntimeException(errorePartita));
 
         // Per ogni probabilità, crea un nuovo record in Partita_Probabilita
         for (Probabilita probabilita : listaProbabilita) {
@@ -108,7 +106,7 @@ public class GameService {
         // Recupera tutte gli imprevisti
         List<Imprevisto> listaImprevisti = imprevistoRepository.findAll();
         Partita partita = partitaRepository.findById(gameId)
-                .orElseThrow(() -> new RuntimeException("Partita non trovata"));
+                .orElseThrow(() -> new RuntimeException(errorePartita));
 
         for (Imprevisto imprevisto : listaImprevisti) {
             Partita_Imprevisto partitaImprevisto = new Partita_Imprevisto();
@@ -125,7 +123,7 @@ public class GameService {
         // Recupera tutte gli imprevisti
         List<Regolafedelta> listaRegole = regolafedeltaRepository.findAll();
         Partita partita = partitaRepository.findById(gameId)
-                .orElseThrow(() -> new RuntimeException("Partita non trovata"));
+                .orElseThrow(() -> new RuntimeException(errorePartita));
 
         for (Regolafedelta regolafedelta : listaRegole) {
             Partita_Regolafedelta partitaRegolafedelta = new Partita_Regolafedelta();
@@ -138,15 +136,13 @@ public class GameService {
 
 
     @Transactional
-    public boolean deletePlayer(String gameId, String nomeGiocatore) {
+    public void deletePlayer(String gameId, String nomeGiocatore) {
         Integer idGiocatore = giocatoreRepository.findIdByNomeAndPartitaCodiceInvito(nomeGiocatore, gameId);
 
         if (idGiocatore != null) {
             giocatoreRepository.deleteByIdGiocatore(idGiocatore);
-            return true; // Operazione riuscita
         }
 
-        return false; // Il giocatore non esisteva
     }
     public List<Integer> getUnusedPedineByPartita(String gameId) {
         return pedinaRepository.findUnusedPedineByPartita(gameId);
