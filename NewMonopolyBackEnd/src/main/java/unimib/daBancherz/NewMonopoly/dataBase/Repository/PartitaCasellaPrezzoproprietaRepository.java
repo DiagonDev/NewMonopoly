@@ -263,7 +263,7 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
         WHERE pcp.idcasella = (SELECT c.id_casella FROM Casella c WHERE c.nome = :nomeCasella)
         AND pcp.idpartita = :gameId
     """, nativeQuery = true)
-    void setGiocatore(@Param("playerName") String playerName, @Param("gameId") String gameId, @Param("nomeCasella") String nomeCasella);
+    void setProprietario(@Param("playerName") String playerName, @Param("gameId") String gameId, @Param("nomeCasella") String nomeCasella);
 
     // Metodo per trovare il costo di acquisto di una proprieta
     @Query(value = """

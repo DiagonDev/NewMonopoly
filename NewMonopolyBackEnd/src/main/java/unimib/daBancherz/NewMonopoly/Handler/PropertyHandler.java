@@ -1,6 +1,5 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -40,8 +39,8 @@ public class PropertyHandler {
         int prezzoCasella = pCPPRepository.prezzoCasella2(messageParts[1], gameId);
         int saldoGiocatore = giocatoreRepository.saldoGiocatore(playerName, gameId);
         if(saldoGiocatore > prezzoCasella){
-            pCPPRepository.setGiocatore(playerName, gameId, messageParts[1]);
-            giocatoreRepository.aggiornamentoSaldo(playerName, gameId, prezzoCasella);
+            pCPPRepository.setProprietario(playerName, gameId, messageParts[1]);
+            giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzoCasella);
             messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
             String proprietaMessage = new ObjectMapper().writeValueAsString(Map.of(
                     "type", "acquistoRiuscito"
@@ -84,7 +83,7 @@ public class PropertyHandler {
         int saldoGiocatore = giocatoreRepository.saldoGiocatore(nomeGiocatore, gameId);
         int countColore = casellaRepository.countByColore(coloreCasella);
         if(numCase<5 && saldoGiocatore > (casine * countColore* costoCasa)){
-            giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, gameId, (casine * countColore * costoCasa));
+            giocatoreRepository.setSaldoGiocatore(nomeGiocatore, gameId, (casine * countColore * costoCasa));
             pCPPRepository.aggiungiCase(coloreCasella, casine);
             // Messaggio aggiornamento
         } else {
@@ -114,8 +113,8 @@ public class PropertyHandler {
         Integer prezzo = property.getPrezzoCorrente()/2;
         Integer posizione = pCPPRepository.findPosizioneByNomeCasellaAndIdpartita(nomeCasella, gameId);
         pCPPRepository.setPrezzoCorrente(prezzo, gameId, posizione);
-        giocatoreRepository.aggiornamentoSaldo(nomeGiocatore, gameId, - (prezzo) );
-        pCPPRepository.setGiocatore(null, gameId, nomeCasella);
+        giocatoreRepository.setSaldoGiocatore(nomeGiocatore, gameId, - (prezzo) );
+        pCPPRepository.setProprietario(null, gameId, nomeCasella);
         messageHandler.rispostaAggiornaProprieta(gameId, nomeGiocatore, session);   //Messaggio al frontend
     }
 
@@ -135,7 +134,7 @@ public class PropertyHandler {
             if(offertaMonetaria>0){
                 soldi = giocatoreRepository.saldoGiocatore(nomeRichiedente, gameId);
                 if (soldi>offertaMonetaria)
-                    giocatoreRepository.aggiornamentoSaldo(nomeRichiedente, gameId, offertaMonetaria);
+                    giocatoreRepository.setSaldoGiocatore(nomeRichiedente, gameId, offertaMonetaria);
                 else {
                     // Messaggio per dire che sei povero
                     return;
@@ -144,14 +143,14 @@ public class PropertyHandler {
                 offertaMonetaria = - offertaMonetaria;
                 soldi = giocatoreRepository.saldoGiocatore(nomeProprietario, gameId);
                 if (soldi>offertaMonetaria)
-                    giocatoreRepository.aggiornamentoSaldo(nomeProprietario, gameId, offertaMonetaria);
+                    giocatoreRepository.setSaldoGiocatore(nomeProprietario, gameId, offertaMonetaria);
                 else {
                     // Messaggio per dire che sei povero
                     return;
                 }
             }
-            pCPPRepository.setGiocatore(nomeRichiedente, gameId, nomeCasella2);
-            pCPPRepository.setGiocatore(nomeProprietario, gameId, nomeCasella1);
+            pCPPRepository.setProprietario(nomeRichiedente, gameId, nomeCasella2);
+            pCPPRepository.setProprietario(nomeProprietario, gameId, nomeCasella1);
 
             messageHandler.rispostaGestisciProprieta("Scambio accettato", session);
         } else {

@@ -1,9 +1,7 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
@@ -24,7 +22,6 @@ public class TurnHandler {
     private final PartitaProbabilitaRepository partitaProbabilitaRepository;
     private final PartitaImprevistoRepository partitaImprevistoRepository;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
-    int counterRollDice = 0;
 
     public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, PartitaImprevistoRepository partitaImprevistoRepository) {
         this.gameHandler = gameHandler;
@@ -100,9 +97,102 @@ public class TurnHandler {
         startTurn(nextPlayer);
     }
 
-    public void rollDice(WebSocketSession session) throws Exception {
-        int diceR1 = ThreadLocalRandom.current().nextInt(1, 7);  // Valore da 1 a 6 per il primo dado
-        int diceR2 = ThreadLocalRandom.current().nextInt(1, 7);  // Valore da 1 a 6 per il secondo dado
+    public boolean lasciaPrigione( WebSocketSession session, int[] diceResults) throws Exception {
+        String gameId = gameHandler.getGameIdBySession(session);
+        String playerName = gameHandler.getPlayerNameBySession(session);
+        int countRoll = gameBoard.getPlayerCountRoll(gameId, playerName);
+        gameBoard.setPlayerCountRoll(gameId, playerName, countRoll + 1);
+        int diceR1 = diceResults[0];
+        int diceR2 = diceResults[1];
+
+        if (gameBoard.getPlayerCountRoll(gameId, playerName) == 4 || diceR1 == diceR2) {
+            gameBoard.setPlayerPrison(gameId, playerName, false);
+            gameBoard.setPlayerCountRoll(gameId, playerName, 0);
+            String exitPrisonMessage = new ObjectMapper().writeValueAsString(Map.of(
+                    "type", "exitPrison",
+                    "flag", true
+            ));
+            session.sendMessage(new TextMessage(exitPrisonMessage));
+            return true;
+        }
+        return false;
+    }
+
+    public void payPrisonExit(WebSocketSession session) throws Exception {
+        String gameId = gameHandler.getGameIdBySession(session);
+        String playerName = gameHandler.getPlayerNameBySession(session);
+        //non sono sicuro, caso in cui tiri il dado doppio ma finisci sulla casella in prigione, serve a far si che si azzeri il cunt del tuo tiro dado doppio
+        gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, 0);
+        if(giocatoreRepository.saldoGiocatore(playerName, gameId) < 50) {
+            String exitPrisonMessage = new ObjectMapper().writeValueAsString(Map.of(
+                    "type", "exitPrison",
+                    "flag", false
+            ));
+            session.sendMessage(new TextMessage(exitPrisonMessage));
+        }else {
+            gameBoard.setPlayerPrison(gameId, playerName, false);
+            giocatoreRepository.setSaldoGiocatore(playerName, gameId, 50);
+            messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
+            gameBoard.setPlayerCountRoll(gameId, playerName, 0);
+            String exitPrisonMessage = new ObjectMapper().writeValueAsString(Map.of(
+                    "type", "exitPrison",
+                    "flag", true
+            ));
+            session.sendMessage(new TextMessage(exitPrisonMessage));
+        }
+    }
+
+    public void spostaPedina(WebSocketSession session ) throws Exception {
+        String gameId = gameHandler.getGameIdBySession(session);
+        String playerName = gameHandler.getPlayerNameBySession(session);
+        boolean isInPrison = gameBoard.isPlayerInPrison(gameId, playerName);
+        int countRollDoubleDice = gameBoard.getPlayerCountRollDoubleDice(gameId, playerName);
+        int pawnId = giocatoreRepository.findPedinaFromGiocatore(playerName, gameId);
+        boolean viaPay = false;
+        int newPosition;
+        int playerPosition = gameBoard.getPlayerPosition(gameId, playerName);
+        int[] diceResults = rollDice(session);
+        int diceR1 = diceResults[0];
+        int diceR2 = diceResults[1];
+        int totDice = diceR1 + diceR2;
+
+        if(isInPrison){
+            isInPrison = !lasciaPrigione(session, diceResults);
+        }
+
+        if(!isInPrison){
+            if(diceR1 == diceR2) gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, ++countRollDoubleDice);
+            else gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, 0);
+
+            if(gameBoard.getPlayerCountRollDoubleDice(gameId, playerName) == 3){
+                gameBoard.setPlayerPrison(gameId, playerName, true);
+                gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, 0);
+                gameBoard.setPlayerCountRoll(gameId, playerName, 0);
+                gameBoard.setPlayerPosition(gameId, playerName, 11);//aggiorna la posizione del giocatore
+                //invia a tutti i giocatori che il "playername" si è postato di tot caselle "newPosition"
+                messageHandler.sendPawnMove(pawnId, playerName, 11, gameHandler.getGameSessions(), gameId);
+
+                //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
+                messageHandler.sendBoxUsage(playerName, session, 11, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
+            }else{
+                newPosition = totDice + playerPosition;
+
+                if (newPosition > 40) {
+                    newPosition -= 40;
+                    viaPay = true;
+                }
+                gameBoard.setPlayerPosition(gameId, playerName, newPosition);//aggiorna la posizione del giocatore
+                //invia a tutti i giocatori che il "playername" si è postato di tot caselle "newPosition"
+                messageHandler.sendPawnMove(pawnId, playerName, newPosition, gameHandler.getGameSessions(), gameId);
+
+                //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
+                messageHandler.sendBoxUsage(playerName, session, newPosition, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
+
+            }
+        }
+        /*int[] diceResults = rollDice();
+        int diceR1 = diceResults[0];
+        int diceR2 = diceResults[1];
         int totDice = diceR1 + diceR2;
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
@@ -192,28 +282,19 @@ public class TurnHandler {
                 //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
                 messageHandler.sendBoxUsage(playerName, session, newPosition, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
             }
-        }
+        }*/
     }
 
-    public void payPrisonExit(WebSocketSession session) throws Exception {
-        String gameId = gameHandler.getGameIdBySession(session);
-        String playerName = gameHandler.getPlayerNameBySession(session);
-        gameBoard.setPlayerPrison(gameId, playerName, false);
-        if(giocatoreRepository.saldoGiocatore(playerName, gameId) < 50) {
-            String exitPrisonMEssage = new ObjectMapper().writeValueAsString(Map.of(
-                    "type", "exitPrison",
-                    "flag", false
-            ));
-            session.sendMessage(new TextMessage(exitPrisonMEssage));
-            gameBoard.setPlayerCountRoll(gameId, playerName, 0);
-        }else {
-            giocatoreRepository.aggiornamentoSaldo(playerName, gameId, 50);
-            messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
-            String exitPrisonMEssage = new ObjectMapper().writeValueAsString(Map.of(
-                    "type", "exitPrison",
-                    "flag", true
-            ));
-            session.sendMessage(new TextMessage(exitPrisonMEssage));
-        }
+    public int[] rollDice(WebSocketSession session) throws Exception {
+        int diceR1 = ThreadLocalRandom.current().nextInt(1, 7);
+        int diceR2 = ThreadLocalRandom.current().nextInt(1, 7);
+        String diceRolled = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "diceRolled",
+                "dice1", diceR1,
+                "dice2", diceR2
+        ));
+        session.sendMessage(new TextMessage(diceRolled));//invia il risultato dei dati al giocatore che li ha tirati
+        return new int[]{diceR1, diceR2}; // Restituisce entrambi i valori
     }
+
 }
