@@ -32,6 +32,11 @@ public class MessageHandler {
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     private static final String CONTENT_KEY = "content";
     private static final String TYPE_KEY = "type";
+    private static final String PLAYERNAME_KEY = "playerName";
+    private static final String BALANCE_KEY = "balance";
+    private static final String THREADINTERRIPT_KEY = "Thread interrotto: ";
+    private static final String DESCRIPTION_KEY = "description";
+
 
     public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, ProbabilitaRepository probabilitaRepository, PartitaImprevistoRepository partitaImprevistoRepository, ImprevistoRepository imprevistoRepository) {
         this.gameService = gameService;
@@ -85,7 +90,7 @@ public class MessageHandler {
         String movimentoPedineMessage = new ObjectMapper().writeValueAsString(Map.of(
                 TYPE_KEY, "pawnMove",
                 "pawnId", pawnId,
-                "playerName", playerName,
+                PLAYERNAME_KEY, playerName,
                 "offset", offset
         ));
 
@@ -103,14 +108,14 @@ public class MessageHandler {
         //crea il messaggio di tipo join che contiene il nome del giocatore
         String joinMessage = new ObjectMapper().writeValueAsString(Map.of(
                 TYPE_KEY, "join",
-                "playerName", playerName,
+                PLAYERNAME_KEY, playerName,
                 "userRole", role
         ));
         int balance = giocatoreRepository.saldoGiocatore(playerName,gameId);
         String playerMessage = new ObjectMapper().writeValueAsString(Map.of(
                 TYPE_KEY, "playersList",
-                "playerName", playerName,
-                "balance", balance
+                PLAYERNAME_KEY, playerName,
+                BALANCE_KEY, balance
         ));
 
         for (WebSocketSession sessions : playersInGame) {
@@ -160,8 +165,8 @@ public class MessageHandler {
                 int balance = giocatoreRepository.saldoGiocatore(player,gameId);
                 String playerMessage = new ObjectMapper().writeValueAsString(Map.of(
                         TYPE_KEY, "playersList",
-                        "playerName", player,
-                        "balance", balance
+                        PLAYERNAME_KEY, player,
+                        BALANCE_KEY, balance
                 ));
                 session.sendMessage(new TextMessage(playerMessage));
 
@@ -169,7 +174,7 @@ public class MessageHandler {
                     Thread.sleep(100); //TODO: vedere se si può diminuire il tempo
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Ripristina lo stato di interruzione del thread
-                    System.out.println("Thread interrotto: " + e.getMessage());
+                    System.out.println(THREADINTERRIPT_KEY + e.getMessage());
                 }
 
             }
@@ -183,8 +188,8 @@ public class MessageHandler {
                 int balance = giocatoreRepository.saldoGiocatore(playerName, gameId);
                 String playerMessage = new ObjectMapper().writeValueAsString(Map.of(
                         TYPE_KEY, "playerBalance",
-                        "playerName", playerName,
-                        "balance", balance
+                        PLAYERNAME_KEY, playerName,
+                        BALANCE_KEY, balance
                 ));
                 session.sendMessage(new TextMessage(playerMessage));
             }
@@ -240,7 +245,7 @@ public class MessageHandler {
 
                     String payBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
                             TYPE_KEY, "payment",
-                            "description", "affitto",
+                            DESCRIPTION_KEY, "affitto",
                             "destination", proprietario,
                             "payment", prezzoAffitto
                     ));
@@ -255,7 +260,7 @@ public class MessageHandler {
                     Thread.sleep(1500); //TODO: vedere se si può diminuire il tempo
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Ripristina lo stato di interruzione del thread
-                    System.out.println("Thread interrotto: " + e.getMessage());
+                    System.out.println(THREADINTERRIPT_KEY + e.getMessage());
                 }
                 sendPawnMove(pawnId, playerName, 11, gameSessions, gameId);
                 gameBoard.setPlayerPrison(gameId, playerName, true);
@@ -270,7 +275,7 @@ public class MessageHandler {
                 String imprevistoMessage = new ObjectMapper().writeValueAsString(Map.of(
                         TYPE_KEY, "draw",
                         "card", "imprevisto",
-                        "description", descrizione
+                        DESCRIPTION_KEY, descrizione
                 ));
                 session.sendMessage(new TextMessage(imprevistoMessage));
 
@@ -290,7 +295,7 @@ public class MessageHandler {
                 String probabilitaMessage = new ObjectMapper().writeValueAsString(Map.of(
                         TYPE_KEY, "draw",
                         "card", "probabilità",
-                        "description", descrizione
+                        DESCRIPTION_KEY, descrizione
                 ));
                 session.sendMessage(new TextMessage(probabilitaMessage));
 
@@ -301,102 +306,113 @@ public class MessageHandler {
                 gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions, typeBox, session);
                 partitaProbabilitaRepository.setUtilizzatoTrue(gameId, descrizione);
                 break;
+            default:
+                throw new IllegalArgumentException("Tipo di messaggio non supportato: " + typeBox);
+
         }
     }
 
-    public void gestisciAzione(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Integer posizione, int pawnId, Map<String, List<WebSocketSession>> gameSessions, String typeBox, WebSocketSession  session) throws Exception {
-        Importo importo_deserializzato;
-        int importo;
-        int soldi;
-        int id_casella=1;
-        List<String> giocatoriPartita;
-
-        switch (tipoAzione){
+    public void gestisciAzione(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Integer posizione, int pawnId, Map<String, List<WebSocketSession>> gameSessions, String typeBox, WebSocketSession session) throws Exception {
+        switch (tipoAzione) {
             case "ricevi_importo", "paga_importo":
-                importo_deserializzato = (Importo) parametri;
-                importo = importo_deserializzato.getImporto();
-                giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, importo);
-                updateBalance(gameSessions, idPartita, nomeGiocatore);
+                gestisciImporto(tipoAzione, parametri, idPartita, nomeGiocatore, gameSessions);
                 break;
-
-            case "paga_importo_giocatore":
-                importo_deserializzato = (Importo) parametri;
-                importo = importo_deserializzato.getImporto();
-                soldi = (giocatoreRepository.contaGiocatoriInPartita(idPartita)-1) * importo;
-                giocatoreRepository.pagaImportoGiocatori(importo, idPartita, nomeGiocatore);
-                giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, soldi);
-                giocatoriPartita = giocatoreRepository.findGiocatori(idPartita);
-                for(String nome : giocatoriPartita)
-                    updateBalance(gameSessions, idPartita, nome);
+            case "paga_importo_giocatore", "ricevi_importo_giocatore":
+                gestisciPagamentoGiocatori(tipoAzione, parametri, idPartita, nomeGiocatore, gameSessions);
                 break;
-
-            case "ricevi_importo_giocatore":
-                importo_deserializzato = (Importo) parametri;
-                importo = importo_deserializzato.getImporto();
-                soldi = -((giocatoreRepository.contaGiocatoriInPartita(idPartita)-1) * importo);
-                giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, soldi);
-                giocatoreRepository.pagaImportoGiocatori(-importo, idPartita, nomeGiocatore);
-                giocatoriPartita = giocatoreRepository.findGiocatori(idPartita);
-                for(String nome : giocatoriPartita)
-                    updateBalance(gameSessions, idPartita, nome);
-                break;
-
             case "paga_possedimenti":
-                PagaPossedimenti pagaPossedimentiDeserializzato = (PagaPossedimenti) parametri;
-                int importoCasa =  pagaPossedimentiDeserializzato.getCosto_casa();
-                int importoAlbergo= pagaPossedimentiDeserializzato.getCosto_abergo();
-                int numCase = pCPPRepository.contaCaseTot(nomeGiocatore, idPartita);
-                int numAlberghi = pCPPRepository.contaAlberghiTot(nomeGiocatore, idPartita);
-                int totaleDaPagare = (numCase * importoCasa) + (numAlberghi * importoAlbergo);
-                giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, totaleDaPagare);
-                updateBalance(gameSessions, idPartita, nomeGiocatore);
+                gestisciPagamentoPossedimenti(parametri, idPartita, nomeGiocatore, gameSessions);
                 break;
-
             case "sposta_avanti":
-                if(parametri instanceof IdCasella id_casellaDeserializzato) {
-                    id_casella = id_casellaDeserializzato.getId_casella();
-                    if(posizione > id_casella) {
-                        giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, -200);
-                        updateBalance(gameSessions, idPartita, nomeGiocatore);
-                    }
-                    gameBoard.setPlayerPosition(idPartita, nomeGiocatore, id_casella);
-                    sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSessions, idPartita);
-                    try {
-                        Thread.sleep(4000); //TODO: vedere se si può diminuire il tempo
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt(); // Ripristina lo stato di interruzione del thread
-                        System.out.println("Thread interrotto: " + e.getMessage());
-                    }
-                    sendBoxUsage(nomeGiocatore, session, id_casella, idPartita, gameSessions, pawnId, false);
-                } else if (parametri instanceof TipoCasella tipoCasellaDeserializzato) {
-                    String tipoCasella = tipoCasellaDeserializzato.getTipo_casella();
-                    id_casella = pCPPRepository.findNextCasellaByTipo(tipoCasella, posizione, idPartita);
-                    gameBoard.setPlayerPosition(idPartita, nomeGiocatore, id_casella);
-                    sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSessions, idPartita);
-                    try {
-                        Thread.sleep(4000); //TODO: vedere se si può diminuire il tempo
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt(); // Ripristina lo stato di interruzione del thread
-                        System.out.println("Thread interrotto: " + e.getMessage());
-                    }
-                    sendBoxUsage(nomeGiocatore, session, id_casella, idPartita, gameSessions, pawnId, false);
-                }
+                gestisciSpostamento(parametri, posizione, idPartita, nomeGiocatore, pawnId, gameSessions, session);
                 break;
-
             case "vai_in_prigione":
-                IdCasella id_casellaDeserializzato =(IdCasella) parametri;
-                id_casella = id_casellaDeserializzato.getId_casella();
-                gameBoard.setPlayerPosition(idPartita, nomeGiocatore, id_casella);
-                sendPawnMove(pawnId, nomeGiocatore, id_casella, gameSessions, idPartita);
-                gameBoard.setPlayerPrison(idPartita, nomeGiocatore, true);
+                gestisciPrigione(parametri, idPartita, nomeGiocatore, pawnId, gameSessions);
                 break;
-
             case "esci_prigione":
-                if(typeBox.equals("Probabilità"))
-                    partitaProbabilitaRepository.setGiocatore(idPartita, nomeGiocatore, tipoAzione);
-                else
-                    partitaImprevistoRepository.setGiocatore(idPartita, nomeGiocatore, tipoAzione);
+                gestisciUscitaPrigione(idPartita, nomeGiocatore, typeBox);
                 break;
+            default:
+                throw new IllegalArgumentException("Tipo di messaggio non supportato: " + tipoAzione);
+        }
+    }
+
+    private void gestisciImporto(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Map<String, List<WebSocketSession>> gameSessions) throws IOException {
+        Importo importoDeserializzato = (Importo) parametri;
+        int importo = importoDeserializzato.getImporto();
+
+        giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, importo);
+        updateBalance(gameSessions, idPartita, nomeGiocatore);
+    }
+
+    private void gestisciPagamentoGiocatori(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Map<String, List<WebSocketSession>> gameSessions) throws IOException {
+        Importo importoDeserializzato = (Importo) parametri;
+        int importo = importoDeserializzato.getImporto();
+        int soldi = (giocatoreRepository.contaGiocatoriInPartita(idPartita) - 1) * importo;
+
+        if (tipoAzione.equals("paga_importo_giocatore")) {
+            giocatoreRepository.pagaImportoGiocatori(importo, idPartita, nomeGiocatore);
+            giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, soldi);
+        } else {
+            giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, -soldi);
+            giocatoreRepository.pagaImportoGiocatori(-importo, idPartita, nomeGiocatore);
+        }
+
+        List<String> giocatoriPartita = giocatoreRepository.findGiocatori(idPartita);
+        for (String nome : giocatoriPartita) {
+            updateBalance(gameSessions, idPartita, nome);
+        }
+    }
+
+    private void gestisciPagamentoPossedimenti(Object parametri, String idPartita, String nomeGiocatore, Map<String, List<WebSocketSession>> gameSessions) throws IOException {
+        PagaPossedimenti pagaPossedimentiDeserializzato = (PagaPossedimenti) parametri;
+        int importoCasa = pagaPossedimentiDeserializzato.getCosto_casa();
+        int importoAlbergo = pagaPossedimentiDeserializzato.getCosto_abergo();
+
+        int numCase = pCPPRepository.contaCaseTot(nomeGiocatore, idPartita);
+        int numAlberghi = pCPPRepository.contaAlberghiTot(nomeGiocatore, idPartita);
+
+        int totaleDaPagare = (numCase * importoCasa) + (numAlberghi * importoAlbergo);
+        giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, totaleDaPagare);
+        updateBalance(gameSessions, idPartita, nomeGiocatore);
+    }
+
+    private void gestisciSpostamento(Object parametri, int posizione, String idPartita, String nomeGiocatore, int pawnId, Map<String, List<WebSocketSession>> gameSessions, WebSocketSession session) throws Exception {
+        int idCasella;
+
+        if (parametri instanceof IdCasella idCasellaDeserializzato) {
+            idCasella = idCasellaDeserializzato.getId_casella();
+
+            if (posizione > idCasella) {
+                giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, -200);
+                updateBalance(gameSessions, idPartita, nomeGiocatore);
+            }
+        } else if (parametri instanceof TipoCasella tipoCasellaDeserializzato) {
+            idCasella = pCPPRepository.findNextCasellaByTipo(tipoCasellaDeserializzato.getTipo_casella(), posizione, idPartita);
+        } else {
+            return;
+        }
+
+        gameBoard.setPlayerPosition(idPartita, nomeGiocatore, idCasella);
+        sendPawnMove(pawnId, nomeGiocatore, idCasella, gameSessions, idPartita);
+        Thread.sleep(4000); // TODO: valutare riduzione tempo
+        sendBoxUsage(nomeGiocatore, session, idCasella, idPartita, gameSessions, pawnId, false);
+    }
+
+    private void gestisciPrigione(Object parametri, String idPartita, String nomeGiocatore, int pawnId, Map<String, List<WebSocketSession>> gameSessions) throws IOException {
+        IdCasella idCasellaDeserializzato = (IdCasella) parametri;
+        int idCasella = idCasellaDeserializzato.getId_casella();
+
+        gameBoard.setPlayerPosition(idPartita, nomeGiocatore, idCasella);
+        sendPawnMove(pawnId, nomeGiocatore, idCasella, gameSessions, idPartita);
+        gameBoard.setPlayerPrison(idPartita, nomeGiocatore, true);
+    }
+
+    private void gestisciUscitaPrigione(String idPartita, String nomeGiocatore, String typeBox) {
+        if (typeBox.equals("Probabilità")) {
+            partitaProbabilitaRepository.setGiocatore(idPartita, nomeGiocatore, "esci_prigione");
+        } else {
+            partitaImprevistoRepository.setGiocatore(idPartita, nomeGiocatore, "esci_prigione");
         }
     }
 
