@@ -1,5 +1,6 @@
 
 import {mockPlayerProperties} from "./PlayerPropertyMock.jsx";
+import {translateColor} from "./itToEnColors.jsx";
 
 // eslint-disable-next-line react/prop-types
 const PropertyOwned = ({playerProperties, onPropertySelect}) => {
@@ -23,7 +24,7 @@ const PropertyOwned = ({playerProperties, onPropertySelect}) => {
                     >
                         <div
                             className="propertyColorBar"
-                            style={{backgroundColor: property.colore}}
+                            style={{backgroundColor: translateColor(property.colore)}}
                         >
                             <br/>
                             <div className="propertyContent">

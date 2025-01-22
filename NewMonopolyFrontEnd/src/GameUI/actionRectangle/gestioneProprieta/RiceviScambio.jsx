@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {WebSocketContext} from "../../../contexts/WebSocketContext.jsx";
 
 
@@ -7,14 +7,14 @@ import {WebSocketContext} from "../../../contexts/WebSocketContext.jsx";
 const RiceviScambio = ({ onClose }) => {
     const {socket, connected, exchangeRequest} = useContext(WebSocketContext);
     const [flag, setFlag] = useState(0);
-    const [exchangeAccepted, setExchangeAccepted] = useState(false);
 
     const handleAccetta = () => {
-        setExchangeAccepted(true);
-        sendMessage();
+        sendMessage(true);
     }
-
-    const sendMessage = () => {
+    const handleRifiuta =() => {
+        sendMessage(false);
+    }
+    const sendMessage = (exchangeAccepted) => {
         if (socket && connected) {
             // Invia un messaggio al server
             const message = {
@@ -26,8 +26,7 @@ const RiceviScambio = ({ onClose }) => {
             };
 
             socket.send(JSON.stringify(message));
-            setExchangeAccepted(false);
-            console.log('Messaggio inviato:', message);
+            console.log('Messaggio inviato RispostaScambio:', message);
         } else {
             console.error('Connessione WebSocket non stabilita!');
         }
@@ -53,21 +52,21 @@ const RiceviScambio = ({ onClose }) => {
                 {/* Quando non si aggiungono soldi all offerta */}
                 {(flag===0) && (
                     <>
-                        <p>Ha offerto {exchangeRequest.property1} per {exchangeRequest.property2}</p>
+                        <p>Ha offerto {exchangeRequest.property1.nome} per {exchangeRequest.property2.nome}</p>
                     </>
                 )}
 
-                {/* Quando ti richiede sodli aggiuntivi */}
+                {/* Quando ti richiede soldi aggiuntivi */}
                 {(flag===1) && (
                     <>
-                        <p>Ha offerto {exchangeRequest.property1} per {exchangeRequest.property2} + {Math.abs(exchangeRequest.money)}</p>
+                        <p>Ha offerto {exchangeRequest.property1.nome} per {exchangeRequest.property2.nome} + {Math.abs(exchangeRequest.money)}</p>
                     </>
                 )}
 
-                {/* Quando ti da sodli aggiuntivi */}
+                {/* Quando ti dà soldi aggiuntivi */}
                 {(flag===2) && (
                     <>
-                        <p>Ha offerto {exchangeRequest.property1} + {Math.abs(exchangeRequest.money)} per {exchangeRequest.property2}</p>
+                        <p>Ha offerto {exchangeRequest.property1.nome} + {Math.abs(exchangeRequest.money)} per {exchangeRequest.property2.nome}</p>
                     </>
                 )}
 
@@ -75,7 +74,7 @@ const RiceviScambio = ({ onClose }) => {
                     <button onClick={handleAccetta}>
                         Accetta
                     </button>
-                    <button onClick={sendMessage}>
+                    <button onClick={handleRifiuta}>
                         Rifiuta
                     </button>
                 </div>
