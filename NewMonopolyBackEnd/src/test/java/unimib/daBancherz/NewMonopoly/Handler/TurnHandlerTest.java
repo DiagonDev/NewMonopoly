@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
@@ -28,23 +28,26 @@ public class TurnHandlerTest {
     @Autowired
     private TurnHandler turnHandler;
 
-    @MockBean
+    @Mock
     private GameHandler gameHandler;
 
-    @MockBean
+    @Mock
     private MessageHandler messageHandler;
 
-    @MockBean
+    @Mock
     private GiocatoreRepository giocatoreRepository;
 
-    @MockBean
+    @Mock
     private PartitaProbabilitaRepository partitaProbabilitaRepository;
 
-    @MockBean
+    @Mock
     private PartitaImprevistoRepository partitaImprevistoRepository;
 
-    @MockBean
+    @Mock
     private WebSocketSession session;
+
+    @Mock
+    private WebSocketSession nextSession;
 
     private GameBoardSingleton gameBoard;
 
@@ -54,10 +57,10 @@ public class TurnHandlerTest {
     private static final String PLAYER_NAME = "teo";
 
     @BeforeEach
-    void setUp() {
+    void setUp() {;
         when(gameHandler.getGameIdBySession(session)).thenReturn(GAME_ID);
         when(gameHandler.getPlayerNameBySession(session)).thenReturn(PLAYER_NAME);
-        when(gameHandler.getGameSessions()).thenReturn(Collections.singletonMap(GAME_ID, List.of(session)));
+        when(gameHandler.getGameSessions()).thenReturn(Collections.singletonMap(GAME_ID, List.of(session, nextSession)));
 
         // Mockiamo il Singleton
         gameBoard = mock(GameBoardSingleton.class);
@@ -153,5 +156,112 @@ public class TurnHandlerTest {
 
         assertEquals("prison", sentData.get("type"));
     }
+
+    @Test
+    void endTurn_ShouldInvokeStartTurnForNextPlayer() throws Exception {
+
+        // Mockiamo il comportamento di startTurn per evitare l'esecuzione reale
+        TurnHandler spyTurnHandler = spy(turnHandler);
+        doNothing().when(spyTurnHandler).startTurn(any(WebSocketSession.class));
+
+        spyTurnHandler.endTurn(session);
+
+        // Verifica che startTurn sia stato chiamato con il giocatore successivo
+        verify(spyTurnHandler).startTurn(nextSession);
+    }
+
+    @Test
+    void payPrisonExit_ShouldNotChargePlayer_WhenBalanceIsInsufficient() throws Exception {
+        // Mock per ottenere i dati necessari
+        when(giocatoreRepository.saldoGiocatore(PLAYER_NAME, GAME_ID)).thenReturn(30);  // Saldo insufficiente
+
+        // Mock del comportamento di setPlayerPrison
+        doNothing().when(gameBoard).setPlayerPrison(GAME_ID, PLAYER_NAME, false);
+
+        // Simuliamo l'invio del messaggio al client
+        ArgumentCaptor<TextMessage> captor = ArgumentCaptor.forClass(TextMessage.class);
+
+        // Chiamata al metodo payPrisonExit
+        turnHandler.payPrisonExit(session);
+
+        // Verifica che il messaggio di "exitPrison" con flag true sia inviato
+        verify(session).sendMessage(captor.capture());
+        TextMessage sentMessage = captor.getValue();
+        String expectedMessage = "{\"type\":\"exitPrison\",\"flag\":false}";
+        String actualMessage = sentMessage.getPayload();
+
+        // Confronta i messaggi ignorando l'ordine dei campi
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> expectedMap = objectMapper.readValue(expectedMessage, Map.class);
+        Map<String, Object> actualMap = objectMapper.readValue(actualMessage, Map.class);
+        assertEquals(expectedMap, actualMap);
+
+        // Verifica che non venga aggiornata la saldo del giocatore
+        verify(giocatoreRepository, never()).aggiornamentoSaldo(PLAYER_NAME, GAME_ID, 50);
+        verify(messageHandler, never()).updateBalance(any(), any(), any());
+    }
+
+    @Test
+    void payPrisonExit_ShouldChargePlayer_WhenBalanceIsSufficient() throws Exception {
+        // Mock per ottenere i dati necessari
+        when(giocatoreRepository.saldoGiocatore(PLAYER_NAME, GAME_ID)).thenReturn(100);  // Saldo sufficiente
+
+        // Mock del comportamento di setPlayerPrison
+        doNothing().when(gameBoard).setPlayerPrison(GAME_ID, PLAYER_NAME, false);
+
+        // Simuliamo l'invio del messaggio al client
+        ArgumentCaptor<TextMessage> captor = ArgumentCaptor.forClass(TextMessage.class);
+
+        // Chiamata al metodo payPrisonExit
+        turnHandler.payPrisonExit(session);
+
+        // Verifica che il messaggio di "exitPrison" con flag true sia inviato
+        verify(session).sendMessage(captor.capture());
+        TextMessage sentMessage = captor.getValue();
+        String expectedMessage = "{\"type\":\"exitPrison\",\"flag\":true}";
+        String actualMessage = sentMessage.getPayload();
+
+        // Confronta i messaggi ignorando l'ordine dei campi
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> expectedMap = objectMapper.readValue(expectedMessage, Map.class);
+        Map<String, Object> actualMap = objectMapper.readValue(actualMessage, Map.class);
+        assertEquals(expectedMap, actualMap);
+
+        // Verifica che il saldo del giocatore venga aggiornato
+        verify(giocatoreRepository).aggiornamentoSaldo(PLAYER_NAME, GAME_ID, 50);
+        verify(messageHandler).updateBalance(gameHandler.getGameSessions(), GAME_ID, PLAYER_NAME);
+    }
+
+    @Test
+    void payPrisonExit_ShouldChargePlayer_WhenBalanceIsExactly50() throws Exception {
+        // Mock per ottenere i dati necessari
+        when(giocatoreRepository.saldoGiocatore(PLAYER_NAME, GAME_ID)).thenReturn(50);  // Saldo esattamente 50
+
+        // Mock del comportamento di setPlayerPrison
+        doNothing().when(gameBoard).setPlayerPrison(GAME_ID, PLAYER_NAME, false);
+
+        // Simuliamo l'invio del messaggio al client
+        ArgumentCaptor<TextMessage> captor = ArgumentCaptor.forClass(TextMessage.class);
+
+        // Chiamata al metodo payPrisonExit
+        turnHandler.payPrisonExit(session);
+
+        // Verifica che il messaggio di "exitPrison" con flag true sia inviato
+        verify(session).sendMessage(captor.capture());
+        TextMessage sentMessage = captor.getValue();
+        String expectedMessage = "{\"type\":\"exitPrison\",\"flag\":true}";
+        String actualMessage = sentMessage.getPayload();
+
+        // Confronta i messaggi ignorando l'ordine dei campi
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> expectedMap = objectMapper.readValue(expectedMessage, Map.class);
+        Map<String, Object> actualMap = objectMapper.readValue(actualMessage, Map.class);
+        assertEquals(expectedMap, actualMap);
+
+        // Verifica che il saldo del giocatore venga aggiornato
+        verify(giocatoreRepository).aggiornamentoSaldo(PLAYER_NAME, GAME_ID, 50);
+        verify(messageHandler).updateBalance(gameHandler.getGameSessions(), GAME_ID, PLAYER_NAME);
+    }
+
 
 }
