@@ -678,6 +678,7 @@ button:focus-visible {
     padding: 1px;
     border: 1px solid black; /* Aggiunge un bordo nero di 1px di spessore */
     font-weight: bold;
+    background-color: grey;
 }
 
 .propieta {
@@ -725,6 +726,7 @@ button:focus-visible {
     gap: 10px;
 }
 
+/*
 .player:nth-child(1) {
     background-color: green;
 }
@@ -748,6 +750,7 @@ button:focus-visible {
 .player:nth-child(6) {
     background-color: orange;
 }
+*/
 
 .pawn-selection {
     text-align: center;

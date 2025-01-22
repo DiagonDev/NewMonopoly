@@ -106,14 +106,14 @@
     align-items: center;   /* Centra gli elementi orizzontalmente */
     gap: 10px;
 }
-
+/*
 .player:nth-child(1) { background-color: green; }
 .player:nth-child(2) { background-color: yellow; }
 .player:nth-child(3) { background-color: blue; }
 .player:nth-child(4) { background-color: red; }
 .player:nth-child(5) { background-color: purple; }
 .player:nth-child(6) { background-color: orange; }
-
+*/
 .grid-item:nth-child(1) {
   display: flex;
   flex-direction: column;

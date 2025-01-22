@@ -13,6 +13,7 @@ export const WebSocketProvider = ({children}) => {
         player: '',
         playerRole: '',
     });
+    const [errorName, setErrorName] = useState(0);
     const [playerBalance, setPlayerBalance] = useState({
         player: '',
         balance: 0,
@@ -125,6 +126,7 @@ export const WebSocketProvider = ({children}) => {
                  * content:playerName
                  */
                 else if (message.type === 'join') {
+                    setErrorName(1);
                     console.log("joinevent" + JSON.stringify(message));
                     setPlayerJoin((prevState) => ({
                         ...prevState, // Mantieni le altre proprietà, se esistono
@@ -137,7 +139,7 @@ export const WebSocketProvider = ({children}) => {
                 }
 
                 else if (message.type === 'playersList') {
-                    console.log("playerList", message.playerName, message.balance, player.pawn);
+                    console.log("playerList", message.playerName, message.balance);
                     setPlayerList((prevState) => ({
                         ...prevState, // Mantieni le altre proprietà, se esistono
                         player: message.playerName, // Aggiorna il nome del giocatore
@@ -230,6 +232,9 @@ export const WebSocketProvider = ({children}) => {
                         playerName: message.playerName,
                         offset: message.offset,
                     }));
+                }else if (message.type === 'errorName') {
+                    console.log("errore nome gia esistente");
+                    setErrorName(2);
                 } else if (message.type === 'payment') {
                     console.log(message.type);
                     setPayment((prevState) => ({
@@ -354,7 +359,8 @@ export const WebSocketProvider = ({children}) => {
                 playerList,
                 buyReturn,
                 prison,
-                exitPrison
+                exitPrison,
+                errorName
             }}>
             {children}
         </WebSocketContext.Provider>
