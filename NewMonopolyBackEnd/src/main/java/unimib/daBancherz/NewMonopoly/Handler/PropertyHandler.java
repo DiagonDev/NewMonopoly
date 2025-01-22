@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.*;
 import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
@@ -20,16 +19,13 @@ public class PropertyHandler {
     private final GameHandler gameHandler;
     private final MessageHandler messageHandler;
     private final CasellaRepository casellaRepository;
-    private final PrezzoproprietaRepository prezzoproprietaRepository;
-    GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
-    public PropertyHandler(PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, GameHandler gameHandler, MessageHandler messageHandler, CasellaRepository casellaRepository, PrezzoproprietaRepository prezzoproprietaRepository) {
+    public PropertyHandler(PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, GameHandler gameHandler, MessageHandler messageHandler, CasellaRepository casellaRepository) {
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;
         this.gameHandler = gameHandler;
         this.messageHandler = messageHandler;
         this.casellaRepository = casellaRepository;
-        this.prezzoproprietaRepository = prezzoproprietaRepository;
     }
 
     public void acquistaProprieta(String[] messageParts, WebSocketSession session) throws Exception {

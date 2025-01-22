@@ -2,10 +2,10 @@ package unimib.daBancherz.NewMonopoly.Handler;
 
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -19,10 +19,10 @@ import java.util.Map;
 @SpringBootTest
 class ChatHandlerTest {
 
-    @MockBean
+    @Mock
     private GameHandler gameHandler; // Mock della dipendenza GameHandler
 
-    @MockBean
+    @Mock
     private WebSocketSession session; // Mock della sessione WebSocket
 
     @Autowired

@@ -2,6 +2,7 @@ package unimib.daBancherz.NewMonopoly.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -208,7 +209,6 @@ public class GameHandler {
                 partitaRepository.deleteByCodiceInvito(gameId);
                 gameSessions.remove(gameId);
                 GameBoardSingleton.getInstance().removeGameIfEmpty(gameId);
-                System.out.println("Partita con ID " + gameId + " rimossa poiché non ci sono più giocatori.");
             }
         }
 
@@ -231,8 +231,6 @@ public class GameHandler {
         for (WebSocketSession session : playersInGame) {
             session.sendMessage(new TextMessage(disconnectMessage));
         }
-
-        System.out.println("Giocatore " + playerName + " disconnesso dalla partita con ID " + gameId + ".");
     }
 
     public void choosePedina(String[] messageParts, WebSocketSession session) throws Exception {

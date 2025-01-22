@@ -29,6 +29,7 @@ public class MessageHandler {
     private final ProbabilitaRepository probabilitaRepository;
     private final PartitaImprevistoRepository partitaImprevistoRepository;
     private final ImprevistoRepository imprevistoRepository;
+
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     private static final String CONTENT_KEY = "content";
     private static final String TYPE_KEY = "type";
@@ -283,7 +284,7 @@ public class MessageHandler {
                 Imprevisto imprevisto = imprevistoRepository.findByDescrizione(descrizione);
                 tipoAzione = imprevisto.getTipoAzione();
                 parametri = imprevisto.getParametroDeserializzato();
-                gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions, typeBox, session);
+                gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, typeBox,session);
                 partitaImprevistoRepository.setUtilizzatoTrue(gameId, descrizione);
                 break;
             case"Probabilità":
@@ -304,7 +305,7 @@ public class MessageHandler {
                 tipoAzione = probabilita.getTipoAzione();
                 parametri = probabilita.getParametroDeserializzato();
 
-                gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, pawnId, gameSessions, typeBox, session);
+                gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, typeBox, session);
                 partitaProbabilitaRepository.setUtilizzatoTrue(gameId, descrizione);
                 break;
             default:
@@ -313,7 +314,9 @@ public class MessageHandler {
         }
     }
 
-    public void gestisciAzione(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Integer posizione, int pawnId, Map<String, List<WebSocketSession>> gameSessions, String typeBox, WebSocketSession session) throws Exception {
+    public void gestisciAzione(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Integer posizione, Map<String, List<WebSocketSession>> gameSessions, String typeBox, WebSocketSession session) throws Exception {
+        //WebSocketSession session = gameHandler.getSessionByPlayerName(nomeGiocatore, idPartita);
+        Integer pawnId = giocatoreRepository.findPedinaFromGiocatore(nomeGiocatore, idPartita);
         switch (tipoAzione) {
             case "ricevi_importo", "paga_importo":
                 gestisciImporto(parametri, idPartita, nomeGiocatore, gameSessions);
@@ -340,7 +343,7 @@ public class MessageHandler {
 
     private void gestisciImporto(Object parametri, String idPartita, String nomeGiocatore, Map<String, List<WebSocketSession>> gameSessions) throws IOException {
         Importo importoDeserializzato = (Importo) parametri;
-        int importo = importoDeserializzato.getImporto();
+        int importo = importoDeserializzato.getImportoSoldi();
 
         giocatoreRepository.setSaldoGiocatore(nomeGiocatore, idPartita, importo);
         updateBalance(gameSessions, idPartita, nomeGiocatore);
@@ -348,7 +351,7 @@ public class MessageHandler {
 
     private void gestisciPagamentoGiocatori(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Map<String, List<WebSocketSession>> gameSessions) throws IOException {
         Importo importoDeserializzato = (Importo) parametri;
-        int importo = importoDeserializzato.getImporto();
+        int importo = importoDeserializzato.getImportoSoldi();
         int soldi = (giocatoreRepository.contaGiocatoriInPartita(idPartita) - 1) * importo;
 
         if (tipoAzione.equals("paga_importo_giocatore")) {
