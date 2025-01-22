@@ -13,8 +13,6 @@ on:
     branches:
       - gitAction
   pull_request:
-  branches:
-      - gitAction
     types: [opened, synchronize, reopened]
 jobs:
   build:
