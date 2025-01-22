@@ -11,7 +11,6 @@ public class Casella {
     private String nome;
     private String colore;
     private String tipo;
-    private Integer prezzo;
 
     public Integer getIdCasella() {
         return idCasella;
@@ -45,13 +44,6 @@ public class Casella {
         this.tipo = tipo;
     }
 
-    public Integer getPrezzo() {
-        return prezzo;
-    }
-
-    public void setPrezzo(Integer prezzo) {
-        this.prezzo = prezzo;
-    }
 
 }
 

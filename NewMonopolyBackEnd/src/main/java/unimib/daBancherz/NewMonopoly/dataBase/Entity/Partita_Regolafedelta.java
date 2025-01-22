@@ -16,6 +16,16 @@ public class Partita_Regolafedelta {
     @JoinColumn(name = "idregolafedelta")
     private Regolafedelta idregolafedelta;
 
+    private boolean utilizzato;
+
+    public boolean isUtilizzato() {
+        return utilizzato;
+    }
+
+    public void setUtilizzato(boolean utilizzato) {
+        this.utilizzato = utilizzato;
+    }
+
     public Partita getIdpartita() {
         return idpartita;
     }
