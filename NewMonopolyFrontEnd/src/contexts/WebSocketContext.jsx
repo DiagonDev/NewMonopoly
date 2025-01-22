@@ -69,8 +69,8 @@ export const WebSocketProvider = ({children}) => {
     const [allProperties, setAllProperties] = useState([]);
     const [exchangeRequest, setExchangeRequest] = useState({
         flag: false,
-        properties1: '',
-        properties2: '',
+        property1: '',
+        property2: '',
         playerName: '',
         money: 0,
     });
@@ -272,12 +272,12 @@ export const WebSocketProvider = ({children}) => {
                 }else if (message.type === 'RispostaAggiornaProprieta'){
                     setPlayerProperties(message.properties);
                 }else if (message.type === 'exchangeRequest') {
-                    console.log("sono Luca che prova");
+                    console.log("exchangeRequest", message);
                     setExchangeRequest((prevState) => ({
                         ...prevState,
-                        flag: true,
-                        properties1: message.properties1,
-                        properties2: message.properties2,
+                        flag : true,
+                        property1: message.property1,
+                        property2: message.property2,
                         playerName: message.playerName,
                         money: message.money,
                     }));

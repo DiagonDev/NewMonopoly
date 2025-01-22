@@ -40,7 +40,7 @@ public class GameHandler {
     public void handleGameMessage(String[] messageParts, WebSocketSession session) throws Exception {
 
         String playerName = messageParts[1];
-        switch (messageParts[0]){
+        switch (messageParts[0]) {
             case "Create":
                 String difficulty = messageParts[2];
                 String randomization = messageParts[3];
@@ -60,7 +60,7 @@ public class GameHandler {
                     return; // Esce dalla funzione senza aggiungere il giocatore
                 }
 
-                if(giocatoreRepository.countGiocatoriByPartita(gameId) == 6){
+                if (giocatoreRepository.countGiocatoriByPartita(gameId) == 6) {
                     //bisogna vedere se mandare un messaggio al front end per dire che la partita è piena
                     return;
                 }
@@ -80,13 +80,13 @@ public class GameHandler {
 
         if (!playersInGame.contains(session)) { // controlla che la sessione non sia già in quella partita
             playersInGame.add(0, session); // Aggiungi la sessione all'inizio della lista,
-                                                 //per fa si che la prima sessione sia quella dell'ADMIN
+            //per fa si che la prima sessione sia quella dell'ADMIN
         }
 
         gameBoard.createGame(gameId);//crea il singleton per la partita con codicePartita = gameId
         gameBoard.setPlayerPosition(gameId, playerName, 1);//imposta nel signleton che il giocatore parte dalla casella 1
         messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
-        gameService.createGameAndPlayer(playerName,difficulty, randomization, gameId);//crea la parita nel database, più informazioni in GameService
+        gameService.createGameAndPlayer(playerName, difficulty, randomization, gameId);//crea la parita nel database, più informazioni in GameService
 
         //GESTIONE MESSAGGI
         messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella gameconsole
@@ -157,8 +157,10 @@ public class GameHandler {
             WebSocketSession session = entry.getValue();  // Sessione WebSocket
 
             // Verifica che il nome e l'ID della partita siano corretti
-            if (key.equals(playerName) && session.getAttributes().get("gameId").equals(gameId)) {
-                return session; // Restituisce la sessione corrispondente
+            if (key.equals(playerName)) {
+                if (getGameIdBySession(session).equals(gameId)) {
+                    return session; // Restituisce la sessione corrispondente
+                }
             }
         }
 
@@ -175,7 +177,7 @@ public class GameHandler {
     private String generateGameId() {
         int Counter = 0;
 
-        if(partitaRepository.findLastCodiceInvito() != null) {
+        if (partitaRepository.findLastCodiceInvito() != null) {
             String[] lastGame = (partitaRepository.findLastCodiceInvito()).split("-");
             Counter = Integer.parseInt(lastGame[1]);
         }
