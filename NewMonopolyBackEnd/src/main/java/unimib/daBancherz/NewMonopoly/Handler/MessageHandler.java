@@ -30,6 +30,8 @@ public class MessageHandler {
     private final PartitaImprevistoRepository partitaImprevistoRepository;
     private final ImprevistoRepository imprevistoRepository;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
+    private static final String CONTENT_KEY = "content";
+    private static final String TYPE_KEY = "type";
 
     public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, ProbabilitaRepository probabilitaRepository, PartitaImprevistoRepository partitaImprevistoRepository, ImprevistoRepository imprevistoRepository) {
         this.gameService = gameService;
@@ -48,8 +50,8 @@ public class MessageHandler {
 
         // Crea un messaggio di sistema come JSON
         String systemMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "system",
-                "content", content
+                TYPE_KEY, "system",
+                CONTENT_KEY, content
         ));
 
         //l'if serve perchè i due messaggi che iniziano con... devono essere inviati solo al giocatore che crea la partita
@@ -67,8 +69,8 @@ public class MessageHandler {
 
         // Crea il messaggio con le pedine non usate in formato JSON
         String pedineMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "pawnsAvailable",
-                "content", pedineNonUsate
+                TYPE_KEY, "pawnsAvailable",
+                CONTENT_KEY, pedineNonUsate
         ));
 
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
@@ -81,7 +83,7 @@ public class MessageHandler {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
 
         String movimentoPedineMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "pawnMove",
+                TYPE_KEY, "pawnMove",
                 "pawnId", pawnId,
                 "playerName", playerName,
                 "offset", offset
@@ -100,13 +102,13 @@ public class MessageHandler {
 
         //crea il messaggio di tipo join che contiene il nome del giocatore
         String joinMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "join",
+                TYPE_KEY, "join",
                 "playerName", playerName,
                 "userRole", role
         ));
         int balance = giocatoreRepository.saldoGiocatore(playerName,gameId);
         String playerMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "playersList",
+                TYPE_KEY, "playersList",
                 "playerName", playerName,
                 "balance", balance
         ));
@@ -124,8 +126,8 @@ public class MessageHandler {
     public void sendGameId(String gameId, WebSocketSession session) throws Exception {
 
         String gameMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "gameId",
-                "content", gameId
+                TYPE_KEY, "gameId",
+                CONTENT_KEY, gameId
         ));
 
         session.sendMessage(new TextMessage(gameMessage));
@@ -134,8 +136,8 @@ public class MessageHandler {
     public void sendTypePlayer(String paleyrType, WebSocketSession session) throws Exception {
 
         String typePlayerMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "user",
-                "content", paleyrType
+                TYPE_KEY, "user",
+                CONTENT_KEY, paleyrType
         ));
 
         session.sendMessage(new TextMessage(typePlayerMessage));
@@ -157,7 +159,7 @@ public class MessageHandler {
             for(String player : playerJoined){
                 int balance = giocatoreRepository.saldoGiocatore(player,gameId);
                 String playerMessage = new ObjectMapper().writeValueAsString(Map.of(
-                        "type", "playersList",
+                        TYPE_KEY, "playersList",
                         "playerName", player,
                         "balance", balance
                 ));
@@ -180,7 +182,7 @@ public class MessageHandler {
             for (WebSocketSession session : playersInGame) {
                 int balance = giocatoreRepository.saldoGiocatore(playerName, gameId);
                 String playerMessage = new ObjectMapper().writeValueAsString(Map.of(
-                        "type", "playerBalance",
+                        TYPE_KEY, "playerBalance",
                         "playerName", playerName,
                         "balance", balance
                 ));
@@ -200,7 +202,7 @@ public class MessageHandler {
         int prezzoCasella, prezzoAffitto, prezzoCasellaVia, nStazione, nSocietà;
 
         String nameBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "nameBox",
+                TYPE_KEY, "nameBox",
                 "name", nomeCasella
         ));
         session.sendMessage(new TextMessage(nameBoxMessage));
@@ -223,7 +225,7 @@ public class MessageHandler {
                 prezzoCasella = pCPPRepository.prezzoCasella(posizione, gameId);
                 if(proprietario == null){
                     String buyBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
-                            "type", "buy",
+                            TYPE_KEY, "buy",
                             "price", prezzoCasella,
                             "nameBox", nomeCasella
                     ));
@@ -237,7 +239,7 @@ public class MessageHandler {
                     giocatoreRepository.setSaldoGiocatore(proprietario, gameId, -prezzoAffitto);
 
                     String payBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
-                            "type", "payment",
+                            TYPE_KEY, "payment",
                             "description", "affitto",
                             "destination", proprietario,
                             "payment", prezzoAffitto
@@ -266,7 +268,7 @@ public class MessageHandler {
                 }
 
                 String imprevistoMessage = new ObjectMapper().writeValueAsString(Map.of(
-                        "type", "draw",
+                        TYPE_KEY, "draw",
                         "card", "imprevisto",
                         "description", descrizione
                 ));
@@ -286,7 +288,7 @@ public class MessageHandler {
                 }
 
                 String probabilitaMessage = new ObjectMapper().writeValueAsString(Map.of(
-                        "type", "draw",
+                        TYPE_KEY, "draw",
                         "card", "probabilità",
                         "description", descrizione
                 ));
@@ -400,8 +402,8 @@ public class MessageHandler {
 
     public void rispostaGestisciProprieta(String messaggioRisposta, WebSocketSession session) throws IOException {
         String scambioMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "rispostaGestisciProprieta",
-                "content", messaggioRisposta
+                TYPE_KEY, "rispostaGestisciProprieta",
+                CONTENT_KEY, messaggioRisposta
         ));
         session.sendMessage(new TextMessage(scambioMessage));
     }
@@ -409,7 +411,7 @@ public class MessageHandler {
     public void rispostaAggiornaProprieta(String gameId, String playerName, WebSocketSession session) throws IOException {
         List<PlayerProperties> playerPropertiesList = pCPPRepository.findPlayerProperties(gameId,playerName);
         String playerPropertiesListMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "rispostaAggiornaProprieta",
+                TYPE_KEY, "rispostaAggiornaProprieta",
                 "properties", playerPropertiesList
         ));
         session.sendMessage(new TextMessage(playerPropertiesListMessage));

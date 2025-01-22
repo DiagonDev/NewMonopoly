@@ -11,12 +11,10 @@ import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
 public class WebSocketConfig implements WebSocketConfigurer {
 
     private final WebSocketConnectionHandler connectionHandler;
-    private final GameHandler gameHandler;
 
     // Constructor Injection
-    public WebSocketConfig(WebSocketConnectionHandler connectionHandler, GameHandler gameHandler) {
+    public WebSocketConfig(WebSocketConnectionHandler connectionHandler) {
         this.connectionHandler = connectionHandler;
-        this.gameHandler = gameHandler;
     }
 
     @Override

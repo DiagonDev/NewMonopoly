@@ -76,6 +76,8 @@ public class GameHandler {
                 //metodo per aggiungere il giocatore alla partita
                 joinGame(playerName, gameId, session);
                 break;
+            default:
+                throw new IllegalArgumentException("Tipo di messaggio non supportato: " + messageParts[0]);
         }
     }
 
