@@ -1,4 +1,4 @@
-package unimib.daBancherz.NewMonopoly;
+package unimib.daBancherz.NewMonopoly.Handler;
 
 
 import org.junit.jupiter.api.Test;
@@ -8,8 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import unimib.daBancherz.NewMonopoly.Handler.ChatHandler;
-import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
 
 import static org.mockito.Mockito.*;
 

@@ -2,9 +2,9 @@ package unimib.daBancherz.NewMonopoly.database.Service;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.*;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.*;
 import unimib.daBancherz.NewMonopoly.dataBase.Service.GameService;
@@ -19,28 +19,28 @@ import java.util.*;
 @SpringBootTest
 public class GameServiceTest {
 
-    @MockBean
+    @Mock
     private PartitaRepository partitaRepository;
 
-    @MockBean
+    @Mock
     private GiocatoreRepository giocatoreRepository;
 
-    @MockBean
+    @Mock
     private PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository;
 
-    @MockBean
+    @Mock
     private ProbabilitaRepository probabilitaRepository;
 
-    @MockBean
+    @Mock
     private PartitaProbabilitaRepository partitaProbabilitaRepository;
 
-    @MockBean
+    @Mock
     private ImprevistoRepository imprevistoRepository;
 
-    @MockBean
+    @Mock
     private PartitaImprevistoRepository partitaImprevistoRepository;
 
-    @MockBean
+    @Mock
     private PedinaRepository pedinaRepository;
 
     @Autowired

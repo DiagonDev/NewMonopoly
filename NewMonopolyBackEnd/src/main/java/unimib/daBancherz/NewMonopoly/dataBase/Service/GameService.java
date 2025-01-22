@@ -21,9 +21,11 @@ public class GameService {
     private final ImprevistoRepository imprevistoRepository;
     private final PartitaImprevistoRepository partitaImprevistoRepository;
     private final PedinaRepository pedinaRepository;
+    private final RegolafedeltaRepository regolafedeltaRepository;
+    private final PartitaRegolafedeltaRepository partitaRegolafedeltaRepository;
 
     @Autowired
-    public GameService(PartitaRepository partitaRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository, CasellaRepository casellaRepository, ProbabilitaRepository probabilitaRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, ImprevistoRepository imprevistoRepository, PartitaImprevistoRepository partitaImprevistoRepository, PedinaRepository pedinaRepository) {
+    public GameService(PartitaRepository partitaRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository, CasellaRepository casellaRepository, ProbabilitaRepository probabilitaRepository, PartitaProbabilitaRepository partitaProbabilitaRepository, ImprevistoRepository imprevistoRepository, PartitaImprevistoRepository partitaImprevistoRepository, PedinaRepository pedinaRepository, RegolafedeltaRepository regolafedeltaRepository, PartitaRegolafedeltaRepository partitaRegolafedeltaRepository) {
         this.partitaRepository = partitaRepository;
         this.giocatoreRepository = giocatoreRepository;
         this.partitaCasellaPrezzoproprietaRepository = partitaCasellaPrezzoproprietaRepository;
@@ -32,6 +34,8 @@ public class GameService {
         this.imprevistoRepository = imprevistoRepository;
         this.partitaImprevistoRepository = partitaImprevistoRepository;
         this.pedinaRepository = pedinaRepository;
+        this.regolafedeltaRepository = regolafedeltaRepository;
+        this.partitaRegolafedeltaRepository = partitaRegolafedeltaRepository;
     }
 
     //Crea la partita, aggiunge l'adim, popola partita_casella_prezzoproprietà in base alla randomizzazione
@@ -64,6 +68,7 @@ public class GameService {
 
         populateGameUnexpected(gameId);     //popola imprevisto
         populateGameProbability(gameId);    //popola probabilita
+        populateGameRoule(gameId);     //popola regolafedelta
     }
 
     //aggiunge un nuovo giocatore
@@ -115,12 +120,34 @@ public class GameService {
         }
     }
 
-    @Transactional
-    public void deletePlayer(String gameId, String nomeGiocatore) {
-        Integer idGiocatore = giocatoreRepository.findIdByNomeAndPartitaCodiceInvito(nomeGiocatore, gameId);
-        giocatoreRepository.deleteByIdGiocatore(idGiocatore);
+
+    private void populateGameRoule(String gameId) {
+        // Recupera tutte gli imprevisti
+        List<Regolafedelta> listaRegole = regolafedeltaRepository.findAll();
+        Partita partita = partitaRepository.findById(gameId)
+                .orElseThrow(() -> new RuntimeException("Partita non trovata"));
+
+        for (Regolafedelta regolafedelta : listaRegole) {
+            Partita_Regolafedelta partitaRegolafedelta = new Partita_Regolafedelta();
+            partitaRegolafedelta.setIdpartita(partita);
+            partitaRegolafedelta.setIdregolafedelta(regolafedelta);
+            partitaRegolafedelta.setUtilizzato(false);  // Impostiamo "utilizzato" a false
+            partitaRegolafedeltaRepository.save(partitaRegolafedelta);
+        }
     }
 
+
+    @Transactional
+    public boolean deletePlayer(String gameId, String nomeGiocatore) {
+        Integer idGiocatore = giocatoreRepository.findIdByNomeAndPartitaCodiceInvito(nomeGiocatore, gameId);
+
+        if (idGiocatore != null) {
+            giocatoreRepository.deleteByIdGiocatore(idGiocatore);
+            return true; // Operazione riuscita
+        }
+
+        return false; // Il giocatore non esisteva
+    }
     public List<Integer> getUnusedPedineByPartita(String gameId) {
         return pedinaRepository.findUnusedPedineByPartita(gameId);
     }
