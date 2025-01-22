@@ -10,13 +10,16 @@ name: SonarQube
 on:
   push:
     branches:
-      - master
+      - gitAction
   pull_request:
+  branches:
+      - gitAction
     types: [opened, synchronize, reopened]
 jobs:
   build:
+  runs-on: ubuntu-latest
     name: Build and analyze
-    runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,6 +42,8 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build and analyze
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=newmonopoly-teruzzi-tentori-ronchi-alessandro-da-bancherz
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  run: |
+    cd NewMonopolyBackEnd
+    mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=newmonopoly-teruzzi-tentori-ronchi-alessandro-da-bancherz
