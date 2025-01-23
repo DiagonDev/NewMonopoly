@@ -240,4 +240,18 @@ public class WebSocketConnectionHandlerTest {
     public void testSupportsPartialMessages() {
         assertFalse(webSocketConnectionHandler.supportsPartialMessages());
     }
+
+    @Test
+    public void testHandleMessageEffettuaScambioWithIntegerOffertaMonetaria() throws Exception {
+        String messagePayload = "{\"type\":\"!EffettuaScambio\", \"property1\":{}, \"property2\":{}, \"offertaMonetaria\":100}";
+        webSocketConnectionHandler.handleMessage(session, new TextMessage(messagePayload));
+        verify(propertyHandler, times(1)).effettuaScambio(any(PlayerProperties.class), any(PlayerProperties.class), eq(100), eq(session));
+    }
+
+    @Test
+    public void testHandleMessageRispostaScambioWithIntegerOffertaMonetaria() throws Exception {
+        String messagePayload = "{\"type\":\"!RispostaScambio\", \"property1\":{}, \"property2\":{}, \"offertaMonetaria\":100, \"exchangeAccepted\":true}";
+        webSocketConnectionHandler.handleMessage(session, new TextMessage(messagePayload));
+        verify(propertyHandler, times(1)).rispostaScambio(any(PlayerProperties.class), any(PlayerProperties.class), eq(100), eq(true), eq(session));
+    }
 }
