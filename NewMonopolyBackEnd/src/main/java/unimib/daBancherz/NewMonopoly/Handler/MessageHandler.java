@@ -35,9 +35,9 @@ public class MessageHandler {
     private static final String THREADINTERRIPT_KEY = "Thread interrotto: ";
     private static final String DESCRIPTION_KEY = "description";
 
-    private final String esciPrigione = "esci_prigione";
-    private final String imprevisto = "Imprevisto";
-    private final String probabilita = "Probabilità";
+    private final String ESCIPRIGIONE_KEY = "esci_prigione";
+    private final String IMPREVISTO_KEY = "Imprevisto";
+    private final String PROBABILITA_KEY = "Probabilità";
 
     public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, OpportunitaRepository opportunitaRepository) {
         this.gameService = gameService;
@@ -265,10 +265,10 @@ public class MessageHandler {
                 gameBoard.setPlayerPrison(gameId, playerName, true);
                 break;
             case"Imprevisto":
-                descrizione = partitaOpportunitaRepository.findDescrizione(gameId, imprevisto);
+                descrizione = partitaOpportunitaRepository.findDescrizione(gameId, IMPREVISTO_KEY);
                 if (descrizione==null) {
-                    partitaOpportunitaRepository.setUtilizzatoFalse(gameId, imprevisto);
-                    descrizione = partitaOpportunitaRepository.findDescrizione(gameId, imprevisto);
+                    partitaOpportunitaRepository.setUtilizzatoFalse(gameId, IMPREVISTO_KEY);
+                    descrizione = partitaOpportunitaRepository.findDescrizione(gameId, IMPREVISTO_KEY);
                 }
 
                 String imprevistoMessage = new ObjectMapper().writeValueAsString(Map.of(
@@ -278,17 +278,17 @@ public class MessageHandler {
                 ));
                 session.sendMessage(new TextMessage(imprevistoMessage));
 
-                opportunita = opportunitaRepository.findByDescrizioneAndTipo(descrizione, imprevisto);
+                opportunita = opportunitaRepository.findByDescrizioneAndTipo(descrizione, IMPREVISTO_KEY);
                 tipoAzione = opportunita.getTipoAzione();
                 parametri = opportunita.getParametroDeserializzato();
                 gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, typeBox,session);
-                partitaOpportunitaRepository.setUtilizzatoTrue(gameId, descrizione, imprevisto);
+                partitaOpportunitaRepository.setUtilizzatoTrue(gameId, descrizione, IMPREVISTO_KEY);
                 break;
             case"Probabilità":
-                descrizione = partitaOpportunitaRepository.findDescrizione(gameId, probabilita);
+                descrizione = partitaOpportunitaRepository.findDescrizione(gameId, PROBABILITA_KEY);
                 if (descrizione==null) {
-                    partitaOpportunitaRepository.setUtilizzatoFalse(gameId, probabilita);
-                    descrizione = partitaOpportunitaRepository.findDescrizione(gameId, probabilita);
+                    partitaOpportunitaRepository.setUtilizzatoFalse(gameId, PROBABILITA_KEY);
+                    descrizione = partitaOpportunitaRepository.findDescrizione(gameId, PROBABILITA_KEY);
                 }
 
                 String probabilitaMessage = new ObjectMapper().writeValueAsString(Map.of(
@@ -298,12 +298,12 @@ public class MessageHandler {
                 ));
                 session.sendMessage(new TextMessage(probabilitaMessage));
 
-                opportunita = opportunitaRepository.findByDescrizioneAndTipo(descrizione, probabilita);
+                opportunita = opportunitaRepository.findByDescrizioneAndTipo(descrizione, PROBABILITA_KEY);
                 tipoAzione = opportunita.getTipoAzione();
                 parametri = opportunita.getParametroDeserializzato();
 
                 gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, typeBox, session);
-                partitaOpportunitaRepository.setUtilizzatoTrue(gameId, descrizione, probabilita);
+                partitaOpportunitaRepository.setUtilizzatoTrue(gameId, descrizione, PROBABILITA_KEY);
                 break;
             default:
                 throw new IllegalArgumentException("Tipo di messaggio non supportato: " + typeBox);
@@ -330,7 +330,7 @@ public class MessageHandler {
             case "vai_in_prigione":
                 gestisciPrigione(parametri, idPartita, nomeGiocatore, pawnId, gameSessions);
                 break;
-            case esciPrigione:
+            case ESCIPRIGIONE_KEY:
                 gestisciUscitaPrigione(idPartita, nomeGiocatore, typeBox);
                 break;
             default:
@@ -411,9 +411,9 @@ public class MessageHandler {
 
     private void gestisciUscitaPrigione(String idPartita, String nomeGiocatore, String typeBox) {
         if (typeBox.equals("Probabilità")) {
-            partitaOpportunitaRepository.setGiocatore(idPartita, nomeGiocatore, esciPrigione, probabilita);
+            partitaOpportunitaRepository.setGiocatore(idPartita, nomeGiocatore, ESCIPRIGIONE_KEY, PROBABILITA_KEY);
         } else {
-            partitaOpportunitaRepository.setGiocatore(idPartita, nomeGiocatore, esciPrigione,imprevisto);
+            partitaOpportunitaRepository.setGiocatore(idPartita, nomeGiocatore, ESCIPRIGIONE_KEY, IMPREVISTO_KEY);
         }
     }
 

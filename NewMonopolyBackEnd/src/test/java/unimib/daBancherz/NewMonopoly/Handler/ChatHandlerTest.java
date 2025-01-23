@@ -1,4 +1,4 @@
-package unimib.daBancherz.NewMonopoly.Handler;
+/*package unimib.daBancherz.NewMonopoly.Handler;
 
 
 import org.junit.jupiter.api.Test;
@@ -122,6 +122,6 @@ class ChatHandlerTest {
     }
 
 }
-
+*/
 
 

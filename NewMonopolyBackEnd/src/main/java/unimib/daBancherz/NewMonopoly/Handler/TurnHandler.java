@@ -10,7 +10,6 @@ import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaOpportunitaRepos
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 import java.security.SecureRandom;
 
 @Component
@@ -21,9 +20,9 @@ public class TurnHandler {
     private final GiocatoreRepository giocatoreRepository;
     private final PartitaOpportunitaRepository partitaOpportunitaRepository;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
-    private final String exitPrison = "exitPrison";
-    private final String imprevisto = "Imprevisto";
-    private final String probabilita = "Probabilità";
+    private final String EXITPRISON_KEY = "exitPrison";
+    private final String IMPREVISTO_KEY = "Imprevisto";
+    private final String PROBABILITA_KEY = "Probabilità";
 
     public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository) {
         this.gameHandler = gameHandler;
@@ -62,15 +61,15 @@ public class TurnHandler {
         }
 
         if(isInPrison){
-            boolean possiedeProbabilita = partitaOpportunitaRepository.possiedeCarta(gameId, playerName,probabilita);
-            boolean possiedeImprevisto = partitaOpportunitaRepository.possiedeCarta(gameId, playerName,imprevisto);
+            boolean possiedeProbabilita = partitaOpportunitaRepository.possiedeCarta(gameId, playerName, PROBABILITA_KEY);
+            boolean possiedeImprevisto = partitaOpportunitaRepository.possiedeCarta(gameId, playerName, IMPREVISTO_KEY);
             if(possiedeProbabilita){
                 gameBoard.setPlayerPrison(gameId, playerName, false);
-                partitaOpportunitaRepository.setGiocatore(gameId, null, "esci_prigione", probabilita);
+                partitaOpportunitaRepository.setGiocatore(gameId, null, "esci_prigione", PROBABILITA_KEY);
                 messageHandler.sendSystemMessage(gameId, playerName + " è uscito di prigione", gameHandler.getGameSessions(), session);
             } else if(possiedeImprevisto){
                 gameBoard.setPlayerPrison(gameId, playerName, false);
-                partitaOpportunitaRepository.setGiocatore(gameId, null, "esci_prigione", imprevisto);
+                partitaOpportunitaRepository.setGiocatore(gameId, null, "esci_prigione", IMPREVISTO_KEY);
                 messageHandler.sendSystemMessage(gameId, playerName + " è uscito di prigione", gameHandler.getGameSessions(), session);
             }else {
                 String prisonMessage = new ObjectMapper().writeValueAsString(Map.of(
@@ -110,7 +109,7 @@ public class TurnHandler {
             gameBoard.setPlayerPrison(gameId, playerName, false);
             gameBoard.setPlayerCountRoll(gameId, playerName, 0);
             String exitPrisonMessage = new ObjectMapper().writeValueAsString(Map.of(
-                    "type", exitPrison,
+                    "type", EXITPRISON_KEY,
                     "flag", true
             ));
             session.sendMessage(new TextMessage(exitPrisonMessage));
@@ -126,7 +125,7 @@ public class TurnHandler {
         gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, 0);
         if(giocatoreRepository.saldoGiocatore(playerName, gameId) < 50) {
             String exitPrisonMessage = new ObjectMapper().writeValueAsString(Map.of(
-                    "type", exitPrison,
+                    "type", EXITPRISON_KEY,
                     "flag", false
             ));
             session.sendMessage(new TextMessage(exitPrisonMessage));
@@ -136,7 +135,7 @@ public class TurnHandler {
             messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
             gameBoard.setPlayerCountRoll(gameId, playerName, 0);
             String exitPrisonMessage = new ObjectMapper().writeValueAsString(Map.of(
-                    "type", exitPrison,
+                    "type", EXITPRISON_KEY,
                     "flag", true
             ));
             session.sendMessage(new TextMessage(exitPrisonMessage));
