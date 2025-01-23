@@ -8,8 +8,8 @@ public class Partita_Casella_PrezzoproprietaIdTest {
     @Test
     public void testGetSetIdpartita() {
         Partita_Casella_PrezzoproprietaId id = new Partita_Casella_PrezzoproprietaId();
-        id.setIdpartita("P12345");
-        assertEquals("P12345", id.getIdpartita());
+        id.setIdpartita("game-1");
+        assertEquals("game-1", id.getIdpartita());
     }
 
     @Test
@@ -22,33 +22,37 @@ public class Partita_Casella_PrezzoproprietaIdTest {
     @Test
     public void testEquals() {
         Partita_Casella_PrezzoproprietaId id1 = new Partita_Casella_PrezzoproprietaId();
-        id1.setIdpartita("P12345");
+        id1.setIdpartita("game-1");
         id1.setIdcasella(10);
 
         Partita_Casella_PrezzoproprietaId id2 = new Partita_Casella_PrezzoproprietaId();
-        id2.setIdpartita("P12345");
+        id2.setIdpartita("game-1");
         id2.setIdcasella(10);
 
         Partita_Casella_PrezzoproprietaId id3 = new Partita_Casella_PrezzoproprietaId();
-        id3.setIdpartita("P54321");
+        id3.setIdpartita("game-2");
         id3.setIdcasella(20);
+
+        Partita_Casella_PrezzoproprietaId id4 = null;
 
         assertEquals(id1, id2);
         assertNotEquals(id1, id3);
+        assertNotEquals(id1, id4);
+        assertNotEquals(id1, new Object());
     }
 
     @Test
     public void testHashCode() {
         Partita_Casella_PrezzoproprietaId id1 = new Partita_Casella_PrezzoproprietaId();
-        id1.setIdpartita("P12345");
+        id1.setIdpartita("game-1");
         id1.setIdcasella(10);
 
         Partita_Casella_PrezzoproprietaId id2 = new Partita_Casella_PrezzoproprietaId();
-        id2.setIdpartita("P12345");
+        id2.setIdpartita("game-1");
         id2.setIdcasella(10);
 
         Partita_Casella_PrezzoproprietaId id3 = new Partita_Casella_PrezzoproprietaId();
-        id3.setIdpartita("P54321");
+        id3.setIdpartita("game-2");
         id3.setIdcasella(20);
 
         assertEquals(id1.hashCode(), id2.hashCode());
