@@ -98,7 +98,7 @@ public class GameService {
     }
 
 
-    private void populateGameRoule(String gameId) {
+    public void populateGameRoule(String gameId) {
         // Recupera tutte gli imprevisti
         List<Regolafedelta> listaRegole = regolafedeltaRepository.findAll();
         Partita partita = partitaRepository.findById(gameId)

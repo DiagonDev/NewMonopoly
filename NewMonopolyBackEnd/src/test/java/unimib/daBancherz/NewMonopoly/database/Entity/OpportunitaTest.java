@@ -1,6 +1,5 @@
 package unimib.daBancherz.NewMonopoly.database.Entity;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.*;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.Opportunita;
@@ -42,6 +41,16 @@ public class OpportunitaTest {
         Opportunita opportunita = new Opportunita();
         opportunita.setTipo("Tipo Test");
         assertEquals("Tipo Test", opportunita.getTipo());
+    }
+
+    @Test
+    public void testGetParametroDeserializzato_EsciPrigione() throws Exception {
+        Opportunita opportunita = new Opportunita();
+        opportunita.setTipoAzione("esci_prigione");
+        opportunita.setParametro("{}");
+
+        Object parametroDeserializzato = opportunita.getParametroDeserializzato();
+        assertNull(parametroDeserializzato);
     }
 
     @Test

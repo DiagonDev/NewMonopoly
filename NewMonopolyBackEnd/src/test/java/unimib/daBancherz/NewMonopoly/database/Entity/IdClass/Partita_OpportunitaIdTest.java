@@ -34,8 +34,12 @@ public class Partita_OpportunitaIdTest {
         id3.setIdpartita("P54321");
         id3.setIdopportunita(20);
 
+        assertEquals(id1, id1);
         assertEquals(id1, id2);
+
         assertNotEquals(id1, id3);
+        assertNotEquals(id1, null);
+        assertNotEquals(id1, new Object());
     }
 
     @Test
