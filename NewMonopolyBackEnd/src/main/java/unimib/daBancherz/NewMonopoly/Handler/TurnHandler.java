@@ -7,6 +7,8 @@ import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaOpportunitaRepository;
+import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaRepository;
+import unimib.daBancherz.NewMonopoly.dataBase.Entity.*;
 
 import java.util.List;
 import java.util.Map;
@@ -19,23 +21,27 @@ public class TurnHandler {
     private final MessageHandler messageHandler;
     private final GiocatoreRepository giocatoreRepository;
     private final PartitaOpportunitaRepository partitaOpportunitaRepository;
+    private final PartitaRepository partitaRepository;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     private final String EXITPRISON_KEY = "exitPrison";
     private final String IMPREVISTO_KEY = "Imprevisto";
     private final String PROBABILITA_KEY = "Probabilità";
 
 
-    public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository) {
+    public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, PartitaRepository partitaRepository) {
         this.gameHandler = gameHandler;
         this.messageHandler = messageHandler;
         this.giocatoreRepository = giocatoreRepository;
         this.partitaOpportunitaRepository = partitaOpportunitaRepository;
+        this.partitaRepository = partitaRepository;
     }
 
     public void startTurn( WebSocketSession session ) throws Exception {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
         List<WebSocketSession> playersInGame = gameHandler.getGameSessions().get(gameId);
+        Partita partita = partitaRepository.findByCodiceInvito(gameId);
+        partita.setStato("Iniziata");
         boolean isInPrison = gameBoard.isPlayerInPrison(gameId, playerName);
 
         String yourTurnMessage = new ObjectMapper().writeValueAsString(Map.of(

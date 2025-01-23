@@ -11,8 +11,8 @@ import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.TipoCasella
 public class Opportunita {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_probabilita")
-    private Integer idProbabilita;
+    @Column(name = "id_opportunita")
+    private Integer idOpportunita;
     private String descrizione;
     @Column(name = "tipo_azione")
     private String tipoAzione;
@@ -76,11 +76,11 @@ public class Opportunita {
         }
     }
 
-    public Integer getIdProbabilita() {
-        return idProbabilita;
+    public Integer getIdOpportunita() {
+        return idOpportunita;
     }
 
-    public void setIdProbabilita(Integer idProbabilita) {
-        this.idProbabilita = idProbabilita;
+    public void setIdOpportunita(Integer idOpportunita) {
+        this.idOpportunita = idOpportunita;
     }
 }

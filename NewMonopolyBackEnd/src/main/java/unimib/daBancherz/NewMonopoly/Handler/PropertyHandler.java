@@ -130,50 +130,34 @@ public class PropertyHandler {
     }
 
     public void rispostaScambio(PlayerProperties property1, PlayerProperties property2, Integer offertaMonetaria, boolean flag, WebSocketSession session) throws Exception {
+        String gameId= gameHandler.getGameIdBySession(session);
         Integer idProprietario2 = property2.getIdGiocatore();
         Integer idProprietario1 = property1.getIdGiocatore();
-        String nomeCasella1 = property1.getNome();
-        String nomeCasella2 = property2.getNome();
         String nomeProprietario = giocatoreRepository.findNomeByidGiocatore(idProprietario2);
         String nomeRichiedente = giocatoreRepository.findNomeByidGiocatore(idProprietario1);
-        String gameId= gameHandler.getGameIdBySession(session);
+
         Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
         String content;
         if(flag){
-
-            Integer soldi;
-            // se offerta > 0 toglie i soldi al richiedente
             // se offerta < 0 toglie i soldi al proprietario
-            if(offertaMonetaria>0){
-                soldi = giocatoreRepository.saldoGiocatore(nomeRichiedente, gameId);
-                if (soldi>offertaMonetaria) {
-                    giocatoreRepository.setSaldoGiocatore(nomeRichiedente, gameId, offertaMonetaria);
-                    messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeRichiedente);
-                    messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeProprietario);
-                }
-                else {
-                    // Messaggio per dire che sei povero
-                    return;
-                }
-            } else {
-                offertaMonetaria = -offertaMonetaria;
-                soldi = giocatoreRepository.saldoGiocatore(nomeProprietario, gameId);
-                if (soldi > offertaMonetaria){
-                    giocatoreRepository.setSaldoGiocatore(nomeProprietario, gameId, offertaMonetaria);
-                    messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeProprietario);
-                    messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeRichiedente);
-                }
-                else {
-                    // Messaggio per dire che sei povero
-                    return;
-                }
-            }
-            pCPPRepository.setProprietario(nomeRichiedente, gameId, nomeCasella2);
-            pCPPRepository.setProprietario(nomeProprietario, gameId, nomeCasella1);
+            // se offerta > 0 toglie i soldi al richiedente
 
-            messageHandler.rispostaGestisciProprieta("Scambio accettato", session);
-            content= nomeProprietario + " ha accettato lo scambio di " + nomeRichiedente + ". " + property2 + " per: " + property1;
-            messageHandler.sendSystemMessage(gameId, content, gameSessions, session);
+            Integer soldi = giocatoreRepository.saldoGiocatore(nomeRichiedente, gameId);
+            if (soldi>offertaMonetaria) {
+                giocatoreRepository.setSaldoGiocatore(nomeRichiedente, gameId, offertaMonetaria);
+                giocatoreRepository.setSaldoGiocatore(nomeProprietario, gameId, -offertaMonetaria);
+                messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeRichiedente);
+                messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeProprietario);
+                pCPPRepository.setProprietario(nomeRichiedente, gameId, property2.getNome());
+                pCPPRepository.setProprietario(nomeProprietario, gameId, property1.getNome());
+                messageHandler.rispostaGestisciProprieta("Scambio accettato", session);
+                content= nomeProprietario + " ha accettato lo scambio di " + nomeRichiedente + ". " + property2 + " per: " + property1;
+                messageHandler.sendSystemMessage(gameId, content, gameSessions, session);
+            }
+            else {
+                // Messaggio per dire che sei povero
+                return;
+            }
         } else {
             messageHandler.rispostaGestisciProprieta("Scambio declinato", session);
             content = nomeProprietario + " ha rifiutato lo scambio di " + nomeRichiedente;

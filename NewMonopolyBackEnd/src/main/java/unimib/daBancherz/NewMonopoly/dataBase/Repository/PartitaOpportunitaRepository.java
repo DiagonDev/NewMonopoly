@@ -60,12 +60,13 @@ public interface PartitaOpportunitaRepository extends JpaRepository<Partita_Oppo
         """)
     void setGiocatore(@Param("idPartita") String idPartita, @Param("nomeGiocatore") String nomeGiocatore, @Param("tipoAzione") String tipoAzione, @Param("tipo") String tipo);
 
-    @Query("""
+    @Query(value = """
         SELECT COUNT(pp) > 0
         FROM Partita_Opportunita pp
-        WHERE pp.idgiocatore.nome = :nomeGiocatore
-        AND pp.idpartita.codiceInvito = :idPartita
-        AND pp.idopportunita.tipo = :tipo
-    """)
-        boolean possiedeCarta(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("tipo") String tipo);
+        JOIN Opportunita o ON pp.idopportunita = o.id_opportunita
+        WHERE pp.idgiocatore= (SELECT id_Giocatore FROM Giocatore WHERE nome = :nomeGiocatore)
+        AND pp.idpartita = :idPartita
+        AND o.tipo = :tipo
+    """, nativeQuery = true)
+    boolean possiedeCarta(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("tipo") String tipo);
 }
