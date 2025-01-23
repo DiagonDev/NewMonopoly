@@ -9,8 +9,9 @@ const PropertyOwned = ({playerProperties, onPropertySelect}) => {
 
     // Aggiorna le proprietà visualizzate quando updateProperties cambia
     useEffect(() => {
-        if (updateProperties) {
+        if (updateProperties != null) {
             setPropertiesToShow(updateProperties);
+            console.log("updateProperties", updateProperties);
         }
     }, [updateProperties]);
 
