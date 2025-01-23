@@ -11,6 +11,7 @@ import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaOpportunitaRepos
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.security.SecureRandom;
 
 @Component
 public class TurnHandler {
@@ -286,8 +287,9 @@ public class TurnHandler {
     }
 
     public int[] rollDice(WebSocketSession session) throws Exception {
-        int diceR1 = ThreadLocalRandom.current().nextInt(1, 7);
-        int diceR2 = ThreadLocalRandom.current().nextInt(1, 7);
+        SecureRandom secureRandom = new SecureRandom();
+        int diceR1 = secureRandom.nextInt(6) + 1; // Genera un numero casuale tra 1 e 6
+        int diceR2 = secureRandom.nextInt(6) + 1;
         String diceRolled = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "diceRolled",
                 "dice1", diceR1,
