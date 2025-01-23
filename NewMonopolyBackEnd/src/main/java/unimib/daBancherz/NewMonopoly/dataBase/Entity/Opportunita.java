@@ -61,7 +61,7 @@ public class Opportunita {
             case "vai_in_prigione", "sposta_avanti":
                 if (parametro.contains("id_casella")) {
                     return objectMapper.readValue(parametro, IdCasella.class);  // Id Casella
-                } else if (parametro.contains("tipo_casella")) {
+                } else {
                     return objectMapper.readValue(parametro, TipoCasella.class);  // Tipo Casella
                 }
 

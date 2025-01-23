@@ -264,7 +264,7 @@ public class MessageHandler {
                 sendPawnMove(pawnId, playerName, 11, gameSessions, gameId);
                 gameBoard.setPlayerPrison(gameId, playerName, true);
                 break;
-            case"Imprevisto":
+            case IMPREVISTO_KEY:
                 descrizione = partitaOpportunitaRepository.findDescrizione(gameId, IMPREVISTO_KEY);
                 if (descrizione==null) {
                     partitaOpportunitaRepository.setUtilizzatoFalse(gameId, IMPREVISTO_KEY);
@@ -284,7 +284,7 @@ public class MessageHandler {
                 gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, typeBox,session);
                 partitaOpportunitaRepository.setUtilizzatoTrue(gameId, descrizione, IMPREVISTO_KEY);
                 break;
-            case"Probabilità":
+            case PROBABILITA_KEY:
                 descrizione = partitaOpportunitaRepository.findDescrizione(gameId, PROBABILITA_KEY);
                 if (descrizione==null) {
                     partitaOpportunitaRepository.setUtilizzatoFalse(gameId, PROBABILITA_KEY);
@@ -410,7 +410,7 @@ public class MessageHandler {
     }
 
     private void gestisciUscitaPrigione(String idPartita, String nomeGiocatore, String typeBox) {
-        if (typeBox.equals("Probabilità")) {
+        if (typeBox.equals(PROBABILITA_KEY)) {
             partitaOpportunitaRepository.setGiocatore(idPartita, nomeGiocatore, ESCIPRIGIONE_KEY, PROBABILITA_KEY);
         } else {
             partitaOpportunitaRepository.setGiocatore(idPartita, nomeGiocatore, ESCIPRIGIONE_KEY, IMPREVISTO_KEY);
