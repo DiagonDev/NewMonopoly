@@ -6,9 +6,11 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
+import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaCasellaPrezzoproprietaRepository;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaOpportunitaRepository;
 import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaRepository;
 import unimib.daBancherz.NewMonopoly.dataBase.Entity.*;
+import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
 import java.util.List;
 import java.util.Map;
@@ -22,18 +24,20 @@ public class TurnHandler {
     private final GiocatoreRepository giocatoreRepository;
     private final PartitaOpportunitaRepository partitaOpportunitaRepository;
     private final PartitaRepository partitaRepository;
+    private final PartitaCasellaPrezzoproprietaRepository pCPPRepository;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     private final String EXITPRISON_KEY = "exitPrison";
     private final String IMPREVISTO_KEY = "Imprevisto";
     private final String PROBABILITA_KEY = "Probabilità";
 
 
-    public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, PartitaRepository partitaRepository) {
+    public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, PartitaRepository partitaRepository, PartitaCasellaPrezzoproprietaRepository pCPPRepository) {
         this.gameHandler = gameHandler;
         this.messageHandler = messageHandler;
         this.giocatoreRepository = giocatoreRepository;
         this.partitaOpportunitaRepository = partitaOpportunitaRepository;
         this.partitaRepository = partitaRepository;
+        this.pCPPRepository = pCPPRepository;
     }
 
     public void startTurn( WebSocketSession session ) throws Exception {
@@ -112,6 +116,7 @@ public class TurnHandler {
         String content = "Il tuo saldo è negativo";
         // Calcola l'indice della prossima sessione in modo circolare
         int nextIndex = (currentIndex + 1) % playersInGame.size();
+        List<PlayerProperties> giocatorePropertiesList;
 
         // Assegna la sessione successiva
         WebSocketSession nextPlayer = playersInGame.get(nextIndex);
@@ -138,6 +143,14 @@ public class TurnHandler {
                 return;
             }
         }
+
+        giocatorePropertiesList = pCPPRepository.findPlayerProperties(gameId,playerName);
+        String updateGiocatorePropertiesMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "updateProperties",
+                "properties", giocatorePropertiesList
+        ));
+        session.sendMessage(new TextMessage(updateGiocatorePropertiesMessage));
+
         // Avvia il turno per la prossima sessione
         startTurn(nextPlayer);
     }

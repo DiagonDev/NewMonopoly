@@ -81,13 +81,13 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                     propertyHandler.acquistaProprieta(parts, session);
                     break;
                 case "PingScambiaProprieta":
-                    propertyHandler.gestisciProprieta(session, "PingScambiaProprieta");
-                    break;
-                case "GestisciProprieta":
-                    propertyHandler.gestisciProprieta(session, "GestisciProprieta");
+                    propertyHandler.gestisciProprieta(session);
                     break;
                 case "PagaUscitaPrigione":
                     turnHandler.payPrisonExit(session);
+                    break;
+                case "RichiestaUpdateProperties":
+                    propertyHandler.updateProperties(session);
                     break;
                 default:
                     throw new IllegalArgumentException("Tipo di messaggio non supportato: " + parts[0]);
