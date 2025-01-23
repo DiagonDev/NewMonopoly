@@ -91,15 +91,38 @@ public class TurnHandler {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
         List<WebSocketSession> playersInGame = gameHandler.getGameSessions().get(gameId);
+        int saldoGiocatore = giocatoreRepository.saldoGiocatore(gameId, playerName);
         messageHandler.sendSystemMessage(gameId, playerName + " ha concluso il turno", gameHandler.getGameSessions(), session);
         int currentIndex = playersInGame.indexOf(session);
-
+        String content = "Il tuo saldo è negativo";
         // Calcola l'indice della prossima sessione in modo circolare
         int nextIndex = (currentIndex + 1) % playersInGame.size();
 
         // Assegna la sessione successiva
         WebSocketSession nextPlayer = playersInGame.get(nextIndex);
+        if(saldoGiocatore < 0) {
+            String loseMessage = new ObjectMapper().writeValueAsString(Map.of(
+                    "type", "partitaFinita",
+                    "flag", "sconfitta",
+                    "content", content
+            ));
+            session.sendMessage(new TextMessage(loseMessage));
+            messageHandler.sendSystemMessage(gameId, playerName + " ha perso", gameHandler.getGameSessions(), session);
+            gameHandler.removePlayerFromGame(gameId, session);
+            playersInGame = gameHandler.getGameSessions().get(gameId);
 
+            if(playersInGame.size() == 1){
+                WebSocketSession vincitore = playersInGame.get(0);
+                content = "Hai vinto";
+                String winMessage = new ObjectMapper().writeValueAsString(Map.of(
+                        "type", "partitaFinita",
+                        "flag", "vittoria",
+                        "content", content
+                ));
+                vincitore.sendMessage(new TextMessage(winMessage));
+                return;
+            }
+        }
         // Avvia il turno per la prossima sessione
         startTurn(nextPlayer);
     }
@@ -197,99 +220,6 @@ public class TurnHandler {
 
             }
         }
-        /*int[] diceResults = rollDice();
-        int diceR1 = diceResults[0];
-        int diceR2 = diceResults[1];
-        int totDice = diceR1 + diceR2;
-        String gameId = gameHandler.getGameIdBySession(session);
-        String playerName = gameHandler.getPlayerNameBySession(session);
-        int playerPosition = gameBoard.getPlayerPosition(gameId, playerName);
-        boolean isInPrison = gameBoard.isPlayerInPrison(gameId, playerName);
-        int countRoll = gameBoard.getPlayerCountRoll(gameId, playerName);
-        gameBoard.setPlayerCountRoll(gameId, playerName, countRoll+1 );
-        int newPosition;
-        boolean viaPay = false;
-        int countRollDoubleDice = gameBoard.getPlayerCountRollDoubleDice(gameId, playerName);
-        int pawnId = giocatoreRepository.findPedinaFromGiocatore(playerName, gameId);
-
-        String diceRolled = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "diceRolled",
-                "dice1", diceR1,
-                "dice2", diceR2
-        ));
-        session.sendMessage(new TextMessage(diceRolled));//invia il risultato dei dati al giocatore che li ha tirati
-        //perchè se per caso ha fatto due volte doppi dadi e alla seconda è finito in prigione per imprevisto/probabilità bisogna azzerargli i tiri doppi
-        if(isInPrison){
-            gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, 0);
-        }
-
-        if(diceR1 == diceR2 && !isInPrison){
-            gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, ++countRollDoubleDice);
-        }
-
-        if(gameBoard.getPlayerCountRollDoubleDice(gameId, playerName) == 3) {
-            gameBoard.setPlayerPrison(gameId, playerName, true);
-            gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, 0);
-            gameBoard.setPlayerCountRoll(gameId, playerName, 0);
-            gameBoard.setPlayerPosition(gameId, playerName, 11);//aggiorna la posizione del giocatore
-            //invia a tutti i giocatori che il "playername" si è postato di tot caselle "newPosition"
-            messageHandler.sendPawnMove(pawnId, playerName, 11, gameHandler.getGameSessions(), gameId);
-
-            //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
-            messageHandler.sendBoxUsage(playerName, session, 11, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
-
-        }
-        else {
-            if (gameBoard.getPlayerCountRoll(gameId, playerName) == 4) {
-                gameBoard.setPlayerPrison(gameId, playerName, false);
-                gameBoard.setPlayerCountRoll(gameId, playerName, 0);
-                //bisogna vedere se mandare il messaggio, perchè in teoria dal prossio turno lui sara furoi e non dal terzo
-                String exitPrisonMEssage = new ObjectMapper().writeValueAsString(Map.of(
-                        "type", "exitPrison",
-                        "flag", true
-                ));
-                session.sendMessage(new TextMessage(exitPrisonMEssage));
-                isInPrison = false;
-            }
-            if(!isInPrison && (diceR1 != diceR2)){
-                gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, 0);
-                gameBoard.setPlayerCountRoll(gameId, playerName, 0);
-                newPosition = totDice + playerPosition;
-                //serve a recuperare la pawnId del giocatore
-
-                if (newPosition > 40) {
-                    newPosition -= 40;
-                    viaPay = true;
-
-                }
-                gameBoard.setPlayerPosition(gameId, playerName, newPosition);//aggiorna la posizione del giocatore
-                //invia a tutti i giocatori che il "playername" si è postato di tot caselle "newPosition"
-                messageHandler.sendPawnMove(pawnId, playerName, newPosition, gameHandler.getGameSessions(), gameId);
-
-                //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
-                messageHandler.sendBoxUsage(playerName, session, newPosition, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
-
-            }
-            else if (!isInPrison || (diceR1 == diceR2)) {
-                gameBoard.setPlayerPrison(gameId, playerName, false);
-                //gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, 0);
-                gameBoard.setPlayerCountRoll(gameId, playerName, 0);
-                newPosition = totDice + playerPosition;
-                //serve a recuperare la pawnId del giocatore
-
-                if (newPosition > 40) {
-                    newPosition -= 40;
-                    viaPay = true;
-
-                }
-                gameBoard.setPlayerPosition(gameId, playerName, newPosition);//aggiorna la posizione del giocatore
-                //invia a tutti i giocatori che il "playername" si è postato di tot caselle "newPosition"
-                messageHandler.sendPawnMove(pawnId, playerName, newPosition, gameHandler.getGameSessions(), gameId);
-
-                //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
-                messageHandler.sendBoxUsage(playerName, session, newPosition, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
-            }
-        }*/
     }
 
     public int[] rollDice(WebSocketSession session) throws Exception {

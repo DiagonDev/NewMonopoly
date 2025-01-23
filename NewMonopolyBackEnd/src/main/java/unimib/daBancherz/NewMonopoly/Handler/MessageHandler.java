@@ -241,6 +241,7 @@ public class MessageHandler {
                     prezzoAffitto = pCPPRepository.calcolaAffitto(gameId, posizione, idProprietario, count);
                     giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzoAffitto);
                     giocatoreRepository.setSaldoGiocatore(proprietario, gameId, -prezzoAffitto);
+                    String content = playerName + " ha pagato l'affitto a " + proprietario + " di " + prezzoAffitto;
 
                     String payBoxMessage = new ObjectMapper().writeValueAsString(Map.of(
                             TYPE_KEY, "payment",
@@ -251,6 +252,7 @@ public class MessageHandler {
                     session.sendMessage(new TextMessage(payBoxMessage));
                     updateBalance(gameSessions, gameId, playerName);
                     updateBalance(gameSessions, gameId, proprietario);
+                    sendSystemMessage(gameId, content, gameSessions,session);
                 }
                 break;
             case"InPrigione":
