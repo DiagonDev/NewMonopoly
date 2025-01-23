@@ -4,44 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PrezzoproprietaTest {
+public class PrezzoproprietaTest {
 
     @Test
-    void testGettersAndSetters() {
-        // Arrange
+    public void testDefaultValues() {
         Prezzoproprieta prezzoproprieta = new Prezzoproprieta();
-
-        // Act
-        prezzoproprieta.setIdPrezzoproprieta(1);
-        prezzoproprieta.setAffitto(100);
-        prezzoproprieta.setIpoteca(50);
-        prezzoproprieta.setCasa(200);
-        prezzoproprieta.setAffitto1Casa(150);
-        prezzoproprieta.setAffitto2Case(200);
-        prezzoproprieta.setAffitto3Case(300);
-        prezzoproprieta.setAffitto4Case(400);
-        prezzoproprieta.setAffittoAlbergo(500);
-        prezzoproprieta.setCostoAcquisto(1000);
-
-        // Assert
-        assertEquals(1, prezzoproprieta.getIdPrezzoproprieta());
-        assertEquals(100, prezzoproprieta.getAffitto());
-        assertEquals(50, prezzoproprieta.getIpoteca());
-        assertEquals(200, prezzoproprieta.getCasa());
-        assertEquals(150, prezzoproprieta.getAffitto1Casa());
-        assertEquals(200, prezzoproprieta.getAffitto2Case());
-        assertEquals(300, prezzoproprieta.getAffitto3Case());
-        assertEquals(400, prezzoproprieta.getAffitto4Case());
-        assertEquals(500, prezzoproprieta.getAffittoAlbergo());
-        assertEquals(1000, prezzoproprieta.getCostoAcquisto());
-    }
-
-    @Test
-    void testDefaultConstructor() {
-        // Arrange
-        Prezzoproprieta prezzoproprieta = new Prezzoproprieta();
-
-        // Assert
         assertNull(prezzoproprieta.getIdPrezzoproprieta());
         assertNull(prezzoproprieta.getAffitto());
         assertNull(prezzoproprieta.getIpoteca());
@@ -52,5 +19,106 @@ class PrezzoproprietaTest {
         assertNull(prezzoproprieta.getAffitto4Case());
         assertNull(prezzoproprieta.getAffittoAlbergo());
         assertNull(prezzoproprieta.getCostoAcquisto());
+    }
+
+    @Test
+    public void testGetSetIdPrezzoproprieta() {
+        Prezzoproprieta prezzoproprieta = new Prezzoproprieta();
+        prezzoproprieta.setIdPrezzoproprieta(1);
+        assertEquals(1, prezzoproprieta.getIdPrezzoproprieta());
+    }
+
+    @Test
+    public void testGetSetAffitto() {
+        Prezzoproprieta prezzoproprieta = new Prezzoproprieta();
+        prezzoproprieta.setAffitto(200);
+        assertEquals(200, prezzoproprieta.getAffitto());
+    }
+
+    @Test
+    public void testGetSetIpoteca() {
+        Prezzoproprieta prezzoproprieta = new Prezzoproprieta();
+        prezzoproprieta.setIpoteca(100);
+        assertEquals(100, prezzoproprieta.getIpoteca());
+    }
+
+    @Test
+    public void testGetSetCasa() {
+        Prezzoproprieta prezzoproprieta = new Prezzoproprieta();
+        prezzoproprieta.setCasa(50);
+        assertEquals(50, prezzoproprieta.getCasa());
+    }
+
+    @Test
+    public void testGetSetAffitto1Casa() {
+        Prezzoproprieta prezzoproprieta = new Prezzoproprieta();
+        prezzoproprieta.setAffitto1Casa(300);
+        assertEquals(300, prezzoproprieta.getAffitto1Casa());
+    }
+
+    @Test
+    public void testGetSetAffitto2Case() {
+        Prezzoproprieta prezzoproprieta = new Prezzoproprieta();
+        prezzoproprieta.setAffitto2Case(350);
+        assertEquals(350, prezzoproprieta.getAffitto2Case());
+    }
+
+    @Test
+    public void testGetSetAffitto3Case() {
+        Prezzoproprieta prezzoproprieta = new Prezzoproprieta();
+        prezzoproprieta.setAffitto3Case(400);
+        assertEquals(400, prezzoproprieta.getAffitto3Case());
+    }
+
+    @Test
+    public void testGetSetAffitto4Case() {
+        Prezzoproprieta prezzoproprieta = new Prezzoproprieta();
+        prezzoproprieta.setAffitto4Case(450);
+        assertEquals(450, prezzoproprieta.getAffitto4Case());
+    }
+
+    @Test
+    public void testGetSetAffittoAlbergo() {
+        Prezzoproprieta prezzoproprieta = new Prezzoproprieta();
+        prezzoproprieta.setAffittoAlbergo(500);
+        assertEquals(500, prezzoproprieta.getAffittoAlbergo());
+    }
+
+    @Test
+    public void testGetSetCostoAcquisto() {
+        Prezzoproprieta prezzoproprieta = new Prezzoproprieta();
+        prezzoproprieta.setCostoAcquisto(600);
+        assertEquals(600, prezzoproprieta.getCostoAcquisto());
+    }
+
+    @Test
+    public void testNegativeValues() {
+        Prezzoproprieta prezzoproprieta = new Prezzoproprieta();
+        prezzoproprieta.setAffitto(-200);
+        assertEquals(-200, prezzoproprieta.getAffitto());
+
+        prezzoproprieta.setIpoteca(-100);
+        assertEquals(-100, prezzoproprieta.getIpoteca());
+
+        prezzoproprieta.setCasa(-50);
+        assertEquals(-50, prezzoproprieta.getCasa());
+
+        prezzoproprieta.setAffitto1Casa(-300);
+        assertEquals(-300, prezzoproprieta.getAffitto1Casa());
+
+        prezzoproprieta.setAffitto2Case(-350);
+        assertEquals(-350, prezzoproprieta.getAffitto2Case());
+
+        prezzoproprieta.setAffitto3Case(-400);
+        assertEquals(-400, prezzoproprieta.getAffitto3Case());
+
+        prezzoproprieta.setAffitto4Case(-450);
+        assertEquals(-450, prezzoproprieta.getAffitto4Case());
+
+        prezzoproprieta.setAffittoAlbergo(-500);
+        assertEquals(-500, prezzoproprieta.getAffittoAlbergo());
+
+        prezzoproprieta.setCostoAcquisto(-600);
+        assertEquals(-600, prezzoproprieta.getCostoAcquisto());
     }
 }
