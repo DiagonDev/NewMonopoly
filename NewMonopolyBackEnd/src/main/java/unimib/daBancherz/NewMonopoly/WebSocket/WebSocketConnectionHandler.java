@@ -57,8 +57,6 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                     ));
                     session.sendMessage(new TextMessage(pongMessage));
                     break;
-                case "Riconnetti":
-                    break;
                 case "LanciaDadi":
                     turnHandler.spostaPedina(session);
                     break;

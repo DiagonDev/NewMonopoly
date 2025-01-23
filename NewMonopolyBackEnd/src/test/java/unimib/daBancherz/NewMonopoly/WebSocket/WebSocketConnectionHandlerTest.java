@@ -181,4 +181,63 @@ public class WebSocketConnectionHandlerTest {
         webSocketConnectionHandler.handleMessage(session, new TextMessage(messagePayload));
         verify(propertyHandler, times(1)).ipotecaProprieta(any(PlayerProperties.class), eq(session));
     }
+
+    @Test
+    public void testHandleMessageSceltaPedina() throws Exception {
+        String messagePayload = "SceltaPedina:";
+        webSocketConnectionHandler.handleMessage(session, new TextMessage(messagePayload));
+        verify(gameHandler, times(1)).choosePedina(any(String[].class), eq(session));
+    }
+
+    @Test
+    public void testHandleMessageDefaultCase() {
+        String messagePayload = "UnknownMessage:";
+        assertThrows(IllegalArgumentException.class, () -> {
+            webSocketConnectionHandler.handleMessage(session, new TextMessage(messagePayload));
+        });
+    }
+
+    @Test
+    public void testHandleMessageEffettuaScambioInvalidOffertaMonetaria() throws Exception {
+        String messagePayload = "{\"type\":\"!EffettuaScambio\", \"property1\":{}, \"property2\":{}, \"offertaMonetaria\":true}";
+        assertThrows(IllegalArgumentException.class, () -> {
+            webSocketConnectionHandler.handleMessage(session, new TextMessage(messagePayload));
+        });
+    }
+
+    @Test
+    public void testHandleMessageRispostaScambioInvalidOffertaMonetaria() throws Exception {
+        String messagePayload = "{\"type\":\"!RispostaScambio\", \"property1\":{}, \"property2\":{}, \"offertaMonetaria\":true, \"exchangeAccepted\":true}";
+        assertThrows(IllegalArgumentException.class, () -> {
+            webSocketConnectionHandler.handleMessage(session, new TextMessage(messagePayload));
+        });
+    }
+
+    @Test
+    public void testHandleMessageDefaultCaseWithPrefix() {
+        String messagePayload = "{\"type\":\"!UnknownType\"}";
+        assertThrows(IllegalArgumentException.class, () -> {
+            webSocketConnectionHandler.handleMessage(session, new TextMessage(messagePayload));
+        });
+    }
+
+    @Test
+    public void testErrorDuringPlayerDisconnectionNotification() throws Exception {
+        when(session.getId()).thenReturn("testSessionId");
+        when(gameHandler.getPlayerNameBySession(session)).thenReturn("player1");
+        when(gameHandler.getGameIdBySession(session)).thenReturn("game1");
+
+        doThrow(new RuntimeException("Errore")).when(gameHandler).notifyPlayerDisconnected("game1", "player1");
+
+        webSocketConnectionHandler.afterConnectionClosed(session, null);
+
+        assertFalse(webSocketConnectionHandler.playerSessions.containsKey("testSessionId"));
+        verify(gameHandler, times(1)).removePlayerFromGame("game1", session);
+        verify(gameHandler, times(1)).notifyPlayerDisconnected("game1", "player1");
+    }
+
+    @Test
+    public void testSupportsPartialMessages() {
+        assertFalse(webSocketConnectionHandler.supportsPartialMessages());
+    }
 }
