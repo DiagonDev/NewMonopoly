@@ -68,15 +68,29 @@ public class TurnHandler {
         }
 
         if(isInPrison){
-            boolean possiedeProbabilita = partitaOpportunitaRepository.possiedeCarta(gameId, playerName, PROBABILITA_KEY);
-            boolean possiedeImprevisto = partitaOpportunitaRepository.possiedeCarta(gameId, playerName, IMPREVISTO_KEY);
+            boolean possiedeProbabilita = partitaOpportunitaRepository.possiedeCarta(playerName, gameId, PROBABILITA_KEY);
+            boolean possiedeImprevisto = partitaOpportunitaRepository.possiedeCarta(playerName, gameId, IMPREVISTO_KEY);
+            System.out.println(possiedeImprevisto);
+            System.out.println(possiedeProbabilita);
             if(possiedeProbabilita){
                 gameBoard.setPlayerPrison(gameId, playerName, false);
                 partitaOpportunitaRepository.setGiocatore(gameId, null, "esci_prigione", PROBABILITA_KEY);
+                gameBoard.setPlayerCountRoll(gameId, playerName, 0);
+                String exitPrisonMessage = new ObjectMapper().writeValueAsString(Map.of(
+                        "type", EXITPRISON_KEY,
+                        "flag", true
+                ));
+                session.sendMessage(new TextMessage(exitPrisonMessage));
                 messageHandler.sendSystemMessage(gameId, playerName + " è uscito di prigione", gameHandler.getGameSessions(), session);
             } else if(possiedeImprevisto){
                 gameBoard.setPlayerPrison(gameId, playerName, false);
                 partitaOpportunitaRepository.setGiocatore(gameId, null, "esci_prigione", IMPREVISTO_KEY);
+                gameBoard.setPlayerCountRoll(gameId, playerName, 0);
+                String exitPrisonMessage = new ObjectMapper().writeValueAsString(Map.of(
+                        "type", EXITPRISON_KEY,
+                        "flag", true
+                ));
+                session.sendMessage(new TextMessage(exitPrisonMessage));
                 messageHandler.sendSystemMessage(gameId, playerName + " è uscito di prigione", gameHandler.getGameSessions(), session);
             }else {
                 String prisonMessage = new ObjectMapper().writeValueAsString(Map.of(
@@ -91,7 +105,8 @@ public class TurnHandler {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
         List<WebSocketSession> playersInGame = gameHandler.getGameSessions().get(gameId);
-        int saldoGiocatore = giocatoreRepository.saldoGiocatore(gameId, playerName);
+        System.out.println(gameId + "  " + playerName);
+        int saldoG = giocatoreRepository.saldoGiocatore(playerName, gameId);
         messageHandler.sendSystemMessage(gameId, playerName + " ha concluso il turno", gameHandler.getGameSessions(), session);
         int currentIndex = playersInGame.indexOf(session);
         String content = "Il tuo saldo è negativo";
@@ -100,7 +115,7 @@ public class TurnHandler {
 
         // Assegna la sessione successiva
         WebSocketSession nextPlayer = playersInGame.get(nextIndex);
-        if(saldoGiocatore < 0) {
+        if(saldoG < 0) {
             String loseMessage = new ObjectMapper().writeValueAsString(Map.of(
                     "type", "partitaFinita",
                     "flag", "sconfitta",
@@ -227,9 +242,9 @@ public class TurnHandler {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
         Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
-
         int diceR1 = secureRandom.nextInt(6) + 1; // Genera un numero casuale tra 1 e 6
         int diceR2 = secureRandom.nextInt(6) + 1;
+
         String diceRolled = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "diceRolled",
                 "dice1", diceR1,

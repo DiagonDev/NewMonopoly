@@ -3,7 +3,7 @@ import WelcomePage from './pages/WelcomePage'; // Importa il componente WelcomeP
 import CreateGamePage from './pages/CreateGamePage';
 import JoinGamePage from './pages/JoinGamePage';
 import './App.css';
-import {WebSocketProvider} from "./contexts/WebSocketContext";
+import {WebSocketContext} from "./contexts/WebSocketContext";
 import GameBoard from "./GameUI/GameBoard.jsx";
 import WinLoseModal from "./modals/WinLoseModal.jsx";
 import {useContext, useEffect, useState} from "react";
@@ -12,21 +12,20 @@ import {useContext, useEffect, useState} from "react";
 function App() {
     const [isWin, setIsWin] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
-    const {partitaFinita} = useContext(WebSocketProvider);
+    const {partitaFinita} = useContext(WebSocketContext);
     const closeModal = () => {
         setModalVisible(false);
     };
 
     useEffect(() => {
-        if (partitaFinita.equals("Vittoria")) {
+        if (partitaFinita ==="Vittoria") {
             setIsWin(true);
         }
-        else if (partitaFinita.equals("Sconfita")) {
+        else if (partitaFinita === "Sconfitta") {
             setIsWin(false);
         }
     }, [partitaFinita]);
     return (
-        <WebSocketProvider>
             <>
                 {/* Titolo in alto a destra */}
                 <h1 className="titolo">NewMonopolyGame</h1>
@@ -51,7 +50,6 @@ function App() {
                 />
 
             </>
-        </WebSocketProvider>
     );
 }
 
