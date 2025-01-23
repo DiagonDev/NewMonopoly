@@ -396,7 +396,7 @@ public class MessageHandler {
 
         gameBoard.setPlayerPosition(idPartita, nomeGiocatore, idCasella);
         sendPawnMove(pawnId, nomeGiocatore, idCasella, gameSessions, idPartita);
-        Thread.sleep(4000); // TODO: valutare riduzione tempo
+        Thread.sleep(2000); // TODO: valutare riduzione tempo
         sendBoxUsage(nomeGiocatore, session, idCasella, idPartita, gameSessions, pawnId, false);
     }
 

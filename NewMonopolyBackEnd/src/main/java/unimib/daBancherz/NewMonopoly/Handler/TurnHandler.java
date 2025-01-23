@@ -24,6 +24,7 @@ public class TurnHandler {
     private final String IMPREVISTO_KEY = "Imprevisto";
     private final String PROBABILITA_KEY = "Probabilità";
 
+
     public TurnHandler(GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository) {
         this.gameHandler = gameHandler;
         this.messageHandler = messageHandler;
@@ -287,6 +288,10 @@ public class TurnHandler {
 
     public int[] rollDice(WebSocketSession session) throws Exception {
         SecureRandom secureRandom = new SecureRandom();
+        String gameId = gameHandler.getGameIdBySession(session);
+        String playerName = gameHandler.getPlayerNameBySession(session);
+        Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
+
         int diceR1 = secureRandom.nextInt(6) + 1; // Genera un numero casuale tra 1 e 6
         int diceR2 = secureRandom.nextInt(6) + 1;
         String diceRolled = new ObjectMapper().writeValueAsString(Map.of(
@@ -295,6 +300,7 @@ public class TurnHandler {
                 "dice2", diceR2
         ));
         session.sendMessage(new TextMessage(diceRolled));//invia il risultato dei dati al giocatore che li ha tirati
+        messageHandler.sendSystemMessage(gameId, playerName + " ha tirato i dati: dado1 " + diceR1 + ", dado2 " + diceR2, gameSessions, session);
         return new int[]{diceR1, diceR2}; // Restituisce entrambi i valori
     }
 

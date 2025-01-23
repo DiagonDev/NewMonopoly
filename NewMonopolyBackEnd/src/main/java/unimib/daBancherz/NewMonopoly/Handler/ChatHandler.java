@@ -33,7 +33,6 @@ public class ChatHandler {
             }
             //invia il messaggio a tutti gli utenti collegati allo stesso gameID sotto forma di messaggioChat
             sendChatMessage(gameId,nameChat + ": " + chatMessage);
-            //broadcastChatMessage(gameId, session, chatMessage);
         }
 
     }

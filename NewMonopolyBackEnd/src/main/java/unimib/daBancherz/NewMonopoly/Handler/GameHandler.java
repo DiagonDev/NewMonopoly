@@ -96,8 +96,8 @@ public class GameHandler {
 
         gameBoard.createGame(gameId);//crea il singleton per la partita con codicePartita = gameId
         gameBoard.setPlayerPosition(gameId, playerName, 1);//imposta nel signleton che il giocatore parte dalla casella 1
-        messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
         gameService.createGameAndPlayer(playerName, difficulty, randomization, gameId);//crea la parita nel database, più informazioni in GameService
+        messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
 
         //GESTIONE MESSAGGI
         messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella gameconsole
@@ -184,7 +184,6 @@ public class GameHandler {
     }
 
     //genera il codice gameID in modo incrementale partendo da game-0
-    //TODO: devo controllare dal databese quale game ci sono già e restituire l'ID successivo a l'ultimo presente
     private String generateGameId() {
         int Counter = 0;
 

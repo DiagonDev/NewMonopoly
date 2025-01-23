@@ -69,8 +69,9 @@ public class PropertyHandler {
         session.sendMessage(new TextMessage(playerPropertiesListMessage));
     }
 
-    public void gestisciCase(PlayerProperties property, Integer casine,  WebSocketSession session) {
+    public void gestisciCase(PlayerProperties property, Integer casine,  WebSocketSession session) throws Exception {
         String gameId = gameHandler.getGameIdBySession(session);
+        String playerName = gameHandler.getPlayerNameBySession(session);
         Integer idGiocatore = property.getIdGiocatore();
         String coloreCasella = property.getColore();
         int numCase = property.getNumCasa();
@@ -78,20 +79,28 @@ public class PropertyHandler {
         String nomeGiocatore = giocatoreRepository.findNomeByidGiocatore(idGiocatore);
         int saldoGiocatore = giocatoreRepository.saldoGiocatore(nomeGiocatore, gameId);
         int countColore = casellaRepository.countByColore(coloreCasella);
+        Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
+        String content;
+
         if(numCase<5 && saldoGiocatore > (casine * countColore* costoCasa)){
             giocatoreRepository.setSaldoGiocatore(nomeGiocatore, gameId, (casine * countColore * costoCasa));
+            messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
             pCPPRepository.aggiungiCase(coloreCasella, casine);
+            content = playerName + " ha costruito " + casine + "case sulle proprietà di colore " + coloreCasella;
+            messageHandler.sendSystemMessage(gameId, content, gameSessions, session);
             // Messaggio aggiornamento
         } else {
             // Messaggio fallito
         }
     }
 
-    public void effettuaScambio(PlayerProperties property1, PlayerProperties property2, Integer money,  WebSocketSession session) throws IOException {
+    public void effettuaScambio(PlayerProperties property1, PlayerProperties property2, Integer money,  WebSocketSession session) throws Exception {
         String nomeRichiedente = giocatoreRepository.findNomeByidGiocatore(property1.getIdGiocatore());
         String nomeProprietario  = giocatoreRepository.findNomeByidGiocatore(property2.getIdGiocatore());
         String gameId = gameHandler.getGameIdBySession(session);
         WebSocketSession session2 = gameHandler.getSessionByPlayerName(nomeProprietario, gameId);
+        Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
+
         String casaMessage = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "exchangeRequest",
                 "property1", property1,
@@ -100,46 +109,60 @@ public class PropertyHandler {
                 "playerName", nomeRichiedente
         ));
         session2.sendMessage(new TextMessage(casaMessage));
+        String content = nomeRichiedente + " ha chiesto uno scambio a " + nomeProprietario + ". " + property1 + " per: " + property2;
+        messageHandler.sendSystemMessage(gameId, content, gameSessions, session);
     }
 
-    public void ipotecaProprieta(PlayerProperties property, WebSocketSession session) throws IOException {
+    public void ipotecaProprieta(PlayerProperties property, WebSocketSession session) throws Exception {
         String nomeCasella = property.getNome();
         String gameId= gameHandler.getGameIdBySession(session);
         String nomeGiocatore = gameHandler.getPlayerNameBySession(session);
         Integer prezzo = property.getPrezzoCorrente()/2;
         Integer posizione = pCPPRepository.findPosizioneByNomeCasellaAndIdpartita(nomeCasella, gameId);
+        Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
+
         pCPPRepository.setPrezzoCorrente(prezzo, gameId, posizione);
         giocatoreRepository.setSaldoGiocatore(nomeGiocatore, gameId, - (prezzo) );
+        messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeGiocatore);
         pCPPRepository.setProprietario(null, gameId, nomeCasella);
-        messageHandler.rispostaAggiornaProprieta(gameId, nomeGiocatore, session);   //Messaggio al frontend
+        messageHandler.rispostaAggiornaProprieta(gameId, nomeGiocatore, session);//Messaggio al frontend
+        messageHandler.sendSystemMessage(gameId, nomeGiocatore + " ha ipotecato: " + nomeCasella, gameSessions, session);
     }
 
-    public void rispostaScambio(PlayerProperties property1, PlayerProperties property2, Integer offertaMonetaria, boolean flag, WebSocketSession session) throws IOException {
+    public void rispostaScambio(PlayerProperties property1, PlayerProperties property2, Integer offertaMonetaria, boolean flag, WebSocketSession session) throws Exception {
+        Integer idProprietario2 = property2.getIdGiocatore();
+        Integer idProprietario1 = property1.getIdGiocatore();
+        String nomeCasella1 = property1.getNome();
+        String nomeCasella2 = property2.getNome();
+        String nomeProprietario = giocatoreRepository.findNomeByidGiocatore(idProprietario2);
+        String nomeRichiedente = giocatoreRepository.findNomeByidGiocatore(idProprietario1);
+        String gameId= gameHandler.getGameIdBySession(session);
+        Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
+        String content;
         if(flag){
-            Integer idProprietario2 = property2.getIdGiocatore();
-            Integer idProprietario1 = property1.getIdGiocatore();
-            String nomeCasella1 = property1.getNome();
-            String nomeCasella2 = property2.getNome();
-            String nomeProprietario = giocatoreRepository.findNomeByidGiocatore(idProprietario2);
-            String nomeRichiedente = giocatoreRepository.findNomeByidGiocatore(idProprietario1);
-            String gameId= gameHandler.getGameIdBySession(session);
 
             Integer soldi;
             // se offerta > 0 toglie i soldi al richiedente
             // se offerta < 0 toglie i soldi al proprietario
             if(offertaMonetaria>0){
                 soldi = giocatoreRepository.saldoGiocatore(nomeRichiedente, gameId);
-                if (soldi>offertaMonetaria)
+                if (soldi>offertaMonetaria) {
                     giocatoreRepository.setSaldoGiocatore(nomeRichiedente, gameId, offertaMonetaria);
+                    messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeRichiedente);
+                    messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeProprietario);
+                }
                 else {
                     // Messaggio per dire che sei povero
                     return;
                 }
             } else {
-                offertaMonetaria = - offertaMonetaria;
+                offertaMonetaria = -offertaMonetaria;
                 soldi = giocatoreRepository.saldoGiocatore(nomeProprietario, gameId);
-                if (soldi>offertaMonetaria)
+                if (soldi > offertaMonetaria){
                     giocatoreRepository.setSaldoGiocatore(nomeProprietario, gameId, offertaMonetaria);
+                    messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeProprietario);
+                    messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeRichiedente);
+                }
                 else {
                     // Messaggio per dire che sei povero
                     return;
@@ -149,8 +172,12 @@ public class PropertyHandler {
             pCPPRepository.setProprietario(nomeProprietario, gameId, nomeCasella1);
 
             messageHandler.rispostaGestisciProprieta("Scambio accettato", session);
+            content= nomeProprietario + " ha accettato lo scambio di " + nomeRichiedente + ". " + property2 + " per: " + property1;
+            messageHandler.sendSystemMessage(gameId, content, gameSessions, session);
         } else {
             messageHandler.rispostaGestisciProprieta("Scambio declinato", session);
+            content = nomeProprietario + " ha rifiutato lo scambio di " + nomeRichiedente;
+            messageHandler.sendSystemMessage(gameId, content, gameSessions, session);
         }
     }
 }
