@@ -74,10 +74,11 @@ export const WebSocketProvider = ({children}) => {
         playerName: '',
         money: 0,
     });
-
+    const [partitaFinita, setPartitaFinita] = useState('');
+    const [updateProperties, setUpdateProperties] = useState([]);
     useEffect(() => {
-        //const ws = new WebSocket("https://c2be-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
-        const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
+        const ws = new WebSocket("https://c2be-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
+        //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
         ws.onopen = () => {
             setSocket(ws);
             setConnected(true);
@@ -314,6 +315,10 @@ export const WebSocketProvider = ({children}) => {
                     }else{
                         setExitPrison(2);
                     }
+                }else if(message.type === 'partitaFinita'){
+                    setPartitaFinita(message.flag);
+                }else if(message.type === 'updateProperties'){
+                    setUpdateProperties(message.properties);
                 }
             };
 
@@ -360,6 +365,8 @@ export const WebSocketProvider = ({children}) => {
                 buyReturn,
                 prison,
                 exitPrison,
+                partitaFinita,
+                updateProperties,
                 errorName
             }}>
             {children}

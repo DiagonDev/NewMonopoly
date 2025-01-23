@@ -3,7 +3,7 @@ import {SquareType} from "./SquareType.jsx";
 import {BoardSection} from "./BoardSection.jsx";
 
 
-
+//Questa classe verrà cambiata con le properties
 export const SquareConfigData = new Map();
 SquareConfigData.set(1, { type: SquareType.Go, section: BoardSection.Bottom });
 SquareConfigData.set(2, { type: SquareType.Property, section: BoardSection.Bottom, groupId: 1 });
