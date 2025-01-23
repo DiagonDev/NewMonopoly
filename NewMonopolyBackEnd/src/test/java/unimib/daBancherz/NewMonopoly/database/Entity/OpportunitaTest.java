@@ -1,8 +1,7 @@
 package unimib.daBancherz.NewMonopoly.database.Entity;
 
 import org.junit.jupiter.api.Test;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.*;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.Opportunita;
+import unimib.daBancherz.NewMonopoly.database.Entity.ClassiParametri.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

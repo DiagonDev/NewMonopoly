@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
+import unimib.daBancherz.NewMonopoly.database.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
-import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaCasellaPrezzoproprietaRepository;
-import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaOpportunitaRepository;
-import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaRepository;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.*;
+import unimib.daBancherz.NewMonopoly.database.Repository.PartitaCasellaPrezzoproprietaRepository;
+import unimib.daBancherz.NewMonopoly.database.Repository.PartitaOpportunitaRepository;
+import unimib.daBancherz.NewMonopoly.database.Repository.PartitaRepository;
+import unimib.daBancherz.NewMonopoly.database.Entity.*;
 import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
 import java.util.List;

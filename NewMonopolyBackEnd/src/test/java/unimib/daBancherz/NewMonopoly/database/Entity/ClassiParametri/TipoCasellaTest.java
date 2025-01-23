@@ -1,7 +1,6 @@
 package unimib.daBancherz.NewMonopoly.database.Entity.ClassiParametri;
 
 import org.junit.jupiter.api.Test;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.ClassiParametri.TipoCasella;
 
 import static org.junit.jupiter.api.Assertions.*;
 

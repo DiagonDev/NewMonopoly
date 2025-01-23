@@ -1,6 +1,5 @@
 package unimib.daBancherz.NewMonopoly.database.Entity.IdClass;
 import org.junit.jupiter.api.Test;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.IdClass.Partita_RegolafedeltaId;
 
 import static org.junit.jupiter.api.Assertions.*;
 

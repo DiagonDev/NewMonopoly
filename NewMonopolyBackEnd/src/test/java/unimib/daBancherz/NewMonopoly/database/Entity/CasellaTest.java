@@ -1,7 +1,6 @@
 package unimib.daBancherz.NewMonopoly.database.Entity;
 
 import org.junit.jupiter.api.Test;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.Casella;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

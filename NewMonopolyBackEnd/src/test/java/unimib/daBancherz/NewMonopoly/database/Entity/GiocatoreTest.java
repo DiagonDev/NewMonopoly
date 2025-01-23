@@ -4,9 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.mockito.Mockito;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.Giocatore;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.Partita;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.Pedina;
 
 class GiocatoreTest {
     private Giocatore giocatore;

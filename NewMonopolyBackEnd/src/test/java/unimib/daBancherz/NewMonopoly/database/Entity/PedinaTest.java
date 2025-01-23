@@ -2,7 +2,6 @@ package unimib.daBancherz.NewMonopoly.database.Entity;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import unimib.daBancherz.NewMonopoly.dataBase.Entity.Pedina;
 
 import static org.junit.jupiter.api.Assertions.*;
 

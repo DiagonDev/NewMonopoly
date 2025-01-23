@@ -6,10 +6,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import unimib.daBancherz.NewMonopoly.dataBase.Repository.GiocatoreRepository;
-import unimib.daBancherz.NewMonopoly.dataBase.Repository.PartitaRepository;
-import unimib.daBancherz.NewMonopoly.dataBase.Repository.PedinaRepository;
-import unimib.daBancherz.NewMonopoly.dataBase.Service.GameService;
+import unimib.daBancherz.NewMonopoly.database.Repository.GiocatoreRepository;
+import unimib.daBancherz.NewMonopoly.database.Repository.PartitaRepository;
+import unimib.daBancherz.NewMonopoly.database.Repository.PedinaRepository;
+import unimib.daBancherz.NewMonopoly.database.Service.GameService;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 
 import java.util.ArrayList;

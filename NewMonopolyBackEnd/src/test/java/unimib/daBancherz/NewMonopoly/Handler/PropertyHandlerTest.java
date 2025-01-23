@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.socket.WebSocketSession;
-import unimib.daBancherz.NewMonopoly.dataBase.Repository.*;
+import unimib.daBancherz.NewMonopoly.database.Repository.*;
 
 import static org.mockito.Mockito.*;
 
