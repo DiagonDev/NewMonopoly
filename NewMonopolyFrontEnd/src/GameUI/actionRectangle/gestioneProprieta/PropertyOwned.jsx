@@ -2,27 +2,36 @@ import {translateColor} from "../../../util/itToEnColors.jsx";
 import {useContext, useEffect, useState} from "react";
 import {WebSocketContext} from "../../../contexts/WebSocketContext.jsx";
 
+const areAllPropertiesDifferent = (playerProperties, updateProperties) => {
+    console.log(playerProperties);
+    console.log(updateProperties);
+    if (!playerProperties || !updateProperties) return true;
+
+    return playerProperties.every(playerProp =>
+        !updateProperties.some(updateProp => playerProp.id === updateProp.id)
+    );
+};
+
 // eslint-disable-next-line react/prop-types
 const PropertyOwned = ({playerProperties, onPropertySelect}) => {
     const {updateProperties} = useContext(WebSocketContext);
-    const [propertiesToShow, setPropertiesToShow] = useState(playerProperties || []); // Inizializza con le proprietà iniziali
+    const [propertiesToShow, setPropertiesToShow] = useState(playerProperties || []);
 
-    // Aggiorna le proprietà visualizzate quando updateProperties cambia
     useEffect(() => {
-        if (updateProperties != null) {
-            setPropertiesToShow(updateProperties);
-            console.log("updateProperties", updateProperties);
+        // Controlla se tutti gli elementi di playerProperties sono diversi da quelli di updateProperties
+        if (areAllPropertiesDifferent(playerProperties, updateProperties)) {
+            setPropertiesToShow(updateProperties); // Usa updateProperties
+        } else {
+            setPropertiesToShow(playerProperties); // Usa playerProperties
         }
-    }, [updateProperties]);
+    }, [playerProperties, updateProperties]);
 
-    // Funzione per aprire il modal e inviare i dati al padre
     const handleSquareClick = (property) => {
         if (onPropertySelect) {
-            onPropertySelect(property); // Passa il valore al padre
+            onPropertySelect(property);
         }
     };
 
-    //non renderizzo se entrambe nulle
     if (!playerProperties && !updateProperties) {
         return null;
     }

@@ -265,8 +265,6 @@ export const WebSocketProvider = ({children}) => {
                 } else if (message.type === 'nameBox') {
 
                     setNameBox(message.name);
-                } else if (message.type === 'propertiesOwned') {
-                    setPlayerProperties(message.properties);
 
                 }else if (message.type === 'allProperties') {
                     setAllProperties(message.properties);

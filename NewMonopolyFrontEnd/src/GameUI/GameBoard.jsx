@@ -64,7 +64,7 @@ const GameBoard = () => {
         setActiveComponent("GestisciProprieta")
         if (socket && connected) {
             // Invia un messaggio al server
-            socket.send('GestisciProprieta:');
+            socket.send('RichiestaUpdateProperties:');
             console.log('Messaggio inviato: GestisciProprieta');
         } else {
             console.error('Connessione WebSocket non stabilita!');

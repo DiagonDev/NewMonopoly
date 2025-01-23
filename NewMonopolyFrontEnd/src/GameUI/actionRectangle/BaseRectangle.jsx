@@ -6,7 +6,6 @@ import PropertyOwned from "./gestioneProprieta/PropertyOwned.jsx";
 const BaseRectangle = ({playerProperties}) => {
     const {exchangeRequest} = useContext(WebSocketContext);
     const [isPageOpen, setIsPageOpen] = useState(false);
-
     useEffect(() => {
         if (exchangeRequest.flag) {
             setIsPageOpen(true);
