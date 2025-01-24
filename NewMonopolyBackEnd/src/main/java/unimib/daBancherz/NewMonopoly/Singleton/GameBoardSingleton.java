@@ -1,11 +1,12 @@
 package unimib.daBancherz.NewMonopoly.Singleton;
 
+import org.springframework.stereotype.Component;
 import unimib.daBancherz.NewMonopoly.model.Game;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
+@Component
 public class GameBoardSingleton {
     private static GameBoardSingleton instance;
     private final Map<String, Game> games = new HashMap<>();

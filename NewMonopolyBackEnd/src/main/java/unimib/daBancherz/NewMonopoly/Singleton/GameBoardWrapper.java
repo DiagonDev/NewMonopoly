@@ -1,5 +1,6 @@
 package unimib.daBancherz.NewMonopoly.Singleton;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import unimib.daBancherz.NewMonopoly.model.Game;
 
@@ -8,7 +9,12 @@ import java.util.Map;
 @Component
 public class GameBoardWrapper {
 
-    private final GameBoardSingleton gameBoardSingleton = GameBoardSingleton.getInstance();
+    private final GameBoardSingleton gameBoardSingleton;
+
+    @Autowired
+    public GameBoardWrapper(GameBoardSingleton gameBoardSingleton) {
+        this.gameBoardSingleton = gameBoardSingleton;
+    }
 
     public void createGame(String gameId) {
         gameBoardSingleton.createGame(gameId);
