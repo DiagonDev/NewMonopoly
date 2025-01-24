@@ -1,56 +1,53 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { WebSocketContext } from "../contexts/WebSocketContext";
+import { useState, useEffect } from 'react';
+import {useWebSocket} from "../websocket/WebSocketProvider.jsx";
 import { useNavigate } from 'react-router-dom';
 import ErrorModal from '../modals/ErrorModal';
 const JoinGamePage = () => {
-  const { socket, connected, serverMessage, errorName} = useContext(WebSocketContext);
+  const { isConnected, sendMessage, messages } = useWebSocket();
   // Stato per i campi del form
   const [name, setName] = useState('');
   const [gameId, setGameId] = useState('');
   const [submit, setSubmit] =useState(false);
   const navigate = useNavigate();
    const [isPageOpen, setIsPageOpen] = useState(false);
-  
-      
-              
+
+  const errorNameMessage = messages.find((msg) => msg.type === "errorName");
+
 
   // Gestore per il submit del form
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Se la connessione WebSocket è aperta, invia il messaggio
-    if (socket && connected) {
+    if (isConnected) {
       setSubmit(true);
-      socket.send(`Partecipa:${name}:${gameId}`);
-      console.log('Nome:', name);
-      console.log('ID Partita:', gameId);
-      // Reset dei campi dopo il submit (opzionale)
-      setName('');
-      setGameId('');
-      
+      sendMessage({ type: "joinGame", name, gameId });
+      console.log("Nome:", name);
+      console.log("ID Partita:", gameId);
+
+      // Reset dei campi
+      setName("");
+      setGameId("");
     } else {
       console.error("Connessione WebSocket non stabilita!");
     }
-    
+
   };
-  
-  useEffect(() => {
-    
-    if(errorName===1 && submit){
-     
-      navigate('/play');
-    }else  if(errorName===2 && submit){
-      
-      setIsPageOpen(true);
-    }
-    
-  }, [errorName]);
+
+    useEffect(() => {
+        if (errorNameMessage && submit) {
+            if (errorNameMessage.payload === 1) {
+                navigate("/play");
+            } else if (errorNameMessage.payload === 2) {
+                setIsPageOpen(true);
+            }
+        }
+    }, [errorNameMessage, submit, navigate]);
 
   return (
     <>
       {isPageOpen ? (
-        <ErrorModal 
+        <ErrorModal
           message="player name gia esistente"
-          onClose={() => setIsPageOpen(false)} 
+          onClose={() => setIsPageOpen(false)}
         />
       ) : (
         <div>
@@ -78,11 +75,10 @@ const JoinGamePage = () => {
             <br />
             <button type="submit">Partecipa</button>
           </form>
-          {/* Mostra il messaggio ricevuto dal server */}
-          {serverMessage && <p>Messaggio dal server: {serverMessage}</p>}
+
         </div>
       )}
-      
+
     </>
   );
 };
