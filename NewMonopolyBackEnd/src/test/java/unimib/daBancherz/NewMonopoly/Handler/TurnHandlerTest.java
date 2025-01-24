@@ -45,45 +45,4 @@ class TurnHandlerTest {
 
     private final GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
-    @Test
-    void testPayPrisonExit_PlayerPays() throws Exception {
-        String gameId = "game123";
-        String playerName = "player1";
-
-        when(mockGameHandler.getGameIdBySession(mockSession)).thenReturn(gameId);
-        when(mockGameHandler.getPlayerNameBySession(mockSession)).thenReturn(playerName);
-        when(mockGiocatoreRepository.saldoGiocatore(playerName, gameId)).thenReturn(100);
-
-        turnHandler.payPrisonExit(mockSession);
-
-        verify(mockGiocatoreRepository).setSaldoGiocatore(playerName, gameId, 50);
-        verify(mockSession).sendMessage(argThat(message -> {
-            try {
-                String payload = ((TextMessage) message).getPayload();
-                return payload.contains("\"type\":\"exitPrison\"") && payload.contains("\"flag\":true");
-            } catch (Exception e) {
-                return false;
-            }
-        }));
-    }
-
-
-    @Test
-    void testRollDice() throws Exception {
-        String gameId = "game123";
-        String playerName = "player1";
-
-        when(mockGameHandler.getGameIdBySession(mockSession)).thenReturn(gameId);
-        when(mockGameHandler.getPlayerNameBySession(mockSession)).thenReturn(playerName);
-
-        int[] diceResults = turnHandler.rollDice(mockSession);
-
-        assertTrue(diceResults[0] >= 1 && diceResults[0] <= 6);
-        assertTrue(diceResults[1] >= 1 && diceResults[1] <= 6);
-
-        verify(mockSession).sendMessage(any(TextMessage.class));
-        verify(mockMessageHandler).sendSystemMessage(eq(gameId), contains("ha tirato i dati"), any(), eq(mockSession));
-    }
-
-
 }

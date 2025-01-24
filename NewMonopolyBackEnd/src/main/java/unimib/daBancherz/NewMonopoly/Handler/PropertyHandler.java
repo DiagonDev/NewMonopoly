@@ -31,26 +31,24 @@ public class PropertyHandler {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
         Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
-        String content;
 
         int prezzoCasella = pCPPRepository.prezzoCasella2(messageParts[1], gameId);
         int saldoGiocatore = giocatoreRepository.saldoGiocatore(playerName, gameId);
-        if(saldoGiocatore > prezzoCasella){
-            pCPPRepository.setProprietario(playerName, gameId, messageParts[1]);
-            giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzoCasella);
-            messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
-            String proprietaMessage = new ObjectMapper().writeValueAsString(Map.of(
-                    "type", "acquistoRiuscito"
-            ));
-            session.sendMessage(new TextMessage(proprietaMessage));
-            content = playerName + " ha acquistato: " + messageParts[1];
-            messageHandler.sendSystemMessage(gameId, content, gameSessions, session);
-        }else{
-            String proprietaMessage = new ObjectMapper().writeValueAsString(Map.of(
-                    "type", "acquistoFallito"
-            ));
-            session.sendMessage(new TextMessage(proprietaMessage));
-        }
+
+        if(saldoGiocatore > prezzoCasella)
+            completaAcquistoProprieta(gameId, playerName, messageParts[1], prezzoCasella, session);
+        else
+            messageHandler.inviaMessaggio(session, "acquistoFallito");
+    }
+
+    public void completaAcquistoProprieta(String gameId, String playerName, String nomeProprieta, int prezzo, WebSocketSession session) throws Exception {
+        pCPPRepository.setProprietario(playerName, gameId, nomeProprieta);
+        giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzo);
+        messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
+
+        messageHandler.inviaMessaggio(session, "acquistoRiuscito");
+        String content = playerName + " ha acquistato: " + nomeProprieta;
+        messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
     }
 
     public void gestisciProprieta(WebSocketSession session) throws IOException {
@@ -58,55 +56,43 @@ public class PropertyHandler {
         String playerName = gameHandler.getPlayerNameBySession(session);
         List<PlayerProperties> playerPropertiesList = pCPPRepository.findOtherPlayerProperties(gameId,playerName);
 
-        String playerPropertiesListMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "allProperties",
-                "properties", playerPropertiesList
-        ));
-        session.sendMessage(new TextMessage(playerPropertiesListMessage));
+        messageHandler.inviaMessaggio(session, "allProperties", "properties", playerPropertiesList);
     }
 
     public void gestisciCase(PlayerProperties property, Integer casine,  WebSocketSession session) throws Exception {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
-        Integer idGiocatore = property.getIdGiocatore();
         String coloreCasella = property.getColore();
         int numCase = property.getNumCasa();
         int costoCasa = property.getPrezzoCasaCorrente();
-        String nomeGiocatore = giocatoreRepository.findNomeByidGiocatore(idGiocatore);
-        int saldoGiocatore = giocatoreRepository.saldoGiocatore(nomeGiocatore, gameId);
+        int saldoGiocatore = giocatoreRepository.saldoGiocatore(playerName, gameId);
         int countColore = casellaRepository.countByColore(coloreCasella);
-        Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
-        String content;
 
-        if(numCase<5 && saldoGiocatore > (casine * countColore* costoCasa)){
-            giocatoreRepository.setSaldoGiocatore(nomeGiocatore, gameId, (casine * countColore * costoCasa));
-            messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
-            pCPPRepository.aggiungiCase(coloreCasella, casine);
-            content = playerName + " ha costruito " + casine + "case sulle proprietà di colore " + coloreCasella;
-            messageHandler.sendSystemMessage(gameId, content, gameSessions, session);
-            // Messaggio aggiornamento
-        } else {
-            // Messaggio fallito
-        }
+        if(numCase<5 && saldoGiocatore > (casine * countColore* costoCasa))
+            completaCostruzioneCase(gameId, playerName, coloreCasella, casine, costoCasa, countColore, session);
+        else
+            messageHandler.inviaMessaggio(session, "costruzioneFallita");
     }
+
+    public void completaCostruzioneCase(String gameId, String playerName, String coloreCasella, int casine, int costoCasa, int countColore, WebSocketSession session) throws Exception {
+        giocatoreRepository.setSaldoGiocatore(playerName, gameId, (casine * countColore * costoCasa));
+        messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
+        pCPPRepository.aggiungiCase(coloreCasella, casine);
+
+        String content = playerName + " ha costruito " + casine + " case sulle proprietà di colore " + coloreCasella;
+        messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
+    }
+
 
     public void effettuaScambio(PlayerProperties property1, PlayerProperties property2, Integer money,  WebSocketSession session) throws Exception {
         String nomeRichiedente = giocatoreRepository.findNomeByidGiocatore(property1.getIdGiocatore());
         String nomeProprietario  = giocatoreRepository.findNomeByidGiocatore(property2.getIdGiocatore());
         String gameId = gameHandler.getGameIdBySession(session);
         WebSocketSession session2 = gameHandler.getSessionByPlayerName(nomeProprietario, gameId);
-        Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
 
-        String casaMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "exchangeRequest",
-                "property1", property1,
-                "property2", property2,
-                "money", money,
-                "playerName", nomeRichiedente
-        ));
-        session2.sendMessage(new TextMessage(casaMessage));
+        messageHandler.exchangeRequestMessage(nomeRichiedente, property1, property2, money, session2);
         String content = nomeRichiedente + " ha chiesto uno scambio a " + nomeProprietario + ". " + property1.getNome() + " per: " + property2.getNome();
-        messageHandler.sendSystemMessage(gameId, content, gameSessions, session);
+        messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
     }
 
     public void ipotecaProprieta(PlayerProperties property, WebSocketSession session) throws Exception {
@@ -115,87 +101,75 @@ public class PropertyHandler {
         String nomeGiocatore = gameHandler.getPlayerNameBySession(session);
         Integer prezzo = property.getPrezzoCorrente()/2;
         Integer posizione = pCPPRepository.findPosizioneByNomeCasellaAndIdpartita(nomeCasella, gameId);
-        Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
-        List<PlayerProperties> giocatorePropertiesList;
 
         pCPPRepository.setPrezzoCorrente(prezzo, gameId, posizione);
         giocatoreRepository.setSaldoGiocatore(nomeGiocatore, gameId, - (prezzo) );
         messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeGiocatore);
         pCPPRepository.setProprietario(null, gameId, nomeCasella);
-        messageHandler.rispostaAggiornaProprieta(gameId, nomeGiocatore, session);//Messaggio al frontend
-        messageHandler.sendSystemMessage(gameId, nomeGiocatore + " ha ipotecato: " + nomeCasella, gameSessions, session);
-        giocatorePropertiesList = pCPPRepository.findPlayerProperties(gameId,nomeGiocatore);
 
-        String updateGiocatorePropertiesMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "updateProperties",
-                "properties", giocatorePropertiesList
-        ));
-        session.sendMessage(new TextMessage(updateGiocatorePropertiesMessage));
+        aggiornaProprieta(gameId, nomeGiocatore, session);
+        String content = nomeGiocatore + " ha ipotecato: " + nomeCasella;
+        messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
+    }
+
+    public void aggiornaProprieta(String gameId, String nomeGiocatore, WebSocketSession session) throws IOException {
+        List<PlayerProperties> giocatorePropertiesList = pCPPRepository.findPlayerProperties(gameId, nomeGiocatore);
+        messageHandler.inviaMessaggio(session, "updateProperties", "properties", giocatorePropertiesList);
     }
 
     public void rispostaScambio(PlayerProperties property1, PlayerProperties property2, Integer offertaMonetaria, boolean flag, WebSocketSession session) throws Exception {
-        String gameId= gameHandler.getGameIdBySession(session);
-        Integer idProprietario2 = property2.getIdGiocatore();
-        Integer idProprietario1 = property1.getIdGiocatore();
-        String nomeProprietario = giocatoreRepository.findNomeByidGiocatore(idProprietario2);
-        String nomeRichiedente = giocatoreRepository.findNomeByidGiocatore(idProprietario1);
+        String gameId = gameHandler.getGameIdBySession(session);
+        String nomeProprietario = giocatoreRepository.findNomeByidGiocatore(property2.getIdGiocatore());
+        String nomeRichiedente = giocatoreRepository.findNomeByidGiocatore(property1.getIdGiocatore());
         WebSocketSession sessionRichiedente = gameHandler.getSessionByPlayerName(nomeRichiedente, gameId);
-        List<PlayerProperties> proprietarioPropertiesList;
-        List<PlayerProperties> richiedentePropertiesList;
 
-        Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
-        String content;
-        if(flag){
-            // se offerta < 0 toglie i soldi al proprietario
-            // se offerta > 0 toglie i soldi al richiedente
-
-            Integer soldi = giocatoreRepository.saldoGiocatore(nomeRichiedente, gameId);
-            if (soldi>offertaMonetaria) {
-                giocatoreRepository.setSaldoGiocatore(nomeRichiedente, gameId, offertaMonetaria);
-                giocatoreRepository.setSaldoGiocatore(nomeProprietario, gameId, -offertaMonetaria);
-                messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeRichiedente);
-                messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeProprietario);
-                pCPPRepository.setProprietario(nomeRichiedente, gameId, property2.getNome());
-                pCPPRepository.setProprietario(nomeProprietario, gameId, property1.getNome());
-                messageHandler.rispostaGestisciProprieta("Scambio accettato", session);
-                content= nomeProprietario + " ha accettato lo scambio di " + nomeRichiedente + ". " + property2.getNome() + " per: " + property1.getNome();
-                messageHandler.sendSystemMessage(gameId, content, gameSessions, session);
-
-                proprietarioPropertiesList = pCPPRepository.findPlayerProperties(gameId,nomeProprietario);
-                richiedentePropertiesList = pCPPRepository.findPlayerProperties(gameId,nomeRichiedente);
-                String updateProprietarioPropertiesMessage = new ObjectMapper().writeValueAsString(Map.of(
-                        "type", "updateProperties",
-                        "properties", proprietarioPropertiesList
-                ));
-                session.sendMessage(new TextMessage(updateProprietarioPropertiesMessage));
-
-                String updateRichiedentePropertiesMessage = new ObjectMapper().writeValueAsString(Map.of(
-                        "type", "updateProperties",
-                        "properties", richiedentePropertiesList
-                ));
-                sessionRichiedente.sendMessage(new TextMessage(updateRichiedentePropertiesMessage));
-            }
-            else {
-                // Messaggio per dire che sei povero
-                return;
-            }
+        if (flag) {
+            completaScambio(gameId, nomeProprietario, nomeRichiedente, property1, property2, offertaMonetaria, session, sessionRichiedente);
         } else {
-            messageHandler.rispostaGestisciProprieta("Scambio declinato", session);
-            content = nomeProprietario + " ha rifiutato lo scambio di " + nomeRichiedente;
-            messageHandler.sendSystemMessage(gameId, content, gameSessions, session);
+            rifiutaScambio(gameId, nomeProprietario, nomeRichiedente, session);
         }
     }
+
+    public void completaScambio(String gameId, String nomeProprietario, String nomeRichiedente, PlayerProperties property1, PlayerProperties property2, Integer offertaMonetaria, WebSocketSession session, WebSocketSession sessionRichiedente) throws Exception {
+        int saldoRichiedente = giocatoreRepository.saldoGiocatore(nomeRichiedente, gameId);
+
+        if (saldoRichiedente > offertaMonetaria) {
+            giocatoreRepository.setSaldoGiocatore(nomeRichiedente, gameId, offertaMonetaria);
+            giocatoreRepository.setSaldoGiocatore(nomeProprietario, gameId, -offertaMonetaria);
+            messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeRichiedente);
+            messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeProprietario);
+            pCPPRepository.setProprietario(nomeRichiedente, gameId, property2.getNome());
+            pCPPRepository.setProprietario(nomeProprietario, gameId, property1.getNome());
+
+            messageHandler.rispostaGestisciProprieta("Scambio accettato", session);
+            String content = nomeProprietario + " ha accettato lo scambio di " + nomeRichiedente + ". " + property2.getNome() + " per: " + property1.getNome();
+            messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
+
+            aggiornaProprietaScambio(gameId, nomeProprietario, nomeRichiedente, session, sessionRichiedente);
+        } else {
+            messageHandler.inviaMessaggio(session, "scambioFallito", "reason", "Saldo insufficiente");
+        }
+    }
+
+    public void aggiornaProprietaScambio(String gameId, String nomeProprietario, String nomeRichiedente, WebSocketSession session, WebSocketSession sessionRichiedente) throws IOException {
+        List<PlayerProperties> proprietarioPropertiesList = pCPPRepository.findPlayerProperties(gameId, nomeProprietario);
+        messageHandler.inviaMessaggio(session, "updateProperties", "properties", proprietarioPropertiesList);
+
+        List<PlayerProperties> richiedentePropertiesList = pCPPRepository.findPlayerProperties(gameId, nomeRichiedente);
+        messageHandler.inviaMessaggio(sessionRichiedente, "updateProperties", "properties", richiedentePropertiesList);
+    }
+
+    public void rifiutaScambio(String gameId, String nomeProprietario, String nomeRichiedente, WebSocketSession session) throws Exception {
+        messageHandler.rispostaGestisciProprieta("Scambio declinato", session);
+        String content = nomeProprietario + " ha rifiutato lo scambio di " + nomeRichiedente;
+        messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
+    }
+
 
     public void updateProperties(WebSocketSession session) throws IOException {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
 
-        List<PlayerProperties> updatePropertiesList = pCPPRepository.findPlayerProperties(gameId,playerName);
-        String updatePropertiesMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "updateProperties",
-                "properties", updatePropertiesList
-        ));
-        session.sendMessage(new TextMessage(updatePropertiesMessage));
-
+        aggiornaProprieta(gameId, playerName, session);
     }
 }

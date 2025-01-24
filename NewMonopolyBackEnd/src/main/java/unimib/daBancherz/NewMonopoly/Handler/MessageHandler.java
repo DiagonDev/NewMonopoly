@@ -146,4 +146,25 @@ public class MessageHandler {
         session.sendMessage(new TextMessage(exitPrisonMessage));
     }
 
+    public void exchangeRequestMessage(String nomeRichiedente, PlayerProperties property1, PlayerProperties property2, Integer money, WebSocketSession session2) throws IOException {
+        String casaMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "exchangeRequest",
+                "property1", property1,
+                "property2", property2,
+                "money", money,
+                "playerName", nomeRichiedente
+        ));
+        session2.sendMessage(new TextMessage(casaMessage));
+    }
+
+    public void inviaMessaggio(WebSocketSession session, String type) throws IOException {
+        String message = new ObjectMapper().writeValueAsString(Map.of("type", type));
+        session.sendMessage(new TextMessage(message));
+    }
+
+    public void inviaMessaggio(WebSocketSession session, String type, String key, Object value) throws IOException {
+        String message = new ObjectMapper().writeValueAsString(Map.of("type", type, key, value));
+        session.sendMessage(new TextMessage(message));
+    }
+
 }
