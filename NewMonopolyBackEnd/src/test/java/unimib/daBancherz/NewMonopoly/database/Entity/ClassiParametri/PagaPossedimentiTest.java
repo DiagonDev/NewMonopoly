@@ -16,7 +16,7 @@ public class PagaPossedimentiTest {
     @Test
     public void testGetSetCostoAbergo() {
         PagaPossedimenti pagaPossedimenti = new PagaPossedimenti();
-        pagaPossedimenti.setCosto_abergo(200);
-        assertEquals(200, pagaPossedimenti.getCosto_abergo());
+        pagaPossedimenti.setCosto_albergo(200);
+        assertEquals(200, pagaPossedimenti.getCosto_albergo());
     }
 }

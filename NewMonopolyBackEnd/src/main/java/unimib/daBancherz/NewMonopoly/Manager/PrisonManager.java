@@ -20,7 +20,6 @@ public class PrisonManager {
     private final GiocatoreRepository giocatoreRepository;
     private final MessageHandler messageHandler;
     private final GameHandler gameHandler;
-    private String EXITPRISON_KEY = "exitPrison";
 
     public PrisonManager(PartitaOpportunitaRepository partitaOpportunitaRepository, GiocatoreRepository giocatoreRepository, MessageHandler messageHandler, GameHandler gameHandler) {
         this.partitaOpportunitaRepository = partitaOpportunitaRepository;

@@ -72,7 +72,6 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
             c.id_casella AS idcasella,
             CASE
                 WHEN c.tipo IN ('Proprietà', 'Stazione', 'Società') THEN c.id_casella
-                ELSE NULL
             END AS idprezzoproprieta,
             c.id_casella AS posizione
         FROM Casella c
@@ -94,7 +93,6 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
                     c.id_casella AS posizione,
                     CASE
                         WHEN c.tipo IN ('Società', 'Stazione') THEN c.id_casella
-                        ELSE NULL
                     END AS idprezzoproprieta
                 FROM
                     Casella c
@@ -196,7 +194,6 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
                             ELSE 1
                         END
                     WHEN dati.tipo = 'Via' THEN dati.prezzo
-                    ELSE NULL
                 END,
                 prezzo_casa_corrente = CASE
                     WHEN dati.tipo = 'Proprietà' THEN dati.casa *
@@ -346,7 +343,7 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     int contaCaseTot(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
 
     @Query(value = """
-        SELECT COUNT(*) 
+        SELECT COUNT(*)
         FROM partita_casella_prezzoproprieta  pcp
         JOIN giocatore g ON pcp.idgiocatore = g.id_giocatore
         WHERE g.nome= :nomeGiocatore
@@ -363,7 +360,7 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
         WHERE c.tipo = :tipoCasella
         AND p.posizione > :posizioneCorrente
         AND p.idpartita = :idPartita
-        ORDER BY p.posizione ASC
+        ORDER BY p.posizione
         LIMIT 1
     """, nativeQuery = true)
     Integer findNextCasellaByTipo(@Param("tipoCasella") String tipoCasella, @Param("posizioneCorrente") Integer posizioneCorrente, @Param("idPartita") String idPartita);

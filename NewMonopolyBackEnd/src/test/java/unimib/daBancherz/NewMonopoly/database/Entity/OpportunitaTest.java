@@ -83,7 +83,7 @@ public class OpportunitaTest {
         Object parametroDeserializzato = opportunita.getParametroDeserializzato();
         assertTrue(parametroDeserializzato instanceof PagaPossedimenti);
         assertEquals(100, ((PagaPossedimenti) parametroDeserializzato).getCosto_casa());
-        assertEquals(200, ((PagaPossedimenti) parametroDeserializzato).getCosto_abergo());
+        assertEquals(200, ((PagaPossedimenti) parametroDeserializzato).getCosto_albergo());
     }
 
     @Test

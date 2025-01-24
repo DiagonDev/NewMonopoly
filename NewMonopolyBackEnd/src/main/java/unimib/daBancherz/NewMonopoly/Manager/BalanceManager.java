@@ -47,8 +47,6 @@ public class BalanceManager {
     }
 
     private void handleNegativeBalance(String gameId, String playerName, WebSocketSession session) throws Exception {
-        List<WebSocketSession> playersInGame = gameHandler.getGameSessions().get(gameId);
-
         String loseMessage = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "partitaFinita",
                 "flag", "sconfitta",

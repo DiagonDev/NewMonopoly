@@ -1,15 +1,12 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.database.Repository.*;
 import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class PropertyHandler {
@@ -31,7 +28,6 @@ public class PropertyHandler {
     public void acquistaProprieta(String[] messageParts, WebSocketSession session) throws Exception {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
-        Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
 
         int prezzoCasella = pCPPRepository.prezzoCasella2(messageParts[1], gameId);
         int saldoGiocatore = giocatoreRepository.saldoGiocatore(playerName, gameId);

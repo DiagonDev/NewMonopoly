@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class GameBoardSingleton {
     private static GameBoardSingleton instance;
-    private Map<String, Game> games = new HashMap<>();
+    private final Map<String, Game> games = new HashMap<>();
 
     private GameBoardSingleton() {}
 

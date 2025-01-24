@@ -1,13 +1,7 @@
 package unimib.daBancherz.NewMonopoly.Manager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
-import unimib.daBancherz.NewMonopoly.Handler.MessageHandler;
-
 import java.security.SecureRandom;
-import java.util.Map;
 
 @Component
 public class DiceManager {

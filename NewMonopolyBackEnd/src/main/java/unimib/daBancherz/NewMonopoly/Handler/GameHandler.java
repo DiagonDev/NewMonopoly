@@ -1,17 +1,13 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardWrapper;
 import unimib.daBancherz.NewMonopoly.database.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.database.Repository.PartitaRepository;
 import unimib.daBancherz.NewMonopoly.database.Repository.PedinaRepository;
 import unimib.daBancherz.NewMonopoly.database.Service.GameService;
-import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,12 +60,12 @@ public class GameHandler {
         }
 
         gameBoardWrapper.createGame(gameId);//crea il singleton per la partita con codicePartita = gameId
-        gameBoardWrapper.setPlayerPosition(gameId, playerName, 1);//imposta nel signleton che il giocatore parte dalla casella 1
-        gameService.createGameAndPlayer(playerName, difficulty, randomization, gameId);//crea la parita nel database, più informazioni in GameService
+        gameBoardWrapper.setPlayerPosition(gameId, playerName, 1);//imposta nel singleton che il giocatore parte dalla casella 1
+        gameService.createGameAndPlayer(playerName, difficulty, randomization, gameId);//crea la partita nel database, più informazioni in GameService
 
         //GESTIONE MESSAGGI
         messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
-        messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella gameconsole
+        messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella game console
         messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "ADMIN");//invia a tutti i giocatori i messaggi di partecipazione alla partita
         messageHandler.sendTypePlayer("ADMIN", session);//invia all'admin il tipo di giocatore che è
 
@@ -102,7 +98,7 @@ public class GameHandler {
         gameBoardWrapper.setPlayerPosition(gameId, playerName, 1);
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         playersInGame.add(session);//aggiunge la sessione del giocatore alla lista di sessioni della partita a cuoi vuole partecipare
-        gameService.addPlayer(playerName, gameId);//aggiunge il giocatore nel databesa alla partita assegnata
+        gameService.addPlayer(playerName, gameId);//aggiunge il giocatore nel database alla partita assegnata
         messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "giocatore");//invia a tutti i giocatori i messaggi di partecipazione alla partita
 
         pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);

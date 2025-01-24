@@ -37,7 +37,7 @@ public interface PartitaRegolafedeltaRepository extends JpaRepository<Partita_Re
     @Query("""
         UPDATE Partita_Regolafedelta pii
         SET pii.utilizzato =  false
-        WHERE pii.idpartita.codiceInvito = :idPartita 
+        WHERE pii.idpartita.codiceInvito = :idPartita
     """)
     void setUtilizzatoFalse(@Param("idPartita") String idPartita);
 

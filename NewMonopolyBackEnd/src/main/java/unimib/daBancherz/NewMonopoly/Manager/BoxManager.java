@@ -111,29 +111,29 @@ public class BoxManager {
         int idCasella;
         switch (tipoAzione) {
             case "ricevi_importo", "paga_importo":
-                opportunitaManager.gestisciImporto(parametri, idPartita, nomeGiocatore, gameSessions);
+                opportunitaManager.gestisciImporto(parametri, idPartita, nomeGiocatore);
                 messageHandler.updateBalance(gameSessions, idPartita, nomeGiocatore);
                 break;
             case "paga_importo_giocatore", "ricevi_importo_giocatore":
-                opportunitaManager.gestisciPagamentoGiocatori(tipoAzione, parametri, idPartita, nomeGiocatore, gameSessions);
+                opportunitaManager.gestisciPagamentoGiocatori(tipoAzione, parametri, idPartita, nomeGiocatore);
                 List<String> giocatoriPartita = giocatoreRepository.findGiocatori(idPartita);
                 for (String nome : giocatoriPartita) {
                     messageHandler.updateBalance(gameSessions, idPartita, nome);
                 }
                 break;
             case "paga_possedimenti":
-                opportunitaManager.gestisciPagamentoPossedimenti(parametri, idPartita, nomeGiocatore, gameSessions);
+                opportunitaManager.gestisciPagamentoPossedimenti(parametri, idPartita, nomeGiocatore);
                 messageHandler.updateBalance(gameSessions, idPartita, nomeGiocatore);
                 break;
             case "sposta_avanti":
-                idCasella = opportunitaManager.gestisciSpostamento(parametri, posizione, idPartita, nomeGiocatore, pawnId, gameSessions, session);
+                idCasella = opportunitaManager.gestisciSpostamento(parametri, posizione, idPartita, nomeGiocatore);
                 messageHandler.updateBalance(gameSessions, idPartita, nomeGiocatore);
                 messageHandler.sendPawnMove(pawnId, nomeGiocatore, idCasella, gameSessions, idPartita);
                 Thread.sleep(2000);
                 sendBoxUsage(nomeGiocatore, session, idCasella, idPartita, gameSessions, pawnId, false);
                 break;
             case "vai_in_prigione":
-                idCasella = opportunitaManager.gestisciPrigione(parametri, idPartita, nomeGiocatore, pawnId, gameSessions);
+                idCasella = opportunitaManager.gestisciPrigione(parametri, idPartita, nomeGiocatore);
                 messageHandler.sendPawnMove(pawnId, nomeGiocatore, idCasella, gameSessions, idPartita);
                 break;
             case ESCIPRIGIONE_KEY:

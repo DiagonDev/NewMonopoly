@@ -8,8 +8,8 @@ import org.springframework.web.socket.*;
 import unimib.daBancherz.NewMonopoly.Handler.ChatHandler;
 import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
 import unimib.daBancherz.NewMonopoly.Handler.PropertyHandler;
-import unimib.daBancherz.NewMonopoly.Handler.TurnHandler;
 import unimib.daBancherz.NewMonopoly.Handler.*;
+import unimib.daBancherz.NewMonopoly.Manager.TurnManager;
 import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
     public final Map<String, WebSocketSession> playerSessions = new ConcurrentHashMap<>();
     private final GameHandler gameHandler;
     private final ChatHandler chatHandler;
-    private final TurnHandler turnHandler;
+    private final TurnManager turnManager;
     private final WebSocketReconnect reconnect;
     private final PropertyHandler propertyHandler;
     private final MessageHandler messageHandler;
@@ -30,11 +30,11 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
 
     // Iniezione di GameHandler e ChatHandler tramite il costruttore
     @Autowired
-    public WebSocketConnectionHandler(GameHandler gameHandler, ChatHandler chatHandler, TurnHandler turnHandler,
+    public WebSocketConnectionHandler(GameHandler gameHandler, ChatHandler chatHandler, TurnManager turnManager,
                                       WebSocketReconnect reconnect, PropertyHandler propertyHandler, MessageHandler messageHandler) {
         this.gameHandler = gameHandler;
         this.chatHandler = chatHandler;
-        this.turnHandler = turnHandler;
+        this.turnManager = turnManager;
         this.reconnect = reconnect;
         this.propertyHandler = propertyHandler;
         this.messageHandler = messageHandler;
@@ -56,13 +56,13 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                     messageHandler.sendPongMessage(session);
                     break;
                 case "LanciaDadi":
-                    turnHandler.spostaPedina(session);
+                    turnManager.spostaPedina(session);
                     break;
                 case "FineTurno":
-                    turnHandler.endTurn(session);
+                    turnManager.endTurn(session);
                     break;
                 case "InizioPartita":
-                    turnHandler.startTurn(session);
+                    turnManager.startTurn(session);
                     break;
                 case "Create":
                     gameHandler.createGame(parts, session);
@@ -83,7 +83,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                     propertyHandler.gestisciProprieta(session);
                     break;
                 case "PagaUscitaPrigione":
-                    turnHandler.payPrisonExit(session);
+                    turnManager.payPrisonExit(session);
                     break;
                 case "RichiestaUpdateProperties":
                     propertyHandler.updateProperties(session);
