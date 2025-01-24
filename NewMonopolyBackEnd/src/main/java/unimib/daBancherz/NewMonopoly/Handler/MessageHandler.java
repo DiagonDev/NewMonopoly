@@ -7,12 +7,10 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.Manager.OpportunitaManager;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
-
 import unimib.daBancherz.NewMonopoly.database.Entity.Opportunita;
 import unimib.daBancherz.NewMonopoly.database.Repository.*;
 import unimib.daBancherz.NewMonopoly.database.Service.GameService;
 import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +49,7 @@ public class MessageHandler {
     }
 
     //invia i messaggi a tutti
-    private void sendToGame(Map<String, Object> data, Map<String, List<WebSocketSession>> gameSessions, String gameId, WebSocketSession session) throws IOException {
+    private void sendToGame(Map<String, Object> data, Map<String, List<WebSocketSession>> gameSessions, String gameId) throws IOException {
         String message = createMessage(data);
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         for (WebSocketSession playerSession : playersInGame) {
@@ -66,7 +64,7 @@ public class MessageHandler {
 
         //l'if serve perchè i due messaggi che iniziano con... devono essere inviati solo al giocatore che crea la partita
         if (!(content.startsWith("Ti sei unito alla partita con ID: ") || content.startsWith("#"))) {
-            sendToGame(Map.of(TYPE_KEY, "system", CONTENT_KEY, content), gameSessions, gameId, session);
+            sendToGame(Map.of(TYPE_KEY, "system", CONTENT_KEY, content), gameSessions, gameId);
         } else {
             //sendToGame(Map.of(TYPE_KEY, "system", CONTENT_KEY, content), gameSessions, gameId, session, false);
             session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "system", CONTENT_KEY, content))));
@@ -74,17 +72,17 @@ public class MessageHandler {
     }
 
     public void sendUnusedPedine(List<Integer> pedineNonUsate, Map<String, List<WebSocketSession>> gameSessions, String gameId) throws Exception {
-        sendToGame(Map.of(TYPE_KEY, "pawnsAvailable", CONTENT_KEY, pedineNonUsate), gameSessions, gameId, null);
+        sendToGame(Map.of(TYPE_KEY, "pawnsAvailable", CONTENT_KEY, pedineNonUsate), gameSessions, gameId);
     }
 
     public void sendPawnMove(Integer pawnId, String playerName, Integer offset, Map<String, List<WebSocketSession>> gameSessions, String gameId) throws IOException {
-        sendToGame(Map.of(TYPE_KEY, "pawnMove", "pawnId", pawnId, PLAYERNAME_KEY, playerName, "offset", offset), gameSessions, gameId, null);
+        sendToGame(Map.of(TYPE_KEY, "pawnMove", "pawnId", pawnId, PLAYERNAME_KEY, playerName, "offset", offset), gameSessions, gameId);
     }
 
     public void sendJoinMessage(String playerName, Map<String, List<WebSocketSession>> gameSessions, String role, String gameId) throws IOException {
         int balance = giocatoreRepository.saldoGiocatore(playerName, gameId);
-        sendToGame(Map.of(TYPE_KEY, "join", PLAYERNAME_KEY, playerName, "userRole", role), gameSessions, gameId, null);
-        sendToGame(Map.of(TYPE_KEY, "playersList", PLAYERNAME_KEY, playerName, BALANCE_KEY, balance), gameSessions, gameId, null);
+        sendToGame(Map.of(TYPE_KEY, "join", PLAYERNAME_KEY, playerName, "userRole", role), gameSessions, gameId);
+        sendToGame(Map.of(TYPE_KEY, "playersList", PLAYERNAME_KEY, playerName, BALANCE_KEY, balance), gameSessions, gameId);
     }
 
     public void sendGameId(String gameId, WebSocketSession session) throws Exception {
@@ -99,22 +97,23 @@ public class MessageHandler {
         // Messaggi per il giocatore che si è unito e per tutti i partecipanti
         sendSystemMessage(gameId, "Ti sei unito alla partita con ID: " + gameId + " con successo!", gameSessions, session);
         sendSystemMessage(gameId, playerName + " si è unito alla partita!", gameSessions, session);
-        sendPlayerAndBalance(gameId, playerName, session);
+        sendPlayerAndBalance(gameId, playerName, session, role);
         sendJoinMessage(playerName, gameSessions, role, gameId);
     }
 
-    public void sendPlayerAndBalance(String gameId, String playerName, WebSocketSession session) throws Exception {
+    public void sendPlayerAndBalance(String gameId, String playerName, WebSocketSession session, String role) throws Exception {
         List<String> playerJoined = gameService.getPlayersWithIdLowerThan(gameId, playerName);
         for (String player : playerJoined) {
             int balance = giocatoreRepository.saldoGiocatore(player, gameId);
             session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "playersList", PLAYERNAME_KEY, player, BALANCE_KEY, balance))));
+            session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "join", PLAYERNAME_KEY, playerName, "userRole", role))));
             Thread.sleep(100); //serve per far si che il frontend riesca a ricevere i messaggi e a visualizzarli in tempo
         }
     }
 
     public void updateBalance(Map<String, List<WebSocketSession>> gameSessions, String gameId, String playerName) throws IOException {
         int balance = giocatoreRepository.saldoGiocatore(playerName, gameId);
-        sendToGame(Map.of(TYPE_KEY, "playerBalance", PLAYERNAME_KEY, playerName, BALANCE_KEY, balance), gameSessions, gameId, null);
+        sendToGame(Map.of(TYPE_KEY, "playerBalance", PLAYERNAME_KEY, playerName, BALANCE_KEY, balance), gameSessions, gameId);
     }
 
     //posizione => il codice della cella dove il giocatore finisce dopo il lancio dadi
@@ -204,7 +203,7 @@ public class MessageHandler {
                 updateBalance(gameSessions, idPartita, nomeGiocatore);
                 break;
             case "sposta_avanti":
-                 idCasella = opportunitaManager.gestisciSpostamento(parametri, posizione, idPartita, nomeGiocatore, pawnId, gameSessions, session);
+                idCasella = opportunitaManager.gestisciSpostamento(parametri, posizione, idPartita, nomeGiocatore, pawnId, gameSessions, session);
                 updateBalance(gameSessions, idPartita, nomeGiocatore);
                 sendPawnMove(pawnId, nomeGiocatore, idCasella, gameSessions, idPartita);
                 Thread.sleep(2000);
@@ -238,6 +237,13 @@ public class MessageHandler {
     public void sendErrorGameIdMessage(WebSocketSession session, String gameId) throws IOException {
         session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "errorGameId", "gameId", gameId))));
     }
+
+    public void notifyPlayerDisconnected(String gameId, String playerName, Map<String, List<WebSocketSession>> gameSessions) throws Exception {
+        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
+        if (playersInGame == null) return;
+        sendToGame(Map.of(TYPE_KEY, "system", CONTENT_KEY, playerName + " si è disconnesso dalla partita."), gameSessions, gameId);
+    }
+
     public String createTurnMessage (boolean turn, String playerName) throws JsonProcessingException {
         String yourTurnMessage = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "turn",
