@@ -1,4 +1,5 @@
-/*package unimib.daBancherz.NewMonopoly.WebSocket;
+package unimib.daBancherz.NewMonopoly.WebSocket;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -11,8 +12,10 @@ import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.Handler.ChatHandler;
 import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
 import unimib.daBancherz.NewMonopoly.Handler.PropertyHandler;
+import unimib.daBancherz.NewMonopoly.Manager.PrisonManager;
 import unimib.daBancherz.NewMonopoly.Manager.TurnManager;
 import unimib.daBancherz.NewMonopoly.MessageService;
+import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
 import java.util.Map;
 
@@ -30,9 +33,6 @@ public class WebSocketConnectionDispatcherTest {
     private ChatHandler chatHandler;
 
     @Mock
-    private TurnManager turnManager;
-
-    @Mock
     private WebSocketReconnect reconnect;
 
     @Mock
@@ -40,6 +40,9 @@ public class WebSocketConnectionDispatcherTest {
 
     @Mock
     private MessageService messageService;
+
+    @Mock
+    private TurnManager turnManager;
 
     @Mock
     private WebSocketSession session;
@@ -226,4 +229,46 @@ public class WebSocketConnectionDispatcherTest {
     public void testSupportsPartialMessages() {
         assertFalse(webSocketConnectionDispatcher.supportsPartialMessages());
     }
-}*/
+
+   @Test
+    public void testHandleMessageEffettuaScambio() throws Exception {
+        String payload = "{ \"type\": \"!EffettuaScambio\", \"data\": {\"key\": \"value\"} }";
+        TextMessage message = new TextMessage(payload);
+
+        webSocketConnectionDispatcher.handleMessage(session, message);
+
+        ArgumentCaptor<Map<String, Object>> captor = ArgumentCaptor.forClass(Map.class);
+        verify(propertyHandler, times(1)).effettuaScambio(captor.capture(), eq(session));
+    }
+
+    @Test
+    public void testHandleMessageCostruisciCasa() throws Exception {
+        PlayerProperties property = new PlayerProperties();
+        property.setNome("propId");
+        String payload = "{ \"type\": \"!CostruisciCasa\", \"property\": " + new ObjectMapper().writeValueAsString(property) + ", \"casine\": 2 }";
+        TextMessage message = new TextMessage(payload);
+
+        webSocketConnectionDispatcher.handleMessage(session, message);
+
+        ArgumentCaptor<PlayerProperties> propertyCaptor = ArgumentCaptor.forClass(PlayerProperties.class);
+        ArgumentCaptor<Integer> casineCaptor = ArgumentCaptor.forClass(Integer.class);
+        verify(propertyHandler, times(1)).gestisciCase(propertyCaptor.capture(), casineCaptor.capture(), eq(session));
+        PlayerProperties capturedProperty = propertyCaptor.getValue();
+        Integer capturedCasine = casineCaptor.getValue();
+        assertEquals("propId", capturedProperty.getNome());
+        assertEquals(Integer.valueOf(2), capturedCasine);
+    }
+
+    @Test
+    public void testHandleMessageIpotecaProprieta() throws Exception {
+        PlayerProperties property = new PlayerProperties();
+        property.setNome("propId");
+        String payload = "{ \"type\": \"!IpotecaProprieta\", \"property\": " + new ObjectMapper().writeValueAsString(property) + "}";
+        TextMessage message = new TextMessage(payload);
+
+        webSocketConnectionDispatcher.handleMessage(session, message);
+
+        ArgumentCaptor<PlayerProperties> propertyCaptor = ArgumentCaptor.forClass(PlayerProperties.class);
+        verify(propertyHandler, times(1)).ipotecaProprieta(propertyCaptor.capture(), eq(session));
+    }
+}
