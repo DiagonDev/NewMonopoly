@@ -1,5 +1,4 @@
-import React, {useState, useContext} from 'react';
-import {WebSocketContext} from "../contexts/WebSocketContext";
+import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useWebSocket} from "../websocket/WebSocketProvider.jsx";
 
@@ -15,7 +14,6 @@ const CreateGamePage = () => {
         e.preventDefault();
 
         if (isConnected) {
-            // Invia il messaggio al server
             sendMessage({
                 type: "createGame",
                 userName,
@@ -66,8 +64,6 @@ const CreateGamePage = () => {
                 <br/>
                 <button type="submit">Crea</button>
             </form>
-            {/* Mostra il messaggio ricevuto dal server */}
-            {serverMessage && <p>Messaggio dal server: {serverMessage}</p>}
         </div>
     );
 };

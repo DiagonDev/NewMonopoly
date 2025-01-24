@@ -1,9 +1,8 @@
-import React from "react";
 import "./ErrorModal.css"; // Per uno stile personalizzato
 
-const ErrorModal = ({ message, onClose }) => {
-    if (!message) return null; // Non mostra nulla se non c'è un messaggio
-
+// eslint-disable-next-line react/prop-types
+const ErrorModal = ({message, onClose}) => {
+    if (!message) return null;
     return (
         <div className="error-modal-overlay">
             <div className="error-modal">

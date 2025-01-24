@@ -1,8 +1,8 @@
-import React from "react";
 import "./WinLoseModal.css"; // Stile per il modal
 
-const WinLoseModal = ({ visible, title, message, onClose }) => {
-    if (!visible) return null; // Rendi il modal invisibile se `visible` è false
+// eslint-disable-next-line react/prop-types
+const WinLoseModal = ({visible, title, message, onClose}) => {
+    if (!visible) return null;
 
     return (
         <div className="modal-overlay">
