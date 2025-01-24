@@ -15,13 +15,14 @@ import java.util.Map;
 @Component
 public class PrisonManager {
 
-    private final GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
+    private final GameBoardSingleton gameBoard;
     private final PartitaOpportunitaRepository partitaOpportunitaRepository;
     private final GiocatoreRepository giocatoreRepository;
     private final MessageService messageService;
     private final GameHandler gameHandler;
 
-    public PrisonManager(PartitaOpportunitaRepository partitaOpportunitaRepository, GiocatoreRepository giocatoreRepository, MessageService messageService, GameHandler gameHandler) {
+    public PrisonManager(GameBoardSingleton gameBoard, PartitaOpportunitaRepository partitaOpportunitaRepository, GiocatoreRepository giocatoreRepository, MessageService messageService, GameHandler gameHandler) {
+        this.gameBoard = gameBoard;
         this.partitaOpportunitaRepository = partitaOpportunitaRepository;
         this.giocatoreRepository = giocatoreRepository;
         this.messageService = messageService;
