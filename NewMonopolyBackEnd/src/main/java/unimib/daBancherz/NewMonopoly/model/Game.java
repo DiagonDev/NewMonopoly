@@ -1,9 +1,9 @@
-package unimib.daBancherz.NewMonopoly.Singleton;
+package unimib.daBancherz.NewMonopoly.model;
 
 import java.util.HashMap;
 import java.util.Map;
 
-class Game {
+public class Game {
     private String gameId;  // ID univoco per la partita
     private Map<String, Player> players = new HashMap<>();  // Mappa che associa il nome del giocatore all'oggetto Player
 

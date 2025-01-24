@@ -6,6 +6,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.daBancherz.NewMonopoly.Singleton.GameBoardWrapper;
 import unimib.daBancherz.NewMonopoly.database.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.database.Repository.PartitaRepository;
 import unimib.daBancherz.NewMonopoly.database.Repository.PedinaRepository;
@@ -29,7 +30,7 @@ public class GameHandler {
     private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
 
-    private final GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
+    private final GameBoardWrapper gameBoardWrapper;
     private List<Integer> pedineNonUsate = new ArrayList<>();
 
     // **Constructor Injection**
@@ -37,12 +38,14 @@ public class GameHandler {
                        GameService gameService,
                        GiocatoreRepository giocatoreRepository,
                        PartitaRepository partitaRepository,
-                       PedinaRepository pedinaRepository) {
+                       PedinaRepository pedinaRepository,
+                       GameBoardWrapper gameBoardWrapper) {
         this.messageHandler = messageHandler;
         this.gameService = gameService;
         this.giocatoreRepository = giocatoreRepository;
         this.partitaRepository = partitaRepository;
         this.pedinaRepository = pedinaRepository;
+        this.gameBoardWrapper = gameBoardWrapper;
     }
 
     public void createGame(String[] messageParts, WebSocketSession session) throws Exception {
@@ -60,8 +63,8 @@ public class GameHandler {
             //per fa si che la prima sessione sia quella dell'ADMIN
         }
 
-        gameBoard.createGame(gameId);//crea il singleton per la partita con codicePartita = gameId
-        gameBoard.setPlayerPosition(gameId, playerName, 1);//imposta nel signleton che il giocatore parte dalla casella 1
+        gameBoardWrapper.createGame(gameId);//crea il singleton per la partita con codicePartita = gameId
+        gameBoardWrapper.setPlayerPosition(gameId, playerName, 1);//imposta nel signleton che il giocatore parte dalla casella 1
         gameService.createGameAndPlayer(playerName, difficulty, randomization, gameId);//crea la parita nel database, più informazioni in GameService
 
         //GESTIONE MESSAGGI
@@ -94,7 +97,9 @@ public class GameHandler {
             return;
         }
 
-        gameBoard.setPlayerPosition(gameId, playerName, 1);
+        gameBoardWrapper.setPlayerPosition(gameId, playerName, 1);
+
+        gameBoardWrapper.setPlayerPosition(gameId, playerName, 1);
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         playersInGame.add(session);//aggiunge la sessione del giocatore alla lista di sessioni della partita a cuoi vuole partecipare
         gameService.addPlayer(playerName, gameId);//aggiunge il giocatore nel databesa alla partita assegnata
@@ -180,12 +185,12 @@ public class GameHandler {
             String player = getPlayerNameBySession(session);
             gameService.deletePlayer(gameId, player);
             playersInGame.remove(session); // Rimuove la sessione dalla lista dei giocatori
-            GameBoardSingleton.getInstance().removePlayerFromGame(gameId, player);
+            gameBoardWrapper.removePlayerFromGame(gameId, player);
             // Se non ci sono più giocatori nella partita, rimuovi completamente la partita
             if (playersInGame.isEmpty()) {
                 partitaRepository.deleteByCodiceInvito(gameId);
                 gameSessions.remove(gameId);
-                GameBoardSingleton.getInstance().removeGameIfEmpty(gameId);
+                gameBoardWrapper.removePlayerFromGame(gameId, player);
             }
         }
 

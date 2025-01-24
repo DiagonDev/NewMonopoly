@@ -9,7 +9,6 @@ import unimib.daBancherz.NewMonopoly.Handler.ChatHandler;
 import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
 import unimib.daBancherz.NewMonopoly.Handler.PropertyHandler;
 import unimib.daBancherz.NewMonopoly.Handler.TurnHandler;
-import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
 import java.util.Map;
@@ -24,7 +23,6 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
     private final TurnHandler turnHandler;
     private final WebSocketReconnect reconnect;
     private final PropertyHandler propertyHandler;
-    GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     ObjectMapper objectMapper = new ObjectMapper();
 
     // Iniezione di GameHandler e ChatHandler tramite il costruttore
