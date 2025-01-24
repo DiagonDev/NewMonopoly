@@ -8,8 +8,8 @@ import org.springframework.web.socket.*;
 import unimib.daBancherz.NewMonopoly.Handler.ChatHandler;
 import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
 import unimib.daBancherz.NewMonopoly.Handler.PropertyHandler;
-import unimib.daBancherz.NewMonopoly.Handler.*;
 import unimib.daBancherz.NewMonopoly.Manager.TurnManager;
+import unimib.daBancherz.NewMonopoly.MessageService;
 import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class WebSocketConnectionHandler implements WebSocketHandler {
+public class WebSocketConnectionDispatcher implements WebSocketHandler {
 
     public final Map<String, WebSocketSession> playerSessions = new ConcurrentHashMap<>();
     private final GameHandler gameHandler;
@@ -25,19 +25,19 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
     private final TurnManager turnManager;
     private final WebSocketReconnect reconnect;
     private final PropertyHandler propertyHandler;
-    private final MessageHandler messageHandler;
+    private final MessageService messageService;
     ObjectMapper objectMapper = new ObjectMapper();
 
     // Iniezione di GameHandler e ChatHandler tramite il costruttore
     @Autowired
-    public WebSocketConnectionHandler(GameHandler gameHandler, ChatHandler chatHandler, TurnManager turnManager,
-                                      WebSocketReconnect reconnect, PropertyHandler propertyHandler, MessageHandler messageHandler) {
+    public WebSocketConnectionDispatcher(GameHandler gameHandler, ChatHandler chatHandler, TurnManager turnManager,
+                                         WebSocketReconnect reconnect, PropertyHandler propertyHandler, MessageService messageService) {
         this.gameHandler = gameHandler;
         this.chatHandler = chatHandler;
         this.turnManager = turnManager;
         this.reconnect = reconnect;
         this.propertyHandler = propertyHandler;
-        this.messageHandler = messageHandler;
+        this.messageService = messageService;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
             String[] parts = (message.getPayload().toString()).split(":");
             switch (parts[0]) {
                 case "Ping":
-                    messageHandler.sendPongMessage(session);
+                    messageService.sendPongMessage(session);
                     break;
                 case "LanciaDadi":
                     turnManager.spostaPedina(session);
@@ -142,7 +142,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
             // Rimuove il giocatore dalla partita
             gameHandler.removePlayerFromGame(gameId, session);
             if(!(gameSession.isEmpty())){
-                messageHandler.notifyPlayerDisconnected(gameId, playerName, gameSessions);
+                messageService.notifyPlayerDisconnected(gameId, playerName, gameSessions);
             }
         }
     }

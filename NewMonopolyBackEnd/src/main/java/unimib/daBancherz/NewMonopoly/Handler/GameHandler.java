@@ -3,6 +3,7 @@ package unimib.daBancherz.NewMonopoly.Handler;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.daBancherz.NewMonopoly.MessageService;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardWrapper;
 import unimib.daBancherz.NewMonopoly.database.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.database.Repository.PartitaRepository;
@@ -17,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class GameHandler {
 
-    private final MessageHandler messageHandler;
+    private final MessageService messageService;
     private final GameService gameService;
     private final GiocatoreRepository giocatoreRepository;
     private final PartitaRepository partitaRepository;
@@ -30,13 +31,13 @@ public class GameHandler {
     private List<Integer> pedineNonUsate = new ArrayList<>();
 
     // **Constructor Injection**
-    public GameHandler(MessageHandler messageHandler,
+    public GameHandler(MessageService messageService,
                        GameService gameService,
                        GiocatoreRepository giocatoreRepository,
                        PartitaRepository partitaRepository,
                        PedinaRepository pedinaRepository,
                        GameBoardWrapper gameBoardWrapper) {
-        this.messageHandler = messageHandler;
+        this.messageService = messageService;
         this.gameService = gameService;
         this.giocatoreRepository = giocatoreRepository;
         this.partitaRepository = partitaRepository;
@@ -64,13 +65,13 @@ public class GameHandler {
         gameService.createGameAndPlayer(playerName, difficulty, randomization, gameId);//crea la partita nel database, più informazioni in GameService
 
         //GESTIONE MESSAGGI
-        messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
-        messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella game console
-        messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "ADMIN");//invia a tutti i giocatori i messaggi di partecipazione alla partita
-        messageHandler.sendTypePlayer("ADMIN", session);//invia all'admin il tipo di giocatore che è
+        messageService.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
+        messageService.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella game console
+        messageService.notifyPlayerJoin(gameId, playerName, session, gameSessions, "ADMIN");//invia a tutti i giocatori i messaggi di partecipazione alla partita
+        messageService.sendTypePlayer("ADMIN", session);//invia all'admin il tipo di giocatore che è
 
         pedineNonUsate = pedinaRepository.findUnusedPedineByPartita(gameId);
-        messageHandler.sendUnusedPedine(pedineNonUsate, gameSessions, gameId); //invia al giocatore la lista delle pedine disponibili
+        messageService.sendUnusedPedine(pedineNonUsate, gameSessions, gameId); //invia al giocatore la lista delle pedine disponibili
     }
 
     public void joinGame(String[] messageParts, WebSocketSession session) throws Exception {
@@ -78,18 +79,18 @@ public class GameHandler {
         String gameId = messageParts[2];
 
         if (giocatoreRepository.existsByNomeAndIdpartita_CodiceInvito(playerName, gameId)) {
-            messageHandler.sendErrorMessage(session);
+            messageService.sendErrorMessage(session);
             return; // Esce dalla funzione senza aggiungere il giocatore
         }
 
         if (giocatoreRepository.countGiocatoriByPartita(gameId) == 6) {
-            messageHandler.sendErrorMessage(session);
+            messageService.sendErrorMessage(session);
             return;
         }
 
         playerNameList.put(playerName, session);
         if (!gameSessions.containsKey(gameId)) {
-            messageHandler.sendErrorGameIdMessage(session, gameId);
+            messageService.sendErrorGameIdMessage(session, gameId);
             return;
         }
 
@@ -99,10 +100,10 @@ public class GameHandler {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         playersInGame.add(session);//aggiunge la sessione del giocatore alla lista di sessioni della partita a cuoi vuole partecipare
         gameService.addPlayer(playerName, gameId);//aggiunge il giocatore nel database alla partita assegnata
-        messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "giocatore");//invia a tutti i giocatori i messaggi di partecipazione alla partita
+        messageService.notifyPlayerJoin(gameId, playerName, session, gameSessions, "giocatore");//invia a tutti i giocatori i messaggi di partecipazione alla partita
 
         pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
-        messageHandler.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);   //invia al giocatore la lista delle pedine disponibili
+        messageService.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);   //invia al giocatore la lista delle pedine disponibili
     }
 
     public String getGameIdBySession(WebSocketSession session) {
@@ -201,7 +202,7 @@ public class GameHandler {
 
         giocatoreRepository.updatePedinaForGiocatore(playerName, Integer.parseInt(idPedina), gameId);  //Assegna la pedina al giocatore nel database
         pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
-        messageHandler.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);
-        messageHandler.sendPawnMove(Integer.parseInt(idPedina), playerName, 1, gameSessions, gameId);   // Invia un messaggio per spostare la pedina sul via
+        messageService.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);
+        messageService.sendPawnMove(Integer.parseInt(idPedina), playerName, 1, gameSessions, gameId);   // Invia un messaggio per spostare la pedina sul via
     }
 }

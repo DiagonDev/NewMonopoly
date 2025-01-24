@@ -3,13 +3,16 @@ package unimib.daBancherz.NewMonopoly.Manager;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.daBancherz.NewMonopoly.Handler.BoxHandler;
 import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
-import unimib.daBancherz.NewMonopoly.Handler.MessageHandler;
+import unimib.daBancherz.NewMonopoly.Handler.PawnHandler;
+import unimib.daBancherz.NewMonopoly.MessageService;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 import unimib.daBancherz.NewMonopoly.database.Entity.Partita;
 import unimib.daBancherz.NewMonopoly.database.Repository.GiocatoreRepository;
 import unimib.daBancherz.NewMonopoly.database.Repository.PartitaRepository;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 
@@ -17,24 +20,25 @@ import java.util.Map;
 public class TurnManager {
 
     private final GameHandler gameHandler;
-    private final MessageHandler messageHandler;
+    private final MessageService messageService;
     private final PrisonManager prisonManager;
     private final BalanceManager balanceManager;
     private final PartitaRepository partitaRepository;
-    private final DiceManager diceManager;
-    private final BoxManager boxManager;
+    private final BoxHandler boxHandler;
     private final GiocatoreRepository giocatoreRepository;
+    private final SecureRandom secureRandom = new SecureRandom();
+    private final PawnHandler pawnHandler;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
-    public TurnManager(GameHandler gameHandler, MessageHandler messageHandler, PrisonManager prisonManager, BalanceManager balanceManager, PartitaRepository partitaRepository, DiceManager diceManager, BoxManager boxManager, GiocatoreRepository giocatoreRepository) {
+    public TurnManager(GameHandler gameHandler, MessageService messageService, PrisonManager prisonManager, BalanceManager balanceManager, PartitaRepository partitaRepository, BoxHandler boxHandler, GiocatoreRepository giocatoreRepository, PawnHandler pawnHandler) {
         this.gameHandler = gameHandler;
-        this.messageHandler = messageHandler;
+        this.messageService = messageService;
         this.prisonManager = prisonManager;
         this.balanceManager = balanceManager;
         this.partitaRepository = partitaRepository;
-        this.diceManager = diceManager;
-        this.boxManager = boxManager;
+        this.boxHandler = boxHandler;
         this.giocatoreRepository = giocatoreRepository;
+        this.pawnHandler = pawnHandler;
     }
 
     public void startTurn(WebSocketSession session) throws Exception {
@@ -42,7 +46,7 @@ public class TurnManager {
         String playerName = gameHandler.getPlayerNameBySession(session);
         Partita partita = partitaRepository.findByCodiceInvito(gameId);
         partita.setStato("Iniziata");
-        messageHandler.sendSystemMessage(gameId, "È il turno di: " + playerName, gameHandler.getGameSessions(), session);
+        messageService.sendSystemMessage(gameId, "È il turno di: " + playerName, gameHandler.getGameSessions(), session);
 
         // Notifica ai giocatori
         notifyPlayersTurn(gameId, playerName, session);
@@ -54,8 +58,8 @@ public class TurnManager {
     }
 
     private void notifyPlayersTurn(String gameId, String playerName, WebSocketSession session) throws Exception {
-        String yourTurnMessage = messageHandler.createTurnMessage(true, playerName);
-        String notYourTurnMessage = messageHandler.createTurnMessage(false, playerName);
+        String yourTurnMessage = messageService.createTurnMessage(true, playerName);
+        String notYourTurnMessage = messageService.createTurnMessage(false, playerName);
         for (WebSocketSession playerSession : gameHandler.getGameSessions().get(gameId)) {
             if (!playerSession.equals(session)) {
                 playerSession.sendMessage(new TextMessage(notYourTurnMessage));
@@ -99,7 +103,7 @@ public class TurnManager {
         int diceR1 = diceResults[0];
         int diceR2 = diceResults[1];
         int totDice = diceR1 + diceR2;
-        messageHandler.sendSystemMessage(gameId, playerName + " ha tirato i dati: dado1 " + diceR1 + ", dado2 " + diceR2, gameSessions, session);
+        messageService.sendSystemMessage(gameId, playerName + " ha tirato i dati: dado1 " + diceR1 + ", dado2 " + diceR2, gameSessions, session);
 
         if(isInPrison){
             isInPrison = !lasciaPrigione(session, diceResults);
@@ -113,12 +117,7 @@ public class TurnManager {
                 gameBoard.setPlayerPrison(gameId, playerName, true);
                 gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, 0);
                 gameBoard.setPlayerCountRoll(gameId, playerName, 0);
-                gameBoard.setPlayerPosition(gameId, playerName, 11);//aggiorna la posizione del giocatore
-                //invia a tutti i giocatori che il "playername" si è postato di tot caselle "newPosition"
-                messageHandler.sendPawnMove(pawnId, playerName, 11, gameHandler.getGameSessions(), gameId);
-
-                //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
-                boxManager.sendBoxUsage(playerName, session, 11, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
+                pawnHandler.movimentoPedina(gameId, playerName, 11, gameHandler.getGameSessions(), pawnId, session,viaPay);
             }else{
                 newPosition = totDice + playerPosition;
 
@@ -126,20 +125,16 @@ public class TurnManager {
                     newPosition -= 40;
                     viaPay = true;
                 }
-                gameBoard.setPlayerPosition(gameId, playerName, newPosition);//aggiorna la posizione del giocatore
-                //invia a tutti i giocatori che il "playername" si è postato di tot caselle "newPosition"
-                messageHandler.sendPawnMove(pawnId, playerName, newPosition, gameHandler.getGameSessions(), gameId);
-
-                //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
-                boxManager.sendBoxUsage(playerName, session, newPosition, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
-
+                pawnHandler.movimentoPedina(gameId, playerName, newPosition, gameHandler.getGameSessions(), pawnId, session,viaPay);
             }
         }
     }
 
     public int[] rollDice(WebSocketSession session) throws Exception {
-        int[] diceResults = diceManager.rollDice();
-        messageHandler.sendDiceResults(session, diceResults[0], diceResults[1]);
-        return diceResults;
+        int diceR1 = secureRandom.nextInt(6) + 1; // Genera un numero casuale tra 1 e 6
+        int diceR2 = secureRandom.nextInt(6) + 1;
+        messageService.sendDiceResults(session, diceR1, diceR2);
+        return new int[]{diceR1, diceR2};
     }
 }
+

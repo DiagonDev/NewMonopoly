@@ -4,12 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.daBancherz.NewMonopoly.MessageService;
 import unimib.daBancherz.NewMonopoly.database.Repository.*;
 import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
-
-import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -24,7 +22,7 @@ class PropertyHandlerTest {
     @Mock
     private GameHandler mockGameHandler;
     @Mock
-    private MessageHandler mockMessageHandler;
+    private MessageService mockMessageService;
     @Mock
     private CasellaRepository mockCasellaRepository;
     @Mock
@@ -37,7 +35,7 @@ class PropertyHandlerTest {
                 mockPCPPRepository,
                 mockGiocatoreRepository,
                 mockGameHandler,
-                mockMessageHandler,
+                mockMessageService,
                 mockCasellaRepository
         );
     }
@@ -58,7 +56,7 @@ class PropertyHandlerTest {
 
         verify(mockPCPPRepository).setPrezzoCorrente(eq(100), eq(gameId), anyInt());
         verify(mockPCPPRepository).setProprietario(null, gameId, "Proprieta1");
-        verify(mockMessageHandler).sendSystemMessage(eq(gameId), contains("ha ipotecato"), any(), eq(mockSession));
+        verify(mockMessageService).sendSystemMessage(eq(gameId), contains("ha ipotecato"), any(), eq(mockSession));
     }
 
 }

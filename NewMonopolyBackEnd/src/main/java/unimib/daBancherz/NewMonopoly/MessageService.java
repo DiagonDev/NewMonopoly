@@ -1,4 +1,4 @@
-package unimib.daBancherz.NewMonopoly.Handler;
+package unimib.daBancherz.NewMonopoly;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class MessageHandler {
+public class MessageService {
 
     private final GameService gameService;
     private final PartitaCasellaPrezzoproprietaRepository pCPPRepository;
@@ -22,7 +22,7 @@ public class MessageHandler {
     private static final String PLAYERNAME_KEY = "playerName";
     private static final String BALANCE_KEY = "balance";
 
-    public MessageHandler(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository) {
+    public MessageService(GameService gameService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository) {
         this.gameService = gameService;
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;
@@ -36,6 +36,7 @@ public class MessageHandler {
     private void sendToGame(Map<String, Object> data, Map<String, List<WebSocketSession>> gameSessions, String gameId) throws IOException {
         String message = createMessage(data);
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
+        if (playersInGame == null) return;
         for (WebSocketSession playerSession : playersInGame) {
             playerSession.sendMessage(new TextMessage(message));
         }
@@ -43,9 +44,6 @@ public class MessageHandler {
 
     //serve per creare un messaggio di sistema in Json così che il front end lo metta nella game console
     public void sendSystemMessage(String gameId, String content, Map<String, List<WebSocketSession>> gameSessions, WebSocketSession session) throws Exception {
-        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
-        if (playersInGame == null) return;
-
         //If serve perché i due messaggi che iniziano con... Devono essere inviati solo al giocatore che crea la partita
         if (!(content.startsWith("Ti sei unito alla partita con ID: ") || content.startsWith("#"))) {
             sendToGame(Map.of(TYPE_KEY, "system", CONTENT_KEY, content), gameSessions, gameId);
@@ -119,8 +117,6 @@ public class MessageHandler {
     }
 
     public void notifyPlayerDisconnected(String gameId, String playerName, Map<String, List<WebSocketSession>> gameSessions) throws Exception {
-        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
-        if (playersInGame == null) return;
         sendToGame(Map.of(TYPE_KEY, "system", CONTENT_KEY, playerName + " si è disconnesso dalla partita."), gameSessions, gameId);
     }
 
@@ -153,5 +149,23 @@ public class MessageHandler {
 
     public void sendPongMessage(WebSocketSession session) throws IOException {
         session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "pong", CONTENT_KEY, "pong"))));
+    }
+
+    public void sendVictoryMessage(WebSocketSession session) throws IOException {
+        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "partitaFinita","flag", "vittoria", CONTENT_KEY, "Hai vinto"))));
+    }
+
+    public void sendLoseMessage(WebSocketSession session) throws IOException {
+        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "partitaFinita","flag", "sconfitta", CONTENT_KEY, "Il tuo saldo è negativo"))));
+    }
+
+    public void updateProperties(String gameId, String playerName, WebSocketSession session) throws Exception {
+        List<PlayerProperties> giocatorePropertiesList = pCPPRepository.findPlayerProperties(gameId, playerName);
+        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "updateProperties","properties", giocatorePropertiesList))));
+    }
+
+    //serve a creare un messaggio in Json per far si che il forntend riesca a capire chè per la game chat
+    public void sendChatMessage(String gameId, String content, Map<String, List<WebSocketSession>> gameSessions) throws Exception {
+        sendToGame(Map.of(TYPE_KEY, "chat", CONTENT_KEY, content), gameSessions, gameId);
     }
 }

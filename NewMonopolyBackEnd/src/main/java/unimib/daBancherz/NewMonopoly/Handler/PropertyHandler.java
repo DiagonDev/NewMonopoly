@@ -1,27 +1,30 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.daBancherz.NewMonopoly.MessageService;
 import unimib.daBancherz.NewMonopoly.database.Repository.*;
 import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class PropertyHandler {
     private final PartitaCasellaPrezzoproprietaRepository pCPPRepository;
     private final GiocatoreRepository giocatoreRepository;
     private final GameHandler gameHandler;
-    private final MessageHandler messageHandler;
+    private final MessageService messageService;
     private final CasellaRepository casellaRepository;
     ObjectMapper objectMapper = new ObjectMapper();
 
-    public PropertyHandler(PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, GameHandler gameHandler, MessageHandler messageHandler, CasellaRepository casellaRepository) {
+    public PropertyHandler(PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, GameHandler gameHandler, MessageService messageService, CasellaRepository casellaRepository) {
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;
         this.gameHandler = gameHandler;
-        this.messageHandler = messageHandler;
+        this.messageService = messageService;
         this.casellaRepository = casellaRepository;
     }
 
@@ -35,17 +38,17 @@ public class PropertyHandler {
         if(saldoGiocatore > prezzoCasella)
             completaAcquistoProprieta(gameId, playerName, messageParts[1], prezzoCasella, session);
         else
-            messageHandler.inviaMessaggio(session, "acquistoFallito");
+            messageService.inviaMessaggio(session, "acquistoFallito");
     }
 
     public void completaAcquistoProprieta(String gameId, String playerName, String nomeProprieta, int prezzo, WebSocketSession session) throws Exception {
         pCPPRepository.setProprietario(playerName, gameId, nomeProprieta);
         giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzo);
-        messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
+        messageService.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
 
-        messageHandler.inviaMessaggio(session, "acquistoRiuscito");
+        messageService.inviaMessaggio(session, "acquistoRiuscito");
         String content = playerName + " ha acquistato: " + nomeProprieta;
-        messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
+        messageService.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
     }
 
     public void gestisciProprieta(WebSocketSession session) throws IOException {
@@ -53,7 +56,7 @@ public class PropertyHandler {
         String playerName = gameHandler.getPlayerNameBySession(session);
         List<PlayerProperties> playerPropertiesList = pCPPRepository.findOtherPlayerProperties(gameId,playerName);
 
-        messageHandler.inviaMessaggio(session, "allProperties", "properties", playerPropertiesList);
+        messageService.inviaMessaggio(session, "allProperties", "properties", playerPropertiesList);
     }
 
     public void gestisciCase(PlayerProperties property, Integer casine,  WebSocketSession session) throws Exception {
@@ -68,16 +71,16 @@ public class PropertyHandler {
         if(numCase<5 && saldoGiocatore > (casine * countColore* costoCasa))
             completaCostruzioneCase(gameId, playerName, coloreCasella, casine, costoCasa, countColore, session);
         else
-            messageHandler.inviaMessaggio(session, "costruzioneFallita");
+            messageService.inviaMessaggio(session, "costruzioneFallita");
     }
 
     public void completaCostruzioneCase(String gameId, String playerName, String coloreCasella, int casine, int costoCasa, int countColore, WebSocketSession session) throws Exception {
         giocatoreRepository.setSaldoGiocatore(playerName, gameId, (casine * countColore * costoCasa));
-        messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
+        messageService.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
         pCPPRepository.aggiungiCase(coloreCasella, casine);
 
         String content = playerName + " ha costruito " + casine + " case sulle proprietà di colore " + coloreCasella;
-        messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
+        messageService.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
     }
 
 
@@ -91,9 +94,9 @@ public class PropertyHandler {
         String gameId = gameHandler.getGameIdBySession(session);
         WebSocketSession session2 = gameHandler.getSessionByPlayerName(nomeProprietario, gameId);
 
-        messageHandler.exchangeRequestMessage(nomeRichiedente, property1, property2, offertaMonetaria, session2);
+        messageService.exchangeRequestMessage(nomeRichiedente, property1, property2, offertaMonetaria, session2);
         String content = nomeRichiedente + " ha chiesto uno scambio a " + nomeProprietario + ". " + property1.getNome() + " per: " + property2.getNome();
-        messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
+        messageService.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
     }
 
     public void rispostaScambio(Map<String, Object> data, boolean flag, WebSocketSession session) throws Exception {
@@ -122,17 +125,17 @@ public class PropertyHandler {
 
         pCPPRepository.setPrezzoCorrente(prezzo, gameId, posizione);
         giocatoreRepository.setSaldoGiocatore(nomeGiocatore, gameId, - (prezzo) );
-        messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeGiocatore);
+        messageService.updateBalance(gameHandler.getGameSessions(), gameId, nomeGiocatore);
         pCPPRepository.setProprietario(null, gameId, nomeCasella);
 
         aggiornaProprieta(gameId, nomeGiocatore, session);
         String content = nomeGiocatore + " ha ipotecato: " + nomeCasella;
-        messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
+        messageService.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
     }
 
     public void aggiornaProprieta(String gameId, String nomeGiocatore, WebSocketSession session) throws IOException {
         List<PlayerProperties> giocatorePropertiesList = pCPPRepository.findPlayerProperties(gameId, nomeGiocatore);
-        messageHandler.inviaMessaggio(session, "updateProperties", "properties", giocatorePropertiesList);
+        messageService.inviaMessaggio(session, "updateProperties", "properties", giocatorePropertiesList);
     }
 
 
@@ -143,33 +146,33 @@ public class PropertyHandler {
         if (saldoRichiedente > offertaMonetaria) {
             giocatoreRepository.setSaldoGiocatore(nomeRichiedente, gameId, offertaMonetaria);
             giocatoreRepository.setSaldoGiocatore(nomeProprietario, gameId, -offertaMonetaria);
-            messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeRichiedente);
-            messageHandler.updateBalance(gameHandler.getGameSessions(), gameId, nomeProprietario);
+            messageService.updateBalance(gameHandler.getGameSessions(), gameId, nomeRichiedente);
+            messageService.updateBalance(gameHandler.getGameSessions(), gameId, nomeProprietario);
             pCPPRepository.setProprietario(nomeRichiedente, gameId, property2.getNome());
             pCPPRepository.setProprietario(nomeProprietario, gameId, property1.getNome());
 
-            messageHandler.rispostaGestisciProprieta("Scambio accettato", session);
+            messageService.rispostaGestisciProprieta("Scambio accettato", session);
             String content = nomeProprietario + " ha accettato lo scambio di " + nomeRichiedente + ". ";
-            messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
+            messageService.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
 
             aggiornaProprietaScambio(gameId, nomeProprietario, nomeRichiedente, session, sessionRichiedente);
         } else {
-            messageHandler.inviaMessaggio(session, "scambioFallito", "reason", "Saldo insufficiente");
+            messageService.inviaMessaggio(session, "scambioFallito", "reason", "Saldo insufficiente");
         }
     }
 
     public void aggiornaProprietaScambio(String gameId, String nomeProprietario, String nomeRichiedente, WebSocketSession session, WebSocketSession sessionRichiedente) throws IOException {
         List<PlayerProperties> proprietarioPropertiesList = pCPPRepository.findPlayerProperties(gameId, nomeProprietario);
-        messageHandler.inviaMessaggio(session, "updateProperties", "properties", proprietarioPropertiesList);
+        messageService.inviaMessaggio(session, "updateProperties", "properties", proprietarioPropertiesList);
 
         List<PlayerProperties> richiedentePropertiesList = pCPPRepository.findPlayerProperties(gameId, nomeRichiedente);
-        messageHandler.inviaMessaggio(sessionRichiedente, "updateProperties", "properties", richiedentePropertiesList);
+        messageService.inviaMessaggio(sessionRichiedente, "updateProperties", "properties", richiedentePropertiesList);
     }
 
     public void rifiutaScambio(String gameId, String nomeProprietario, String nomeRichiedente, WebSocketSession session) throws Exception {
-        messageHandler.rispostaGestisciProprieta("Scambio declinato", session);
+        messageService.rispostaGestisciProprieta("Scambio declinato", session);
         String content = nomeProprietario + " ha rifiutato lo scambio di " + nomeRichiedente;
-        messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
+        messageService.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
     }
 
     public void updateProperties(WebSocketSession session) throws IOException {

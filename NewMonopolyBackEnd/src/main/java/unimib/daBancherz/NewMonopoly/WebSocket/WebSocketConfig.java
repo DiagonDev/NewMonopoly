@@ -9,10 +9,10 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final WebSocketConnectionHandler connectionHandler;
+    private final WebSocketConnectionDispatcher connectionHandler;
 
     // Constructor Injection
-    public WebSocketConfig(WebSocketConnectionHandler connectionHandler) {
+    public WebSocketConfig(WebSocketConnectionDispatcher connectionHandler) {
         this.connectionHandler = connectionHandler;
     }
 

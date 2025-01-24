@@ -12,7 +12,7 @@ class WebSocketConfigTest {
     @Test
     void testWebSocketHandlerRegistration() {
         // Mock del WebSocketConnectionHandler
-        WebSocketConnectionHandler connectionHandler = mock(WebSocketConnectionHandler.class);
+        WebSocketConnectionDispatcher connectionHandler = mock(WebSocketConnectionDispatcher.class);
 
         // Mock del WebSocketHandlerRegistry
         WebSocketHandlerRegistry registry = mock(WebSocketHandlerRegistry.class);
