@@ -1,26 +1,28 @@
-import {useContext, useState, useEffect, useRef} from 'react';
-import RiceviScambio from './gestioneProprieta/RiceviScambio';
-import {WebSocketContext} from "../../contexts/WebSocketContext.jsx";
+import { useState, useEffect } from "react";
+import RiceviScambio from "./gestioneProprieta/RiceviScambio";
+import { useWebSocket } from "../../websocket/WebSocketProvider.jsx";
 import PropertyOwned from "./gestioneProprieta/PropertyOwned.jsx";
 
-const BaseRectangle = ({playerProperties}) => {
-    const {exchangeRequest} = useContext(WebSocketContext);
+const BaseRectangle = ({ playerProperties }) => {
+    const { messages } = useWebSocket();
     const [isPageOpen, setIsPageOpen] = useState(false);
+
+    // Trova il messaggio exchangeRequest
+    const exchangeRequestMessage = messages.find((msg) => msg.type === "exchangeRequest");
+
     useEffect(() => {
-        if (exchangeRequest.flag) {
+        if (exchangeRequestMessage?.payload.flag) {
             setIsPageOpen(true);
         }
-        exchangeRequest.flag = false;
-    }, [exchangeRequest]);
+    }, [exchangeRequestMessage]);
 
     return (
         <div>
             {isPageOpen ? (
-                <RiceviScambio onClose={() => setIsPageOpen(false)}/>
+                <RiceviScambio onClose={() => setIsPageOpen(false)} />
             ) : (
-                <PropertyOwned playerProperties={playerProperties}/>
+                <PropertyOwned playerProperties={playerProperties} />
             )}
-
         </div>
     );
 };

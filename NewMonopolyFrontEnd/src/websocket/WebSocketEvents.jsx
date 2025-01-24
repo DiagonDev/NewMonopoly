@@ -10,7 +10,7 @@ export const createWebSocketEvents = (socketRef, setMessages, setIsConnected) =>
                 setMessages((prev) => [...prev, data]);
             }
         } catch (error) {
-            console.error("Error parsing WebSocket message:", error);
+            console.error("Error parsing WebSocket message", error);
         }
     };
 
@@ -25,9 +25,36 @@ const handleSystemMessage = (payload, setMessages) => {
     console.log("System message:", payload);
     setMessages((prev) => [...prev, { type: "system", payload }]);
 };
-
-const handleJoinMessage = (payload, setMessages) => {
+const handleJoinMessage = (payload, setMessages, setPlayerJoin) => {
     setMessages((prev) => [...prev, { type: "join", payload }]);
+    setPlayerJoin((prevState) => ({
+        ...prevState,
+        player: payload.playerName,
+        playerRole: payload.userRole,
+    }));
+};
+
+const handlePongMessage = () => {
+    console.log("Received Pong from server");
+};
+
+const handleNameBoxMessage = (payload, setNameBox) => {
+    setNameBox(payload.name);
+};
+
+const handleAllPropertiesMessage = (payload, setAllProperties) => {
+    setAllProperties(payload.properties);
+};
+
+const handleExchangeRequestMessage = (payload, setExchangeRequest) => {
+    setExchangeRequest((prevState) => ({
+        ...prevState,
+        flag: true,
+        property1: payload.property1,
+        property2: payload.property2,
+        playerName: payload.playerName,
+        money: payload.money,
+    }));
 };
 
 const handleError = (payload) => {
@@ -178,10 +205,18 @@ const handleUpdatePropertiesMessage = (payload, setMessages, setUpdateProperties
     setUpdateProperties(payload.properties);
 };
 
+const handleRispostaAggiornaProprietaMessage = (payload, setMessages, setPlayerProperties) => {
+    setPlayerProperties(payload.properties);
+};
+
 const eventHandlers = {
     chat: handleChatMessage,
     system: handleSystemMessage,
     join: handleJoinMessage,
+    pong: handlePongMessage,
+    nameBox: handleNameBoxMessage,
+    allProperties: handleAllPropertiesMessage,
+    exchangeRequest: handleExchangeRequestMessage,
     error: handleError,
     gameId: handleGameIdMessage,
     playersList: handlePlayersListMessage,
@@ -200,6 +235,7 @@ const eventHandlers = {
     exitPrison: handleExitPrisonMessage,
     partitaFinita: handlePartitaFinitaMessage,
     updateProperties: handleUpdatePropertiesMessage,
+    RispostaAggiornaProprieta: handleRispostaAggiornaProprietaMessage,
 };
 
 export const handleCustomEvent = (type, payload, ...handlers) => {
