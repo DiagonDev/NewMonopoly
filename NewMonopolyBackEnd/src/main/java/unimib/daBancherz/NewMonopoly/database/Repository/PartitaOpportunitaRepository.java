@@ -67,6 +67,7 @@ public interface PartitaOpportunitaRepository extends JpaRepository<Partita_Oppo
         WHERE pp.idgiocatore= (SELECT id_Giocatore FROM Giocatore WHERE nome = :nomeGiocatore)
         AND pp.idpartita = :idPartita
         AND o.tipo = :tipo
+        LIMIT 1
     """, nativeQuery = true)
     boolean possiedeCarta(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("tipo") String tipo);
 }

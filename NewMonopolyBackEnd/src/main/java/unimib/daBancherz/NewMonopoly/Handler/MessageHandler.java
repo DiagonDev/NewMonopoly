@@ -1,5 +1,6 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -110,7 +111,7 @@ public class MessageHandler {
         for (String player : playerJoined) {
             int balance = giocatoreRepository.saldoGiocatore(player, gameId);
             session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "playersList", PLAYERNAME_KEY, player, BALANCE_KEY, balance))));
-            Thread.sleep(100); //serve per far si che il frontend riesca a ricevere i messaggi e a visualizzarli in tempo
+            Thread.sleep(500); //serve per far si che il frontend riesca a ricevere i messaggi e a visualizzarli in tempo
         }
     }
 
@@ -231,6 +232,23 @@ public class MessageHandler {
     public void rispostaAggiornaProprieta(String gameId, String playerName, WebSocketSession session) throws IOException {
         List<PlayerProperties> playerPropertiesList = pCPPRepository.findPlayerProperties(gameId,playerName);
         session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "rispostaAggiornaProprieta", "properties", playerPropertiesList))));
+    }
+
+    public String createTurnMessage (boolean turn, String playerName) throws JsonProcessingException {
+        String yourTurnMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "turn",
+                "content", turn,
+                "playername", playerName
+        ));
+        return yourTurnMessage;
+    }
+
+    public void exitPrisonMessage(boolean flag, WebSocketSession session) throws IOException {
+        String exitPrisonMessage = new ObjectMapper().writeValueAsString(Map.of(
+                "type", "exitPrison",
+                "flag", flag
+        ));
+        session.sendMessage(new TextMessage(exitPrisonMessage));
     }
 
 }

@@ -45,19 +45,6 @@ class TurnHandlerTest {
 
     private final GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        turnHandler = new TurnHandler(
-                mockGameHandler,
-                mockMessageHandler,
-                mockGiocatoreRepository,
-                mockPartitaOpportunitaRepository,
-                mockPartitaRepository,
-                mockPCPPRepository
-        );
-    }
-
     @Test
     void testPayPrisonExit_PlayerPays() throws Exception {
         String gameId = "game123";
