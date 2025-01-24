@@ -112,8 +112,7 @@ public class TurnHandler {
 
     public int[] rollDice(WebSocketSession session) throws Exception {
         int[] diceResults = diceManager.rollDice();
-        diceManager.sendDiceResults(session, diceResults[0], diceResults[1]);
+        messageHandler.sendDiceResults(session, diceResults[0], diceResults[1]);
         return diceResults;
     }
-
 }

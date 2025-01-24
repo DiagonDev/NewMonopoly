@@ -1,13 +1,9 @@
 package unimib.daBancherz.NewMonopoly.Handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import unimib.daBancherz.NewMonopoly.Manager.OpportunitaManager;
-import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
-import unimib.daBancherz.NewMonopoly.database.Entity.Opportunita;
 import unimib.daBancherz.NewMonopoly.database.Repository.*;
 import unimib.daBancherz.NewMonopoly.database.Service.GameService;
 import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
@@ -21,7 +17,6 @@ public class MessageHandler {
     private final GameService gameService;
     private final PartitaCasellaPrezzoproprietaRepository pCPPRepository;
     private final GiocatoreRepository giocatoreRepository;
-    GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     private static final String CONTENT_KEY = "content";
     private static final String TYPE_KEY = "type";
     private static final String PLAYERNAME_KEY = "playerName";
@@ -32,7 +27,7 @@ public class MessageHandler {
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;
     }
-    //crea il messaggio Json con il parameto che gli viene inviato
+    //crea il messaggio Json con il parametro che gli viene inviato
     public String createMessage(Map<String, Object> data) throws IOException {
         return new ObjectMapper().writeValueAsString(data);
     }
@@ -46,12 +41,12 @@ public class MessageHandler {
         }
     }
 
-    //serve per creare un messaggio di sistema in Json così che il forntend lo metta nella game console
+    //serve per creare un messaggio di sistema in Json così che il front end lo metta nella game console
     public void sendSystemMessage(String gameId, String content, Map<String, List<WebSocketSession>> gameSessions, WebSocketSession session) throws Exception {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         if (playersInGame == null) return;
 
-        //l'if serve perchè i due messaggi che iniziano con... devono essere inviati solo al giocatore che crea la partita
+        //If serve perché i due messaggi che iniziano con... Devono essere inviati solo al giocatore che crea la partita
         if (!(content.startsWith("Ti sei unito alla partita con ID: ") || content.startsWith("#"))) {
             sendToGame(Map.of(TYPE_KEY, "system", CONTENT_KEY, content), gameSessions, gameId);
         } else {
@@ -78,8 +73,8 @@ public class MessageHandler {
         session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "gameId", CONTENT_KEY, gameId))));
     }
 
-    public void sendTypePlayer(String paleyerType, WebSocketSession session) throws Exception {
-        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "user", CONTENT_KEY, paleyerType))));
+    public void sendTypePlayer(String playerType, WebSocketSession session) throws Exception {
+        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "user", CONTENT_KEY, playerType))));
     }
 
     public void notifyPlayerJoin(String gameId, String playerName, WebSocketSession session, Map<String, List<WebSocketSession>> gameSessions, String role) throws Exception {
@@ -129,32 +124,21 @@ public class MessageHandler {
         sendToGame(Map.of(TYPE_KEY, "system", CONTENT_KEY, playerName + " si è disconnesso dalla partita."), gameSessions, gameId);
     }
 
-    public String createTurnMessage (boolean turn, String playerName) throws JsonProcessingException {
-        String yourTurnMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "turn",
-                "content", turn,
-                "playername", playerName
-        ));
-        return yourTurnMessage;
+    public String createTurnMessage (boolean turn, String playerName) throws IOException {
+        return createMessage(Map.of(TYPE_KEY, "turn", CONTENT_KEY, turn, "playername", playerName));
     }
 
     public void exitPrisonMessage(boolean flag, WebSocketSession session) throws IOException {
-        String exitPrisonMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "exitPrison",
-                "flag", flag
-        ));
-        session.sendMessage(new TextMessage(exitPrisonMessage));
+        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "exitPrison", "flag", flag))));
     }
 
-    public void exchangeRequestMessage(String nomeRichiedente, PlayerProperties property1, PlayerProperties property2, Integer money, WebSocketSession session2) throws IOException {
-        String casaMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "exchangeRequest",
-                "property1", property1,
-                "property2", property2,
-                "money", money,
-                "playerName", nomeRichiedente
-        ));
-        session2.sendMessage(new TextMessage(casaMessage));
+    public void sendDiceResults(WebSocketSession session, int diceR1, int diceR2) throws Exception {
+        //invia il risultato dei dati al giocatore che li ha tirati
+        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "diceRolled", "dice1", diceR1,"dice2", diceR2))));
+    }
+
+    public void exchangeRequestMessage(String nomeRichiedente, PlayerProperties property1, PlayerProperties property2, Integer money, WebSocketSession session) throws IOException {
+        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "exchangeRequest", "property1", property1,"property2", property2,"money", money,"playerName", nomeRichiedente))));
     }
 
     public void inviaMessaggio(WebSocketSession session, String type) throws IOException {
@@ -167,4 +151,7 @@ public class MessageHandler {
         session.sendMessage(new TextMessage(message));
     }
 
+    public void sendPongMessage(WebSocketSession session) throws IOException {
+        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "pong", CONTENT_KEY, "pong"))));
+    }
 }

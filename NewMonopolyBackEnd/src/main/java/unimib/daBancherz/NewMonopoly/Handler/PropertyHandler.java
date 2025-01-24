@@ -18,6 +18,7 @@ public class PropertyHandler {
     private final GameHandler gameHandler;
     private final MessageHandler messageHandler;
     private final CasellaRepository casellaRepository;
+    ObjectMapper objectMapper = new ObjectMapper();
 
     public PropertyHandler(PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, GameHandler gameHandler, MessageHandler messageHandler, CasellaRepository casellaRepository) {
         this.pCPPRepository = pCPPRepository;
@@ -84,15 +85,36 @@ public class PropertyHandler {
     }
 
 
-    public void effettuaScambio(PlayerProperties property1, PlayerProperties property2, Integer money,  WebSocketSession session) throws Exception {
+    public void effettuaScambio(Map<String, Object> data, WebSocketSession session) throws Exception {
+        PlayerProperties property1 = property(data, "property1");
+        PlayerProperties property2 = property(data, "property2");
+        Integer offertaMonetaria= offertaMonetaria(data);
+
         String nomeRichiedente = giocatoreRepository.findNomeByidGiocatore(property1.getIdGiocatore());
         String nomeProprietario  = giocatoreRepository.findNomeByidGiocatore(property2.getIdGiocatore());
         String gameId = gameHandler.getGameIdBySession(session);
         WebSocketSession session2 = gameHandler.getSessionByPlayerName(nomeProprietario, gameId);
 
-        messageHandler.exchangeRequestMessage(nomeRichiedente, property1, property2, money, session2);
+        messageHandler.exchangeRequestMessage(nomeRichiedente, property1, property2, offertaMonetaria, session2);
         String content = nomeRichiedente + " ha chiesto uno scambio a " + nomeProprietario + ". " + property1.getNome() + " per: " + property2.getNome();
         messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
+    }
+
+    public void rispostaScambio(Map<String, Object> data, boolean flag, WebSocketSession session) throws Exception {
+        PlayerProperties property1 = property(data, "property1");
+        PlayerProperties property2 = property(data, "property2");
+        Integer offertaMonetaria= offertaMonetaria(data);
+
+        String gameId = gameHandler.getGameIdBySession(session);
+        String nomeProprietario = giocatoreRepository.findNomeByidGiocatore(property2.getIdGiocatore());
+        String nomeRichiedente = giocatoreRepository.findNomeByidGiocatore(property1.getIdGiocatore());
+        WebSocketSession sessionRichiedente = gameHandler.getSessionByPlayerName(nomeRichiedente, gameId);
+
+        if (flag) {
+            completaScambio(gameId, nomeProprietario, nomeRichiedente, property1, property2, offertaMonetaria, session, sessionRichiedente);
+        } else {
+            rifiutaScambio(gameId, nomeProprietario, nomeRichiedente, session);
+        }
     }
 
     public void ipotecaProprieta(PlayerProperties property, WebSocketSession session) throws Exception {
@@ -117,18 +139,7 @@ public class PropertyHandler {
         messageHandler.inviaMessaggio(session, "updateProperties", "properties", giocatorePropertiesList);
     }
 
-    public void rispostaScambio(PlayerProperties property1, PlayerProperties property2, Integer offertaMonetaria, boolean flag, WebSocketSession session) throws Exception {
-        String gameId = gameHandler.getGameIdBySession(session);
-        String nomeProprietario = giocatoreRepository.findNomeByidGiocatore(property2.getIdGiocatore());
-        String nomeRichiedente = giocatoreRepository.findNomeByidGiocatore(property1.getIdGiocatore());
-        WebSocketSession sessionRichiedente = gameHandler.getSessionByPlayerName(nomeRichiedente, gameId);
 
-        if (flag) {
-            completaScambio(gameId, nomeProprietario, nomeRichiedente, property1, property2, offertaMonetaria, session, sessionRichiedente);
-        } else {
-            rifiutaScambio(gameId, nomeProprietario, nomeRichiedente, session);
-        }
-    }
 
     public void completaScambio(String gameId, String nomeProprietario, String nomeRichiedente, PlayerProperties property1, PlayerProperties property2, Integer offertaMonetaria, WebSocketSession session, WebSocketSession sessionRichiedente) throws Exception {
         int saldoRichiedente = giocatoreRepository.saldoGiocatore(nomeRichiedente, gameId);
@@ -142,7 +153,7 @@ public class PropertyHandler {
             pCPPRepository.setProprietario(nomeProprietario, gameId, property1.getNome());
 
             messageHandler.rispostaGestisciProprieta("Scambio accettato", session);
-            String content = nomeProprietario + " ha accettato lo scambio di " + nomeRichiedente + ". " + property2.getNome() + " per: " + property1.getNome();
+            String content = nomeProprietario + " ha accettato lo scambio di " + nomeRichiedente + ". ";
             messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
 
             aggiornaProprietaScambio(gameId, nomeProprietario, nomeRichiedente, session, sessionRichiedente);
@@ -165,11 +176,28 @@ public class PropertyHandler {
         messageHandler.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
     }
 
-
     public void updateProperties(WebSocketSession session) throws IOException {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
 
         aggiornaProprieta(gameId, playerName, session);
+    }
+
+    public PlayerProperties property(Map<String, Object> data, String numberProperty){
+        return objectMapper.convertValue(data.get(numberProperty), PlayerProperties.class);
+    }
+
+    public Integer offertaMonetaria(Map<String, Object> data){
+        Integer offertaMonetaria;
+        Object offertaMonetariaObj = data.get("offertaMonetaria");
+        // Gestione sicura di offertaMonetaria
+        if (offertaMonetariaObj instanceof String) {
+            offertaMonetaria = Integer.parseInt((String) offertaMonetariaObj); // Converti da stringa
+        } else if (offertaMonetariaObj instanceof Integer) {
+            offertaMonetaria = (Integer) offertaMonetariaObj; // Già un Integer, usa direttamente
+        } else {
+            throw new IllegalArgumentException("Tipo non valido per offertaMonetaria: " + offertaMonetariaObj.getClass());
+        }
+        return offertaMonetaria;
     }
 }

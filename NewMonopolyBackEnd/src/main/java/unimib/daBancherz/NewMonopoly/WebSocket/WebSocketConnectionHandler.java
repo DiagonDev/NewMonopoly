@@ -53,11 +53,7 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
             String[] parts = (message.getPayload().toString()).split(":");
             switch (parts[0]) {
                 case "Ping":
-                    String pongMessage = new ObjectMapper().writeValueAsString(Map.of(
-                            "type", "pong",
-                            "content", "pong"
-                    ));
-                    session.sendMessage(new TextMessage(pongMessage));
+                    messageHandler.sendPongMessage(session);
                     break;
                 case "LanciaDadi":
                     turnHandler.spostaPedina(session);
@@ -99,45 +95,15 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
 
             String payload = message.getPayload().toString();
             Map<String, Object> data = objectMapper.readValue(payload, new TypeReference<Map<String, Object>>() {});
-
             String type = (String) data.get("type");
-            PlayerProperties property1;
-            PlayerProperties property2;
-            Integer offertaMonetaria;
 
             switch (type) {
                 case "!EffettuaScambio":
-                    property1 = objectMapper.convertValue(data.get("property1"), PlayerProperties.class);
-                    property2 = objectMapper.convertValue(data.get("property2"), PlayerProperties.class);
-
-                    // Gestione sicura di offertaMonetaria
-                    Object offertaMonetariaObj = data.get("offertaMonetaria");
-                    if (offertaMonetariaObj instanceof String) {
-                        offertaMonetaria = Integer.parseInt((String) offertaMonetariaObj); // Converti da stringa
-                    } else if (offertaMonetariaObj instanceof Integer) {
-                        offertaMonetaria = (Integer) offertaMonetariaObj; // Già un Integer, usa direttamente
-                    } else {
-                        throw new IllegalArgumentException("Tipo non valido per offertaMonetaria: " + offertaMonetariaObj.getClass());
-                    }
-
-                    propertyHandler.effettuaScambio(property1, property2, offertaMonetaria, session);
+                    propertyHandler.effettuaScambio(data, session);
                     break;
                 case "!RispostaScambio":
-                    property1 = objectMapper.convertValue(data.get("property1"), PlayerProperties.class);
-                    property2 = objectMapper.convertValue(data.get("property2"), PlayerProperties.class);
-
-                    // Gestione sicura di offertaMonetaria
-                    offertaMonetariaObj = data.get("offertaMonetaria");
-                    if (offertaMonetariaObj instanceof String) {
-                        offertaMonetaria = Integer.parseInt((String) offertaMonetariaObj); // Converti da stringa
-                    } else if (offertaMonetariaObj instanceof Integer) {
-                        offertaMonetaria = (Integer) offertaMonetariaObj; // Già un Integer, usa direttamente
-                    } else {
-                        throw new IllegalArgumentException("Tipo non valido per offertaMonetaria: " + offertaMonetariaObj.getClass());
-                    }
-
                     boolean flag = (boolean) data.get("exchangeAccepted");
-                    propertyHandler.rispostaScambio(property1, property2, offertaMonetaria, flag, session);
+                    propertyHandler.rispostaScambio(data, flag, session);
                     break;
                 case "!CostruisciCasa":
                     PlayerProperties property = objectMapper.convertValue(data.get("property"), PlayerProperties.class);

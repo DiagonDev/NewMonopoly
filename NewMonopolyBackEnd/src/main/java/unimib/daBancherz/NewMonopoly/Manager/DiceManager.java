@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.daBancherz.NewMonopoly.Handler.MessageHandler;
 
 import java.security.SecureRandom;
 import java.util.Map;
@@ -19,13 +20,5 @@ public class DiceManager {
         return new int[]{diceR1, diceR2}; // Restituisce entrambi i valori
     }
 
-    public void sendDiceResults(WebSocketSession session, int diceR1, int diceR2) throws Exception {
-        String diceRolled = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "diceRolled",
-                "dice1", diceR1,
-                "dice2", diceR2
-        ));
-        session.sendMessage(new TextMessage(diceRolled));//invia il risultato dei dati al giocatore che li ha tirati
-    }
 }
 
