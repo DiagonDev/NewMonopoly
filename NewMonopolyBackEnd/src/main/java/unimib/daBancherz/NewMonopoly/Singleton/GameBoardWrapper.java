@@ -9,12 +9,7 @@ import java.util.Map;
 @Component
 public class GameBoardWrapper {
 
-    private final GameBoardSingleton gameBoardSingleton;
-
-    @Autowired
-    public GameBoardWrapper(GameBoardSingleton gameBoardSingleton) {
-        this.gameBoardSingleton = gameBoardSingleton;
-    }
+    private final GameBoardSingleton gameBoardSingleton = GameBoardSingleton.getInstance();
 
     public void createGame(String gameId) {
         gameBoardSingleton.createGame(gameId);
