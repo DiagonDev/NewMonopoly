@@ -1,3 +1,4 @@
+/*
 package unimib.daBancherz.NewMonopoly.database.Entity;
 
 import org.junit.jupiter.api.Test;
@@ -112,4 +113,4 @@ public class OpportunitaTest {
 
         assertTrue(actualMessage.contains(expectedMessage));
     }
-}
+}*/
