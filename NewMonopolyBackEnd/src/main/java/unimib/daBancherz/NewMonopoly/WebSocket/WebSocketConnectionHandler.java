@@ -9,8 +9,10 @@ import unimib.daBancherz.NewMonopoly.Handler.ChatHandler;
 import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
 import unimib.daBancherz.NewMonopoly.Handler.PropertyHandler;
 import unimib.daBancherz.NewMonopoly.Handler.TurnHandler;
+import unimib.daBancherz.NewMonopoly.Handler.*;
 import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,17 +25,19 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
     private final TurnHandler turnHandler;
     private final WebSocketReconnect reconnect;
     private final PropertyHandler propertyHandler;
+    private final MessageHandler messageHandler;
     ObjectMapper objectMapper = new ObjectMapper();
 
     // Iniezione di GameHandler e ChatHandler tramite il costruttore
     @Autowired
     public WebSocketConnectionHandler(GameHandler gameHandler, ChatHandler chatHandler, TurnHandler turnHandler,
-                                      WebSocketReconnect reconnect, PropertyHandler propertyHandler) {
+                                      WebSocketReconnect reconnect, PropertyHandler propertyHandler, MessageHandler messageHandler) {
         this.gameHandler = gameHandler;
         this.chatHandler = chatHandler;
         this.turnHandler = turnHandler;
         this.reconnect = reconnect;
         this.propertyHandler = propertyHandler;
+        this.messageHandler = messageHandler;
     }
 
     @Override
@@ -138,12 +142,10 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                 case "!CostruisciCasa":
                     PlayerProperties property = objectMapper.convertValue(data.get("property"), PlayerProperties.class);
                     Integer casine = (Integer) data.get("casine");
-
                     propertyHandler.gestisciCase(property, casine, session);
                     break;
                 case "!IpotecaProprieta":
                     PlayerProperties propertyIpotecata = objectMapper.convertValue(data.get("property"), PlayerProperties.class);
-
                     propertyHandler.ipotecaProprieta(propertyIpotecata, session);
                     break;
                 default:
@@ -161,23 +163,20 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         System.out.println("Connessione chiusa. ID sessione: " + session.getId());
         playerSessions.remove(session.getId());
 
         // Determina il nome del giocatore e il gameId associato alla sessione chiusa
         String playerName = gameHandler.getPlayerNameBySession(session);
         String gameId = gameHandler.getGameIdBySession(session);
-
+        List<WebSocketSession> gameSession = gameHandler.getGameSessions().get(gameId);
+        Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
         if (gameId != null) {
             // Rimuove il giocatore dalla partita
             gameHandler.removePlayerFromGame(gameId, session);
-
-            // Notifica agli altri giocatori della partita
-            try {
-                gameHandler.notifyPlayerDisconnected(gameId, playerName);
-            } catch (Exception e) {
-                System.err.println("Errore durante la notifica della disconnessione del giocatore: " + e.getMessage());
+            if(!(gameSession.isEmpty())){
+                messageHandler.notifyPlayerDisconnected(gameId, playerName, gameSessions);
             }
         }
     }

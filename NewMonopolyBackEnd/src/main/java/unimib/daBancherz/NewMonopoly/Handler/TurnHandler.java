@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.daBancherz.NewMonopoly.Manager.BoxManager;
 import unimib.daBancherz.NewMonopoly.Manager.DiceManager;
 import unimib.daBancherz.NewMonopoly.Manager.PrisonManager;
 import unimib.daBancherz.NewMonopoly.Manager.TurnManager;
@@ -25,16 +26,17 @@ public class TurnHandler {
     private final TurnManager turnManager;
     private final DiceManager diceManager;
     private final PrisonManager prisonManager;
-
+    private final BoxManager boxManager;
     private final GameHandler gameHandler;
     private final MessageHandler messageHandler;
     private final GiocatoreRepository giocatoreRepository;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
-    public TurnHandler(TurnManager turnManager, DiceManager diceManager, PrisonManager prisonManager, GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository) {
+    public TurnHandler(TurnManager turnManager, DiceManager diceManager, PrisonManager prisonManager, BoxManager boxManager, GameHandler gameHandler, MessageHandler messageHandler, GiocatoreRepository giocatoreRepository) {
         this.turnManager = turnManager;
         this.diceManager = diceManager;
         this.prisonManager = prisonManager;
+        this.boxManager = boxManager;
         this.gameHandler = gameHandler;
         this.messageHandler = messageHandler;
         this.giocatoreRepository = giocatoreRepository;
@@ -89,7 +91,7 @@ public class TurnHandler {
                 messageHandler.sendPawnMove(pawnId, playerName, 11, gameHandler.getGameSessions(), gameId);
 
                 //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
-                messageHandler.sendBoxUsage(playerName, session, 11, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
+                boxManager.sendBoxUsage(playerName, session, 11, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
             }else{
                 newPosition = totDice + playerPosition;
 
@@ -102,7 +104,7 @@ public class TurnHandler {
                 messageHandler.sendPawnMove(pawnId, playerName, newPosition, gameHandler.getGameSessions(), gameId);
 
                 //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
-                messageHandler.sendBoxUsage(playerName, session, newPosition, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
+                boxManager.sendBoxUsage(playerName, session, newPosition, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
 
             }
         }

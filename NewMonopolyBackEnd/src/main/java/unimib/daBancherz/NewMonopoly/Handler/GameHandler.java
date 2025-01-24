@@ -198,23 +198,6 @@ public class GameHandler {
         playerNameList.values().removeIf(existingSession -> existingSession.equals(session));
     }
 
-    public void notifyPlayerDisconnected(String gameId, String playerName) throws Exception {
-        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
-
-        if (playersInGame == null) return;
-
-        // Crea un messaggio di notifica come JSON
-        String disconnectMessage = new ObjectMapper().writeValueAsString(Map.of(
-                "type", "system",
-                "content", playerName + " si è disconnesso dalla partita."
-        ));
-
-        // Invia il messaggio a tutti i giocatori rimanenti nella partita
-        for (WebSocketSession session : playersInGame) {
-            session.sendMessage(new TextMessage(disconnectMessage));
-        }
-    }
-
     public void choosePedina(String[] messageParts, WebSocketSession session) throws Exception {
         String idPedina = messageParts[1];
         String gameId = getGameIdBySession(session);
@@ -223,7 +206,6 @@ public class GameHandler {
         giocatoreRepository.updatePedinaForGiocatore(playerName, Integer.parseInt(idPedina), gameId);  //Assegna la pedina al giocatore nel database
         pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
         messageHandler.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);
-
         messageHandler.sendPawnMove(Integer.parseInt(idPedina), playerName, 1, gameSessions, gameId);   // Invia un messaggio per spostare la pedina sul via
     }
 }
