@@ -3,7 +3,6 @@ package unimib.daBancherz.NewMonopoly.Manager;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import unimib.daBancherz.NewMonopoly.Handler.BoxHandler;
 import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
 import unimib.daBancherz.NewMonopoly.Handler.PawnHandler;
 import unimib.daBancherz.NewMonopoly.MessageService;
@@ -24,19 +23,17 @@ public class TurnManager {
     private final PrisonManager prisonManager;
     private final BalanceManager balanceManager;
     private final PartitaRepository partitaRepository;
-    private final BoxHandler boxHandler;
     private final GiocatoreRepository giocatoreRepository;
     private final SecureRandom secureRandom = new SecureRandom();
     private final PawnHandler pawnHandler;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
-    public TurnManager(GameHandler gameHandler, MessageService messageService, PrisonManager prisonManager, BalanceManager balanceManager, PartitaRepository partitaRepository, BoxHandler boxHandler, GiocatoreRepository giocatoreRepository, PawnHandler pawnHandler) {
+    public TurnManager(GameHandler gameHandler, MessageService messageService, PrisonManager prisonManager, BalanceManager balanceManager, PartitaRepository partitaRepository, GiocatoreRepository giocatoreRepository, PawnHandler pawnHandler) {
         this.gameHandler = gameHandler;
         this.messageService = messageService;
         this.prisonManager = prisonManager;
         this.balanceManager = balanceManager;
         this.partitaRepository = partitaRepository;
-        this.boxHandler = boxHandler;
         this.giocatoreRepository = giocatoreRepository;
         this.pawnHandler = pawnHandler;
     }
@@ -57,7 +54,7 @@ public class TurnManager {
         }
     }
 
-    private void notifyPlayersTurn(String gameId, String playerName, WebSocketSession session) throws Exception {
+    public void notifyPlayersTurn(String gameId, String playerName, WebSocketSession session) throws Exception {
         String yourTurnMessage = messageService.createTurnMessage(true, playerName);
         String notYourTurnMessage = messageService.createTurnMessage(false, playerName);
         for (WebSocketSession playerSession : gameHandler.getGameSessions().get(gameId)) {
