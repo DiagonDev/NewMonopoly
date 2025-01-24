@@ -187,7 +187,7 @@ public class PropertyHandler {
     }
 
     public Integer offertaMonetaria(Map<String, Object> data){
-        Integer offertaMonetaria;
+        int offertaMonetaria;
         Object offertaMonetariaObj = data.get("offertaMonetaria");
         // Gestione sicura di offertaMonetaria
         if (offertaMonetariaObj instanceof String) {
