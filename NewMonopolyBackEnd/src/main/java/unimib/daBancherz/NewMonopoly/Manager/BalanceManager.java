@@ -1,17 +1,12 @@
 package unimib.daBancherz.NewMonopoly.Manager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
 import unimib.daBancherz.NewMonopoly.MessageService;
 import unimib.daBancherz.NewMonopoly.database.Repository.GiocatoreRepository;
-import unimib.daBancherz.NewMonopoly.database.Repository.PartitaCasellaPrezzoproprietaRepository;
-import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class BalanceManager {
@@ -39,7 +34,7 @@ public class BalanceManager {
         }
     }
 
-    private void handleNegativeBalance(String gameId, String playerName, WebSocketSession session) throws Exception {
+    public void handleNegativeBalance(String gameId, String playerName, WebSocketSession session) throws Exception {
         messageService.sendLoseMessage(session);
         messageService.sendSystemMessage(gameId, playerName + " ha perso", gameHandler.getGameSessions(), session);
         gameHandler.removePlayerFromGame(gameId, session);
