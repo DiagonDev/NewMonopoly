@@ -6,10 +6,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.Manager.OpportunitaManager;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
-import unimib.daBancherz.NewMonopoly.database.Entity.ClassiParametri.IdCasella;
-import unimib.daBancherz.NewMonopoly.database.Entity.ClassiParametri.Importo;
-import unimib.daBancherz.NewMonopoly.database.Entity.ClassiParametri.PagaPossedimenti;
-import unimib.daBancherz.NewMonopoly.database.Entity.ClassiParametri.TipoCasella;
+
 import unimib.daBancherz.NewMonopoly.database.Entity.Opportunita;
 import unimib.daBancherz.NewMonopoly.database.Repository.*;
 import unimib.daBancherz.NewMonopoly.database.Service.GameService;
@@ -233,4 +230,11 @@ public class MessageHandler {
         session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "rispostaAggiornaProprieta", "properties", playerPropertiesList))));
     }
 
+    public void sendErrorMessage(WebSocketSession session) throws IOException {
+        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "errorName"))));
+    }
+
+    public void sendErrorGameIdMessage(WebSocketSession session, String gameId) throws IOException {
+        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "errorGameId", "gameId", gameId))));
+    }
 }

@@ -45,45 +45,11 @@ public class GameHandler {
         this.pedinaRepository = pedinaRepository;
     }
 
-    //gestisce i messaggi per la creazione e la partecipazione dei giocatori alla partita
-    public void handleGameMessage(String[] messageParts, WebSocketSession session) throws Exception {
-
+    public void createGame(String[] messageParts, WebSocketSession session) throws Exception {
         String playerName = messageParts[1];
-        switch (messageParts[0]) {
-            case "Create":
-                String difficulty = messageParts[2];
-                String randomization = messageParts[3];
-                playerNameList.put(playerName, session);
-                //metodo che crea la partita
-                createGame(playerName, difficulty, randomization, session);
-                break;
-            case "Partecipa":
-                String gameId = messageParts[2];
-
-                if (giocatoreRepository.existsByNomeAndIdpartita_CodiceInvito(playerName, gameId)) {
-                    // TODO: Gestire il messaggio frontend per non mandarlo all'altra pagina
-                    String duplicatePlayerNameMessage = new ObjectMapper().writeValueAsString(Map.of(
-                            "type", "errorName"
-                    ));
-                    session.sendMessage(new TextMessage(duplicatePlayerNameMessage));
-                    return; // Esce dalla funzione senza aggiungere il giocatore
-                }
-
-                if (giocatoreRepository.countGiocatoriByPartita(gameId) == 6) {
-                    //bisogna vedere se mandare un messaggio al front end per dire che la partita è piena
-                    return;
-                }
-                playerNameList.put(playerName, session);
-                //metodo per aggiungere il giocatore alla partita
-                joinGame(playerName, gameId, session);
-                break;
-            default:
-                throw new IllegalArgumentException("Tipo di messaggio non supportato: " + messageParts[0]);
-        }
-    }
-
-    private void createGame(String playerName, String difficulty, String randomization, WebSocketSession session) throws Exception {
-
+        String difficulty = messageParts[2];
+        String randomization = messageParts[3];
+        playerNameList.put(playerName, session);
         String gameId = generateGameId();//crea l'ID del game
 
         gameSessions.putIfAbsent(gameId, new ArrayList<>()); // aggiunge il gameId alla lista delle partite
@@ -97,9 +63,9 @@ public class GameHandler {
         gameBoard.createGame(gameId);//crea il singleton per la partita con codicePartita = gameId
         gameBoard.setPlayerPosition(gameId, playerName, 1);//imposta nel signleton che il giocatore parte dalla casella 1
         gameService.createGameAndPlayer(playerName, difficulty, randomization, gameId);//crea la parita nel database, più informazioni in GameService
-        messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
 
         //GESTIONE MESSAGGI
+        messageHandler.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
         messageHandler.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella gameconsole
         messageHandler.notifyPlayerJoin(gameId, playerName, session, gameSessions, "ADMIN");//invia a tutti i giocatori i messaggi di partecipazione alla partita
         messageHandler.sendTypePlayer("ADMIN", session);//invia all'admin il tipo di giocatore che è
@@ -108,15 +74,27 @@ public class GameHandler {
         messageHandler.sendUnusedPedine(pedineNonUsate, gameSessions, gameId); //invia al giocatore la lista delle pedine disponibili
     }
 
-    private void joinGame(String playerName, String gameId, WebSocketSession session) throws Exception {
-        //TODO: aggiornare il messaggio in formato Json, e gestire il messaggio in frontEnd
+    public void joinGame(String[] messageParts, WebSocketSession session) throws Exception {
+        String playerName = messageParts[1];
+        String gameId = messageParts[2];
+
+        if (giocatoreRepository.existsByNomeAndIdpartita_CodiceInvito(playerName, gameId)) {
+            messageHandler.sendErrorMessage(session);
+            return; // Esce dalla funzione senza aggiungere il giocatore
+        }
+
+        if (giocatoreRepository.countGiocatoriByPartita(gameId) == 6) {
+            messageHandler.sendErrorMessage(session);
+            return;
+        }
+
+        playerNameList.put(playerName, session);
         if (!gameSessions.containsKey(gameId)) {
-            session.sendMessage(new TextMessage("Errore: La partita con ID " + gameId + " non esiste."));
+            messageHandler.sendErrorGameIdMessage(session, gameId);
             return;
         }
 
         gameBoard.setPlayerPosition(gameId, playerName, 1);
-
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         playersInGame.add(session);//aggiunge la sessione del giocatore alla lista di sessioni della partita a cuoi vuole partecipare
         gameService.addPlayer(playerName, gameId);//aggiunge il giocatore nel databesa alla partita assegnata

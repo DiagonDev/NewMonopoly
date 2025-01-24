@@ -63,11 +63,14 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                 case "FineTurno":
                     turnHandler.endTurn(session);
                     break;
-                case "InizioPartita": //TODO: controllare che il messaggio che mi arriva dal frontend sia uguale
+                case "InizioPartita":
                     turnHandler.startTurn(session);
                     break;
-                case "Create", "Partecipa":
-                    gameHandler.handleGameMessage(parts, session);
+                case "Create":
+                    gameHandler.createGame(parts, session);
+                    break;
+                case "Partecipa":
+                    gameHandler.joinGame(parts, session);
                     break;
                 case "MessaggioUtente":
                     chatHandler.chatHandler(parts, session);
