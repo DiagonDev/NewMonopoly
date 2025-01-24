@@ -7,10 +7,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.daBancherz.NewMonopoly.Manager.OpportunitaManager;
 import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
-import unimib.daBancherz.NewMonopoly.database.Entity.ClassiParametri.IdCasella;
-import unimib.daBancherz.NewMonopoly.database.Entity.ClassiParametri.Importo;
-import unimib.daBancherz.NewMonopoly.database.Entity.ClassiParametri.PagaPossedimenti;
-import unimib.daBancherz.NewMonopoly.database.Entity.ClassiParametri.TipoCasella;
+
 import unimib.daBancherz.NewMonopoly.database.Entity.Opportunita;
 import unimib.daBancherz.NewMonopoly.database.Repository.*;
 import unimib.daBancherz.NewMonopoly.database.Service.GameService;
@@ -111,7 +108,7 @@ public class MessageHandler {
         for (String player : playerJoined) {
             int balance = giocatoreRepository.saldoGiocatore(player, gameId);
             session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "playersList", PLAYERNAME_KEY, player, BALANCE_KEY, balance))));
-            Thread.sleep(500); //serve per far si che il frontend riesca a ricevere i messaggi e a visualizzarli in tempo
+            Thread.sleep(100); //serve per far si che il frontend riesca a ricevere i messaggi e a visualizzarli in tempo
         }
     }
 
@@ -234,6 +231,13 @@ public class MessageHandler {
         session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "rispostaAggiornaProprieta", "properties", playerPropertiesList))));
     }
 
+    public void sendErrorMessage(WebSocketSession session) throws IOException {
+        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "errorName"))));
+    }
+
+    public void sendErrorGameIdMessage(WebSocketSession session, String gameId) throws IOException {
+        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "errorGameId", "gameId", gameId))));
+    }
     public String createTurnMessage (boolean turn, String playerName) throws JsonProcessingException {
         String yourTurnMessage = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "turn",

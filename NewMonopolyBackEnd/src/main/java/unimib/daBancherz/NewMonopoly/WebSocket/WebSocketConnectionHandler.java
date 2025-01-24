@@ -9,7 +9,6 @@ import unimib.daBancherz.NewMonopoly.Handler.ChatHandler;
 import unimib.daBancherz.NewMonopoly.Handler.GameHandler;
 import unimib.daBancherz.NewMonopoly.Handler.PropertyHandler;
 import unimib.daBancherz.NewMonopoly.Handler.TurnHandler;
-import unimib.daBancherz.NewMonopoly.Singleton.GameBoardSingleton;
 import unimib.daBancherz.NewMonopoly.model.PlayerProperties;
 
 import java.util.Map;
@@ -24,7 +23,6 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
     private final TurnHandler turnHandler;
     private final WebSocketReconnect reconnect;
     private final PropertyHandler propertyHandler;
-    GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     ObjectMapper objectMapper = new ObjectMapper();
 
     // Iniezione di GameHandler e ChatHandler tramite il costruttore
@@ -63,11 +61,14 @@ public class WebSocketConnectionHandler implements WebSocketHandler {
                 case "FineTurno":
                     turnHandler.endTurn(session);
                     break;
-                case "InizioPartita": //TODO: controllare che il messaggio che mi arriva dal frontend sia uguale
+                case "InizioPartita":
                     turnHandler.startTurn(session);
                     break;
-                case "Create", "Partecipa":
-                    gameHandler.handleGameMessage(parts, session);
+                case "Create":
+                    gameHandler.createGame(parts, session);
+                    break;
+                case "Partecipa":
+                    gameHandler.joinGame(parts, session);
                     break;
                 case "MessaggioUtente":
                     chatHandler.chatHandler(parts, session);

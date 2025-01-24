@@ -1,6 +1,8 @@
 package unimib.daBancherz.NewMonopoly.Singleton;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import unimib.daBancherz.NewMonopoly.model.Game;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameTest {

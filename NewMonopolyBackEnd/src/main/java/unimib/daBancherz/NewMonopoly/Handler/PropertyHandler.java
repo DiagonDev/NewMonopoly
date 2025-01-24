@@ -105,7 +105,7 @@ public class PropertyHandler {
                 "playerName", nomeRichiedente
         ));
         session2.sendMessage(new TextMessage(casaMessage));
-        String content = nomeRichiedente + " ha chiesto uno scambio a " + nomeProprietario + ". " + property1 + " per: " + property2;
+        String content = nomeRichiedente + " ha chiesto uno scambio a " + nomeProprietario + ". " + property1.getNome() + " per: " + property2.getNome();
         messageHandler.sendSystemMessage(gameId, content, gameSessions, session);
     }
 
@@ -158,7 +158,7 @@ public class PropertyHandler {
                 pCPPRepository.setProprietario(nomeRichiedente, gameId, property2.getNome());
                 pCPPRepository.setProprietario(nomeProprietario, gameId, property1.getNome());
                 messageHandler.rispostaGestisciProprieta("Scambio accettato", session);
-                content= nomeProprietario + " ha accettato lo scambio di " + nomeRichiedente + ". " + property2 + " per: " + property1;
+                content= nomeProprietario + " ha accettato lo scambio di " + nomeRichiedente + ". " + property2.getNome() + " per: " + property1.getNome();
                 messageHandler.sendSystemMessage(gameId, content, gameSessions, session);
 
                 proprietarioPropertiesList = pCPPRepository.findPlayerProperties(gameId,nomeProprietario);
