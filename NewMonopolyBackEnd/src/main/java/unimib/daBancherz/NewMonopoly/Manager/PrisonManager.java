@@ -15,7 +15,7 @@ import java.util.Map;
 @Component
 public class PrisonManager {
 
-    private final GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
+    public GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     private final PartitaOpportunitaRepository partitaOpportunitaRepository;
     private final GiocatoreRepository giocatoreRepository;
     private final MessageService messageService;
