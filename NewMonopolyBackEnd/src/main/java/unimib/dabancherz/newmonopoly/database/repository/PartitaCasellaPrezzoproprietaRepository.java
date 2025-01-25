@@ -159,7 +159,7 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
                 FROM
                     caselle_non_proprieta cnp
                 UNION ALL
-                SELECT\s
+                SELECT
                     cp.id_casella,
                     cp.posizione,
                     cp.id_prezzoproprieta
@@ -193,7 +193,7 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
                             WHEN dati.livello_difficolta = 'Difficile' THEN 1.10
                             ELSE 1
                         END
-                    WHEN dati.tipo = 'Via' THEN dati.prezzo
+                        ELSE NULL
                 END,
                 prezzo_casa_corrente = CASE
                     WHEN dati.tipo = 'Proprietà' THEN dati.casa *
@@ -207,7 +207,6 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
             FROM (
                 SELECT
                     pcp.idcasella,
-                    c.prezzo,
                     c.tipo,
                     pp.costo_acquisto,
                     pp.casa,

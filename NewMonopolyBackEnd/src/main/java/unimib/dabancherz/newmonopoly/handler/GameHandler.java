@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.MessageService;
+import unimib.dabancherz.newmonopoly.database.entity.Casella;
+import unimib.dabancherz.newmonopoly.database.repository.CasellaRepository;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardWrapper;
 import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaRepository;
@@ -23,6 +25,7 @@ public class GameHandler {
     private final GiocatoreRepository giocatoreRepository;
     private final PartitaRepository partitaRepository;
     private final PedinaRepository pedinaRepository;
+    private final CasellaRepository casellaRepository;
 
     private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
@@ -35,13 +38,14 @@ public class GameHandler {
                        GameService gameService,
                        GiocatoreRepository giocatoreRepository,
                        PartitaRepository partitaRepository,
-                       PedinaRepository pedinaRepository,
+                       PedinaRepository pedinaRepository, CasellaRepository casellaRepository,
                        GameBoardWrapper gameBoardWrapper) {
         this.messageService = messageService;
         this.gameService = gameService;
         this.giocatoreRepository = giocatoreRepository;
         this.partitaRepository = partitaRepository;
         this.pedinaRepository = pedinaRepository;
+        this.casellaRepository = casellaRepository;
         this.gameBoardWrapper = gameBoardWrapper;
     }
 
@@ -63,8 +67,10 @@ public class GameHandler {
         gameBoardWrapper.createGame(gameId);//crea il singleton per la partita con codicePartita = gameId
         gameBoardWrapper.setPlayerPosition(gameId, playerName, 1);//imposta nel singleton che il giocatore parte dalla casella 1
         gameService.createGameAndPlayer(playerName, difficulty, randomization, gameId);//crea la partita nel database, più informazioni in GameService
+        List<Casella> boxOrder = casellaRepository.findByOrder(gameId);
 
         //GESTIONE MESSAGGI
+        messageService.sendBoxOrderMessage(boxOrder, gameSessions, gameId); //serve per mandare le caselle ordinate
         messageService.sendGameId(gameId, session);//serve per mostrare all'admin il gameId da passare agli altri giocatori per connettersi
         messageService.sendSystemMessage(gameId, "#" + gameId, gameSessions, session); //serve per inviare i messaggi da mostrare nella game console
         messageService.notifyPlayerJoin(gameId, playerName, session, gameSessions, "ADMIN");//invia a tutti i giocatori i messaggi di partecipazione alla partita

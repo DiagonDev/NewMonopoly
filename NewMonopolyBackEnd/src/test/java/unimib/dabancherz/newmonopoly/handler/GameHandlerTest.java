@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.MessageService;
+import unimib.dabancherz.newmonopoly.database.repository.CasellaRepository;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardWrapper;
 import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaRepository;
@@ -25,6 +26,7 @@ class GameHandlerTest {
     private GiocatoreRepository giocatoreRepository;
     private PartitaRepository partitaRepository;
     private PedinaRepository pedinaRepository;
+    private CasellaRepository casellaRepository;;
     private GameBoardWrapper gameBoardWrapper;
     private WebSocketSession session;
 
@@ -35,10 +37,11 @@ class GameHandlerTest {
         giocatoreRepository = mock(GiocatoreRepository.class);
         partitaRepository = mock(PartitaRepository.class);
         pedinaRepository = mock(PedinaRepository.class);
+        casellaRepository = mock(CasellaRepository.class);
         gameBoardWrapper = mock(GameBoardWrapper.class);
         session = mock(WebSocketSession.class);
 
-        gameHandler = new GameHandler(messageService, gameService, giocatoreRepository, partitaRepository, pedinaRepository, gameBoardWrapper);
+        gameHandler = new GameHandler(messageService, gameService, giocatoreRepository, partitaRepository, pedinaRepository, casellaRepository, gameBoardWrapper);
     }
 
     @Test

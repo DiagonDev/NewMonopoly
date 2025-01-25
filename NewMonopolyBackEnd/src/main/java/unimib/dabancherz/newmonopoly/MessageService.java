@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.dabancherz.newmonopoly.database.entity.Casella;
 import unimib.dabancherz.newmonopoly.database.repository.*;
 import unimib.dabancherz.newmonopoly.database.service.GameService;
 import unimib.dabancherz.newmonopoly.model.PlayerProperties;
@@ -169,5 +170,10 @@ public class MessageService {
     //serve a creare un messaggio in Json per far si che il forntend riesca a capire chè per la game chat
     public void sendChatMessage(String gameId, String content, Map<String, List<WebSocketSession>> gameSessions) throws Exception {
         sendToGame(Map.of(TYPE_KEY, "chat", CONTENT_KEY, content), gameSessions, gameId);
+    }
+
+    //serve per mandare un messaggio contenete la lista di caselle ordinate da stampare
+    public void sendBoxOrderMessage(List<Casella> caselle, Map<String, List<WebSocketSession>> gameSessions, String gameId) throws IOException {
+        sendToGame(Map.of(TYPE_KEY, "boxOrder", CONTENT_KEY, caselle), gameSessions, gameId);
     }
 }

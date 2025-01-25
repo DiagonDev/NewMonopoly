@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import unimib.dabancherz.newmonopoly.database.entity.Casella;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface CasellaRepository extends JpaRepository<Casella, Long> {
@@ -15,4 +16,12 @@ public interface CasellaRepository extends JpaRepository<Casella, Long> {
 
     @Query("SELECT COUNT(c) FROM Casella c WHERE c.colore = :colore")
     int countByColore(@Param("colore") String colore);
+
+    @Query(value = """
+        SELECT c.* FROM Casella c
+        JOIN public.partita_casella_prezzoproprieta pcp on c.id_casella = pcp.idcasella
+        WHERE pcp.idpartita = :idPartita
+        ORDER BY pcp.posizione
+    """, nativeQuery = true)
+    List<Casella> findByOrder(@Param("idPartita") String idPartita);
 }
