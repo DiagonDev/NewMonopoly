@@ -70,7 +70,7 @@ public class PropertyHandler {
         int costoCasa = property.getPrezzoCasaCorrente();
         int saldoGiocatore = giocatoreRepository.saldoGiocatore(playerName, gameId);
         int countColore = casellaRepository.countByColore(coloreCasella);
-        int countColoreGiocatore = pCPPRepository.countProprietaColore(gameId, playerName, coloreCasella);
+        int countColoreGiocatore = pCPPRepository.countProprietaColore(playerName, coloreCasella, gameId);
 
         if(numCase<5 && saldoGiocatore > (casine * countColore* costoCasa) && countColore == countColoreGiocatore)
             completaCostruzioneCase(gameId, playerName, coloreCasella, casine, costoCasa, countColore, session);
