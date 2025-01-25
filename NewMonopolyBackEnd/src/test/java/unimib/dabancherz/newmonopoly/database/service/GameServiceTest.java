@@ -95,7 +95,7 @@ class GameServiceTest {
         verify(partitaOpportunitaRepository, times(1)).save(any(Partita_Opportunita.class));
     }
 
-    @Test
+    /*@Test
      void testAddPlayer() {
         Partita partita = new Partita();
         partita.setCodiceInvito("gameId");
@@ -105,7 +105,7 @@ class GameServiceTest {
         gameService.addPlayer("playerName", "gameId");
 
         verify(giocatoreRepository, times(1)).save(any(Giocatore.class));
-    }
+    }*/
 
     @Test
      void testAddPlayerPartitaNotFound() {

@@ -136,12 +136,13 @@ public class WebSocketConnectionDispatcher implements WebSocketHandler {
         // Determina il nome del giocatore e il gameId associato alla sessione chiusa
         String playerName = gameHandler.getPlayerNameBySession(session);
         String gameId = gameHandler.getGameIdBySession(session);
-        List<WebSocketSession> gameSession = gameHandler.getGameSessions().get(gameId);
-        Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
         if (gameId != null) {
+            // Ottieni la lista di sessioni associate al gioco
+            List<WebSocketSession> gameSession = gameHandler.getGameSessions().get(gameId);
+            Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
             // Rimuove il giocatore dalla partita
             gameHandler.removePlayerFromGame(gameId, session);
-            if(!(gameSession.isEmpty())){
+            if (gameSession != null && !gameSession.isEmpty()) {
                 messageService.notifyPlayerDisconnected(gameId, playerName, gameSessions);
             }
         }

@@ -51,7 +51,6 @@ public class MessageService {
         if (!(content.startsWith("Ti sei unito alla partita con ID: ") || content.startsWith("#"))) {
             sendToGame(Map.of(TYPE_KEY, SYSTEM_KEY, CONTENT_KEY, content), gameSessions, gameId);
         } else {
-            //sendToGame(Map.of(TYPE_KEY, "system", CONTENT_KEY, content), gameSessions, gameId, session, false);
             session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, SYSTEM_KEY, CONTENT_KEY, content))));
         }
     }
@@ -62,6 +61,10 @@ public class MessageService {
 
     public void sendPawnMove(Integer pawnId, String playerName, Integer offset, Map<String, List<WebSocketSession>> gameSessions, String gameId) throws IOException {
         sendToGame(Map.of(TYPE_KEY, "pawnMove", "pawnId", pawnId, PLAYERNAME_KEY, playerName, "offset", offset), gameSessions, gameId);
+    }
+
+    public void sendPlayerPawnPosition(Integer pawnId, String playerName, Integer offset, WebSocketSession session) throws IOException {
+        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "pawnMove", "pawnId", pawnId, PLAYERNAME_KEY, playerName, "offset", offset))));
     }
 
     public void sendJoinMessage(String playerName, Map<String, List<WebSocketSession>> gameSessions, String role, String gameId) throws IOException {
@@ -112,7 +115,7 @@ public class MessageService {
     }
 
     public void sendErrorMessage(WebSocketSession session) throws IOException {
-        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "errorName"))));
+        session.sendMessage(new TextMessage(createMessage(Map.of(TYPE_KEY, "errore, partita piena o nome già presente nella partita"))));
     }
 
     public void sendErrorGameIdMessage(WebSocketSession session, String gameId) throws IOException {

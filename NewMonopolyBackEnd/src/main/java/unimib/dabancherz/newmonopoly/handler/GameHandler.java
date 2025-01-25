@@ -5,13 +5,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.MessageService;
 import unimib.dabancherz.newmonopoly.database.entity.Casella;
+import unimib.dabancherz.newmonopoly.database.entity.Giocatore;
 import unimib.dabancherz.newmonopoly.database.repository.CasellaRepository;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardWrapper;
+import unimib.dabancherz.newmonopoly.database.entity.Partita;
 import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PedinaRepository;
 import unimib.dabancherz.newmonopoly.database.service.GameService;
+import unimib.dabancherz.newmonopoly.singleton.GameBoardWrapper;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -89,20 +93,14 @@ public class GameHandler {
             return; // Esce dalla funzione senza aggiungere il giocatore
         }
 
-        if (giocatoreRepository.countGiocatoriByPartita(gameId) == 6) {
-            messageService.sendErrorMessage(session);
-            return;
-        }
-
-        playerNameList.put(playerName, session);
         if (!gameSessions.containsKey(gameId)) {
             messageService.sendErrorGameIdMessage(session, gameId);
             return;
         }
 
+        playerNameList.put(playerName, session);
         gameBoardWrapper.setPlayerPosition(gameId, playerName, 1);
 
-        gameBoardWrapper.setPlayerPosition(gameId, playerName, 1);
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         playersInGame.add(session);//aggiunge la sessione del giocatore alla lista di sessioni della partita a cuoi vuole partecipare
         gameService.addPlayer(playerName, gameId);//aggiunge il giocatore nel database alla partita assegnata
@@ -110,8 +108,8 @@ public class GameHandler {
 
         pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
         messageService.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);   //invia al giocatore la lista delle pedine disponibili
-    }
 
+    }
     public String getGameIdBySession(WebSocketSession session) {
         // Scorre tutte le partite nella mappa
         for (Map.Entry<String, List<WebSocketSession>> entry : gameSessions.entrySet()) {
@@ -206,6 +204,22 @@ public class GameHandler {
         giocatoreRepository.updatePedinaForGiocatore(playerName, Integer.parseInt(idPedina), gameId);  //Assegna la pedina al giocatore nel database
         pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
         messageService.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);
+        sendPositionPawn(gameId, session);
         messageService.sendPawnMove(Integer.parseInt(idPedina), playerName, 1, gameSessions, gameId);   // Invia un messaggio per spostare la pedina sul via
+    }
+
+
+    public void sendPositionPawn(String gameId, WebSocketSession session) throws IOException, InterruptedException {
+        List<Giocatore> giocatori = giocatoreRepository.findGiocatoreWithPedina(gameId);
+
+        for (Giocatore giocatore : giocatori) {
+            String playerName = giocatore.getNome();
+            if(!(playerName.equals(getPlayerNameBySession(session)))){
+                int pawnId = giocatore.getIdpedina().getIdPedina();
+                int position = gameBoardWrapper.getPlayerPosition(gameId, playerName);
+                messageService.sendPlayerPawnPosition(pawnId,playerName, position, session);
+            }
+            Thread.sleep(20);
+        }
     }
 }

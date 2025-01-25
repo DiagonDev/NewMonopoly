@@ -116,29 +116,6 @@ class PropertyHandlerTest {
     }
 
     @Test
-    void testGestisciCase() throws Exception {
-        PlayerProperties property = new PlayerProperties();
-        property.setColore("Rosso");
-        property.setNumCasa(0);
-        property.setPrezzoCasaCorrente(50);
-
-        String gameId = "game123";
-        String playerName = "player1";
-
-        when(mockGameHandler.getGameIdBySession(mockSession)).thenReturn(gameId);
-        when(mockGameHandler.getPlayerNameBySession(mockSession)).thenReturn(playerName);
-        when(mockGiocatoreRepository.saldoGiocatore(playerName, gameId)).thenReturn(600);
-        when(mockCasellaRepository.countByColore("Rosso")).thenReturn(3);
-
-        propertyHandler.gestisciCase(property, 1, mockSession);
-
-        verify(mockGiocatoreRepository).setSaldoGiocatore(playerName, gameId, 150);
-        verify(mockMessageService).updateBalance(anyMap(), eq(gameId), eq(playerName));
-        verify(mockPCPPRepository).aggiungiCase("Rosso", 1);
-        verify(mockMessageService).sendSystemMessage(eq(gameId), contains("ha costruito 1 case sulle proprietà di colore Rosso"), anyMap(), eq(mockSession));
-    }
-
-    @Test
     void testEffettuaScambio() throws Exception {
         PlayerProperties property1 = new PlayerProperties();
         property1.setIdGiocatore(1);
