@@ -316,7 +316,6 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     """, nativeQuery = true)
     int calcolaAffitto(@Param("idPartita") String idPartita, @Param("posizione") Integer posizione, @Param("idGiocatore") Integer idGiocatore, @Param("count") Integer count);
 
-
     //Metodo per contare quante caselle di quel tipo ha l'utente
     @Query(value =  """
         SELECT COUNT(*) AS numero_caselle
@@ -329,6 +328,20 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
           AND p.codice_invito = :idPartita
     """, nativeQuery = true)
     int countProprieta(@Param("nomeGiocatore") String nomeGiocatore, @Param("casellaTipo") String casellaTipo, @Param("idPartita") String idPartita);
+
+    //Metodo per contare quante caselle di quel colore ha l'utente
+    @Query(value =  """
+        SELECT COUNT(*) AS numero_caselle
+        FROM Partita_Casella_Prezzoproprieta pc
+        JOIN Giocatore g ON pc.idgiocatore = g.id_giocatore
+        JOIN Casella c ON pc.idcasella = c.id_casella
+        JOIN Partita p ON pc.idpartita = p.codice_invito
+        WHERE g.nome = :nomeGiocatore
+          AND c.colore = :casellaColore
+          AND p.codice_invito = :idPartita
+    """, nativeQuery = true)
+    int countProprietaColore(@Param("nomeGiocatore") String nomeGiocatore, @Param("casellaColore") String casellaColore, @Param("idPartita") String idPartita);
+
 
     @Query(value = """
         SELECT COALESCE(SUM(pcp.num_casa), 0) AS total_casa
@@ -376,5 +389,4 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
             )
     """, nativeQuery = true)
     void aggiungiCase(@Param("colore") String colore, @Param("numeroCase") Integer numeroCase);
-
 }
