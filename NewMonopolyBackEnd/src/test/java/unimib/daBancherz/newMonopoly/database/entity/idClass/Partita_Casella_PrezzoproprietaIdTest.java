@@ -3,24 +3,24 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class Partita_Casella_PrezzoproprietaIdTest {
+ class Partita_Casella_PrezzoproprietaIdTest {
 
     @Test
-    public void testGetSetIdpartita() {
+     void testGetSetIdpartita() {
         Partita_Casella_PrezzoproprietaId id = new Partita_Casella_PrezzoproprietaId();
         id.setIdpartita("game-1");
         assertEquals("game-1", id.getIdpartita());
     }
 
     @Test
-    public void testGetSetIdcasella() {
+     void testGetSetIdcasella() {
         Partita_Casella_PrezzoproprietaId id = new Partita_Casella_PrezzoproprietaId();
         id.setIdcasella(10);
         assertEquals(10, id.getIdcasella());
     }
 
     @Test
-    public void testEquals() {
+     void testEquals() {
         Partita_Casella_PrezzoproprietaId id1 = new Partita_Casella_PrezzoproprietaId();
         id1.setIdpartita("game-1");
         id1.setIdcasella(10);
@@ -42,7 +42,7 @@ public class Partita_Casella_PrezzoproprietaIdTest {
     }
 
     @Test
-    public void testHashCode() {
+     void testHashCode() {
         Partita_Casella_PrezzoproprietaId id1 = new Partita_Casella_PrezzoproprietaId();
         id1.setIdpartita("game-1");
         id1.setIdcasella(10);

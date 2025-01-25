@@ -14,7 +14,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class GameServiceTest {
+class GameServiceTest {
 
     @Mock
     private PartitaRepository partitaRepository;
@@ -37,12 +37,12 @@ public class GameServiceTest {
     private GameService gameService;
 
     @BeforeEach
-    public void setUp() {
+     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testCreateGameAndPlayer() {
+     void testCreateGameAndPlayer() {
         Partita nuovaPartita = new Partita();
         nuovaPartita.setCodiceInvito("gameId");
         nuovaPartita.setLivelloDifficolta("difficile");
@@ -69,7 +69,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void testCreateGameAndPlayerWithRandomizationFalse() {
+     void testCreateGameAndPlayerWithRandomizationFalse() {
         Partita nuovaPartita = new Partita();
         nuovaPartita.setCodiceInvito("gameId");
         nuovaPartita.setLivelloDifficolta("difficile");
@@ -96,7 +96,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void testAddPlayer() {
+     void testAddPlayer() {
         Partita partita = new Partita();
         partita.setCodiceInvito("gameId");
 
@@ -108,7 +108,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void testAddPlayerPartitaNotFound() {
+     void testAddPlayerPartitaNotFound() {
         when(partitaRepository.findByCodiceInvito("gameId")).thenReturn(null);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -123,7 +123,7 @@ public class GameServiceTest {
 
 
     @Test
-    public void testPopulateGameOpportunity() {
+     void testPopulateGameOpportunity() {
         Opportunita opportunita = new Opportunita();
         opportunita.setIdOpportunita(1);
 
@@ -136,7 +136,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void testPopulateGameRoule() {
+     void testPopulateGameRoule() {
         Regolafedelta regolafedelta = new Regolafedelta();
         regolafedelta.setIdRegolafedelta(1);
 
@@ -149,7 +149,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void testDeletePlayer() {
+     void testDeletePlayer() {
         when(giocatoreRepository.findIdByNomeAndPartitaCodiceInvito("playerName", "gameId")).thenReturn(1);
 
         gameService.deletePlayer("gameId", "playerName");
@@ -158,7 +158,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void testDeletePlayerIdGiocatoreNull() {
+     void testDeletePlayerIdGiocatoreNull() {
         when(giocatoreRepository.findIdByNomeAndPartitaCodiceInvito("playerName", "gameId")).thenReturn(null);
 
         gameService.deletePlayer("gameId", "playerName");
@@ -168,7 +168,7 @@ public class GameServiceTest {
 
 
     @Test
-    public void testGetUnusedPedineByPartita() {
+     void testGetUnusedPedineByPartita() {
         List<Integer> unusedPedine = Collections.singletonList(1);
 
         when(pedinaRepository.findUnusedPedineByPartita("gameId")).thenReturn(unusedPedine);
@@ -179,7 +179,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void testGetPlayersWithIdLowerThan() {
+     void testGetPlayersWithIdLowerThan() {
         List<String> players = Collections.singletonList("player1");
 
         when(giocatoreRepository.findIdGiocatoreByNome("playerName", "gameId")).thenReturn(1);
@@ -191,7 +191,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void testGetPlayersWithIdLowerThanIdGiocatoreNull() {
+     void testGetPlayersWithIdLowerThanIdGiocatoreNull() {
         when(giocatoreRepository.findIdGiocatoreByNome("playerName", "gameId")).thenReturn(null);
 
         List<String> result = gameService.getPlayersWithIdLowerThan("gameId", "playerName");
@@ -200,7 +200,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void testGetPlayersWithIdLowerThanEmptyList() {
+     void testGetPlayersWithIdLowerThanEmptyList() {
         List<String> players = Collections.emptyList();
 
         when(giocatoreRepository.findIdGiocatoreByNome("playerName", "gameId")).thenReturn(1);

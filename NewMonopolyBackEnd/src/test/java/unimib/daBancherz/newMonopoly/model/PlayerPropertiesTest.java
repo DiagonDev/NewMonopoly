@@ -3,101 +3,101 @@ package unimib.daBancherz.newMonopoly.model;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PlayerPropertiesTest {
+class PlayerPropertiesTest {
 
     @Test
-    public void testGetSetPrezzoCorrente() {
+     void testGetSetPrezzoCorrente() {
         PlayerProperties playerProperties = new PlayerProperties();
         playerProperties.setPrezzoCorrente(100);
         assertEquals(100, playerProperties.getPrezzoCorrente());
     }
 
     @Test
-    public void testGetSetIdGiocatore() {
+     void testGetSetIdGiocatore() {
         PlayerProperties playerProperties = new PlayerProperties();
         playerProperties.setIdGiocatore(1);
         assertEquals(1, playerProperties.getIdGiocatore());
     }
 
     @Test
-    public void testGetSetNumCasa() {
+     void testGetSetNumCasa() {
         PlayerProperties playerProperties = new PlayerProperties();
         playerProperties.setNumCasa(3);
         assertEquals(3, playerProperties.getNumCasa());
     }
 
     @Test
-    public void testGetSetPrezzoCasaCorrente() {
+     void testGetSetPrezzoCasaCorrente() {
         PlayerProperties playerProperties = new PlayerProperties();
         playerProperties.setPrezzoCasaCorrente(200);
         assertEquals(200, playerProperties.getPrezzoCasaCorrente());
     }
 
     @Test
-    public void testGetSetNome() {
+     void testGetSetNome() {
         PlayerProperties playerProperties = new PlayerProperties();
         playerProperties.setNome("Test Nome");
         assertEquals("Test Nome", playerProperties.getNome());
     }
 
     @Test
-    public void testGetSetColore() {
+     void testGetSetColore() {
         PlayerProperties playerProperties = new PlayerProperties();
         playerProperties.setColore("Rosso");
         assertEquals("Rosso", playerProperties.getColore());
     }
 
     @Test
-    public void testGetSetAffitto() {
+     void testGetSetAffitto() {
         PlayerProperties playerProperties = new PlayerProperties();
         playerProperties.setAffitto(50);
         assertEquals(50, playerProperties.getAffitto());
     }
 
     @Test
-    public void testGetSetIpoteca() {
+     void testGetSetIpoteca() {
         PlayerProperties playerProperties = new PlayerProperties();
         playerProperties.setIpoteca(75);
         assertEquals(75, playerProperties.getIpoteca());
     }
 
     @Test
-    public void testGetSetAffitto1Casa() {
+     void testGetSetAffitto1Casa() {
         PlayerProperties playerProperties = new PlayerProperties();
         playerProperties.setAffitto1Casa(60);
         assertEquals(60, playerProperties.getAffitto1Casa());
     }
 
     @Test
-    public void testGetSetAffitto2Case() {
+     void testGetSetAffitto2Case() {
         PlayerProperties playerProperties = new PlayerProperties();
         playerProperties.setAffitto2Case(70);
         assertEquals(70, playerProperties.getAffitto2Case());
     }
 
     @Test
-    public void testGetSetAffitto3Case() {
+     void testGetSetAffitto3Case() {
         PlayerProperties playerProperties = new PlayerProperties();
         playerProperties.setAffitto3Case(80);
         assertEquals(80, playerProperties.getAffitto3Case());
     }
 
     @Test
-    public void testGetSetAffitto4Case() {
+     void testGetSetAffitto4Case() {
         PlayerProperties playerProperties = new PlayerProperties();
         playerProperties.setAffitto4Case(90);
         assertEquals(90, playerProperties.getAffitto4Case());
     }
 
     @Test
-    public void testGetSetAffittoAlbergo() {
+     void testGetSetAffittoAlbergo() {
         PlayerProperties playerProperties = new PlayerProperties();
         playerProperties.setAffittoAlbergo(100);
         assertEquals(100, playerProperties.getAffittoAlbergo());
     }
 
     @Test
-    public void testAllArgsConstructor() {
+     void testAllArgsConstructor() {
         PlayerProperties playerProperties = new PlayerProperties(100, 1, 3, 200, "Test Nome", "Rosso", 50, 60, 70, 80, 90, 100, 75);
         assertEquals(100, playerProperties.getPrezzoCorrente());
         assertEquals(1, playerProperties.getIdGiocatore());

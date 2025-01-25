@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class Partita_RegolafedeltaTest {
+ class Partita_RegolafedeltaTest {
 
     @Test
-    public void testGetSetIdpartita() {
+     void testGetSetIdpartita() {
         Partita partita = new Partita();
         Partita_Regolafedelta partitaRegolafedelta = new Partita_Regolafedelta();
         partitaRegolafedelta.setIdpartita(partita);
@@ -15,7 +15,7 @@ public class Partita_RegolafedeltaTest {
     }
 
     @Test
-    public void testGetSetIdregolafedelta() {
+     void testGetSetIdregolafedelta() {
         Regolafedelta regolafedelta = new Regolafedelta();
         Partita_Regolafedelta partitaRegolafedelta = new Partita_Regolafedelta();
         partitaRegolafedelta.setIdregolafedelta(regolafedelta);
@@ -23,7 +23,7 @@ public class Partita_RegolafedeltaTest {
     }
 
     @Test
-    public void testIsSetUtilizzato() {
+     void testIsSetUtilizzato() {
         Partita_Regolafedelta partitaRegolafedelta = new Partita_Regolafedelta();
         partitaRegolafedelta.setUtilizzato(true);
         assertTrue(partitaRegolafedelta.isUtilizzato());

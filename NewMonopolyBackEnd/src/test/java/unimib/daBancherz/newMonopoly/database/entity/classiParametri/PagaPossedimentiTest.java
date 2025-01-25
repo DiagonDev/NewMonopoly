@@ -4,17 +4,17 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PagaPossedimentiTest {
+ class PagaPossedimentiTest {
 
     @Test
-    public void testGetSetCostoCasa() {
+     void testGetSetCostoCasa() {
         PagaPossedimenti pagaPossedimenti = new PagaPossedimenti();
         pagaPossedimenti.setCosto_casa(100);
         assertEquals(100, pagaPossedimenti.getCosto_casa());
     }
 
     @Test
-    public void testGetSetCostoAbergo() {
+     void testGetSetCostoAbergo() {
         PagaPossedimenti pagaPossedimenti = new PagaPossedimenti();
         pagaPossedimenti.setCosto_albergo(200);
         assertEquals(200, pagaPossedimenti.getCosto_albergo());

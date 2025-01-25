@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class Partita_Casella_PrezzoproprietaTest {
+ class Partita_Casella_PrezzoproprietaTest {
 
     @Test
-    public void testGetSetIdpartita() {
+     void testGetSetIdpartita() {
         Partita partita = new Partita();
         Partita_Casella_Prezzoproprieta partitaCasellaPrezzo = new Partita_Casella_Prezzoproprieta();
         partitaCasellaPrezzo.setIdpartita(partita);
@@ -15,7 +15,7 @@ public class Partita_Casella_PrezzoproprietaTest {
     }
 
     @Test
-    public void testGetSetIdcasella() {
+     void testGetSetIdcasella() {
         Casella casella = new Casella();
         Partita_Casella_Prezzoproprieta partitaCasellaPrezzo = new Partita_Casella_Prezzoproprieta();
         partitaCasellaPrezzo.setIdcasella(casella);
@@ -23,7 +23,7 @@ public class Partita_Casella_PrezzoproprietaTest {
     }
 
     @Test
-    public void testGetSetIdprezzoproprieta() {
+     void testGetSetIdprezzoproprieta() {
         Prezzoproprieta prezzoproprieta = new Prezzoproprieta();
         Partita_Casella_Prezzoproprieta partitaCasellaPrezzo = new Partita_Casella_Prezzoproprieta();
         partitaCasellaPrezzo.setIdprezzoproprieta(prezzoproprieta);
@@ -31,28 +31,28 @@ public class Partita_Casella_PrezzoproprietaTest {
     }
 
     @Test
-    public void testGetSetPrezzoCorrente() {
+     void testGetSetPrezzoCorrente() {
         Partita_Casella_Prezzoproprieta partitaCasellaPrezzo = new Partita_Casella_Prezzoproprieta();
         partitaCasellaPrezzo.setPrezzoCorrente(200);
         assertEquals(200, partitaCasellaPrezzo.getPrezzoCorrente());
     }
 
     @Test
-    public void testGetSetPrezzoCasaCorrente() {
+     void testGetSetPrezzoCasaCorrente() {
         Partita_Casella_Prezzoproprieta partitaCasellaPrezzo = new Partita_Casella_Prezzoproprieta();
         partitaCasellaPrezzo.setPrezzoCasaCorrente(50);
         assertEquals(50, partitaCasellaPrezzo.getPrezzoCasaCorrente());
     }
 
     @Test
-    public void testGetSetPosizione() {
+     void testGetSetPosizione() {
         Partita_Casella_Prezzoproprieta partitaCasellaPrezzo = new Partita_Casella_Prezzoproprieta();
         partitaCasellaPrezzo.setPosizione(10);
         assertEquals(10, partitaCasellaPrezzo.getPosizione());
     }
 
     @Test
-    public void testGetSetIdgiocatore() {
+     void testGetSetIdgiocatore() {
         Giocatore giocatore = new Giocatore();
         Partita_Casella_Prezzoproprieta partitaCasellaPrezzo = new Partita_Casella_Prezzoproprieta();
         partitaCasellaPrezzo.setIdgiocatore(giocatore);
@@ -60,7 +60,7 @@ public class Partita_Casella_PrezzoproprietaTest {
     }
 
     @Test
-    public void testGetSetNumCasa() {
+     void testGetSetNumCasa() {
         Partita_Casella_Prezzoproprieta partitaCasellaPrezzo = new Partita_Casella_Prezzoproprieta();
         partitaCasellaPrezzo.setNumCasa(3);
         assertEquals(3, partitaCasellaPrezzo.getNumCasa());

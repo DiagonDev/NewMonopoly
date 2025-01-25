@@ -7,13 +7,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-public class WebSocketReconnectTest {
+class WebSocketReconnectTest {
 
     @Autowired
     private WebSocketReconnect webSocketReconnect;
 
     @Test
-    public void contextLoads() {
+    void contextLoads() {
         // Verifica che il contesto dell'applicazione si carichi correttamente
         assertThat(webSocketReconnect).isNotNull();
     }

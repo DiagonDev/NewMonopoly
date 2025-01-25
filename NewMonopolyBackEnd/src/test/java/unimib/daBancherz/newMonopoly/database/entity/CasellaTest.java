@@ -4,31 +4,31 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CasellaTest {
+ class CasellaTest {
 
     @Test
-    public void testGetSetIdCasella() {
+     void testGetSetIdCasella() {
         Casella casella = new Casella();
         casella.setIdCasella(1);
         assertEquals(1, casella.getIdCasella());
     }
 
     @Test
-    public void testGetSetNome() {
+     void testGetSetNome() {
         Casella casella = new Casella();
         casella.setNome("Via");
         assertEquals("Via", casella.getNome());
     }
 
     @Test
-    public void testGetSetColore() {
+     void testGetSetColore() {
         Casella casella = new Casella();
         casella.setColore("Rosso");
         assertEquals("Rosso", casella.getColore());
     }
 
     @Test
-    public void testGetSetTipo() {
+     void testGetSetTipo() {
         Casella casella = new Casella();
         casella.setTipo("Proprietà");
         assertEquals("Proprietà", casella.getTipo());

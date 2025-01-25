@@ -3,24 +3,24 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class Partita_RegolafedeltaIdTest {
+ class Partita_RegolafedeltaIdTest {
 
     @Test
-    public void testGetSetIdpartita() {
+     void testGetSetIdpartita() {
         Partita_RegolafedeltaId id = new Partita_RegolafedeltaId();
         id.setIdpartita("game-1");
         assertEquals("game-1", id.getIdpartita());
     }
 
     @Test
-    public void testGetSetIdregolafedelta() {
+     void testGetSetIdregolafedelta() {
         Partita_RegolafedeltaId id = new Partita_RegolafedeltaId();
         id.setIdregolafedelta(10);
         assertEquals(10, id.getIdregolafedelta());
     }
 
     @Test
-    public void testEquals() {
+     void testEquals() {
         Partita_RegolafedeltaId id1 = new Partita_RegolafedeltaId();
         id1.setIdpartita("game-1");
         id1.setIdregolafedelta(10);
@@ -42,7 +42,7 @@ public class Partita_RegolafedeltaIdTest {
     }
 
     @Test
-    public void testHashCode() {
+     void testHashCode() {
         Partita_RegolafedeltaId id1 = new Partita_RegolafedeltaId();
         id1.setIdpartita("game-1");
         id1.setIdregolafedelta(10);

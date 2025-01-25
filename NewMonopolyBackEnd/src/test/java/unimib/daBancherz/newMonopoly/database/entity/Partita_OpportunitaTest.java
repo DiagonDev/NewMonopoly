@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class Partita_OpportunitaTest {
+ class Partita_OpportunitaTest {
 
     @Test
-    public void testGetSetIdpartita() {
+     void testGetSetIdpartita() {
         Partita partita = new Partita();
         Partita_Opportunita partitaOpportunita = new Partita_Opportunita();
         partitaOpportunita.setIdpartita(partita);
@@ -15,7 +15,7 @@ public class Partita_OpportunitaTest {
     }
 
     @Test
-    public void testGetSetIdopportunita() {
+     void testGetSetIdopportunita() {
         Opportunita opportunita = new Opportunita();
         Partita_Opportunita partitaOpportunita = new Partita_Opportunita();
         partitaOpportunita.setIdopportunita(opportunita);
@@ -23,7 +23,7 @@ public class Partita_OpportunitaTest {
     }
 
     @Test
-    public void testGetSetIdgiocatore() {
+     void testGetSetIdgiocatore() {
         Giocatore giocatore = new Giocatore();
         Partita_Opportunita partitaOpportunita = new Partita_Opportunita();
         partitaOpportunita.setIdgiocatore(giocatore);
@@ -31,7 +31,7 @@ public class Partita_OpportunitaTest {
     }
 
     @Test
-    public void testIsSetUtilizzato() {
+     void testIsSetUtilizzato() {
         Partita_Opportunita partitaOpportunita = new Partita_Opportunita();
         partitaOpportunita.setUtilizzato(true);
         assertTrue(partitaOpportunita.isUtilizzato());

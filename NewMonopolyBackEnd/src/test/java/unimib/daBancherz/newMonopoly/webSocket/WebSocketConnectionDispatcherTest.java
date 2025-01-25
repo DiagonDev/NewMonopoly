@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-public class WebSocketConnectionDispatcherTest {
+class WebSocketConnectionDispatcherTest {
 
     @Mock
     private GameHandler gameHandler;
@@ -56,14 +56,14 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testAfterConnectionEstablished() {
+    void testAfterConnectionEstablished() {
         when(session.getId()).thenReturn("sessionId");
         webSocketConnectionDispatcher.afterConnectionEstablished(session);
         assertTrue(webSocketConnectionDispatcher.playerSessions.containsKey("sessionId"));
     }
 
     @Test
-    public void testHandleMessage() throws Exception {
+    void testHandleMessage() throws Exception {
         String payload = "Ping";
         TextMessage message = new TextMessage(payload);
 
@@ -75,7 +75,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessagePing() throws Exception {
+    void testHandleMessagePing() throws Exception {
         String payload = "Ping:";
         TextMessage message = new TextMessage(payload);
 
@@ -85,7 +85,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessageLanciaDadi() throws Exception {
+    void testHandleMessageLanciaDadi() throws Exception {
         String payload = "LanciaDadi:";
         TextMessage message = new TextMessage(payload);
 
@@ -95,7 +95,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessageFineTurno() throws Exception {
+    void testHandleMessageFineTurno() throws Exception {
         String payload = "FineTurno:";
         TextMessage message = new TextMessage(payload);
 
@@ -105,7 +105,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessageInizioPartita() throws Exception {
+    void testHandleMessageInizioPartita() throws Exception {
         String payload = "InizioPartita:";
         TextMessage message = new TextMessage(payload);
 
@@ -115,7 +115,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessageCreate() throws Exception {
+    void testHandleMessageCreate() throws Exception {
         String payload = "Create:someData";
         TextMessage message = new TextMessage(payload);
 
@@ -125,7 +125,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessagePartecipa() throws Exception {
+    void testHandleMessagePartecipa() throws Exception {
         String payload = "Partecipa:someData";
         TextMessage message = new TextMessage(payload);
 
@@ -135,7 +135,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessageMessaggioUtente() throws Exception {
+    void testHandleMessageMessaggioUtente() throws Exception {
         String payload = "MessaggioUtente:someData";
         TextMessage message = new TextMessage(payload);
 
@@ -145,7 +145,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessageSceltaPedina() throws Exception {
+     void testHandleMessageSceltaPedina() throws Exception {
         String payload = "SceltaPedina:someData";
         TextMessage message = new TextMessage(payload);
 
@@ -155,7 +155,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessageAcquistaProprieta() throws Exception {
+    void testHandleMessageAcquistaProprieta() throws Exception {
         String payload = "AcquistaProprieta:someData";
         TextMessage message = new TextMessage(payload);
 
@@ -165,7 +165,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessagePingScambiaProprieta() throws Exception {
+     void testHandleMessagePingScambiaProprieta() throws Exception {
         String payload = "PingScambiaProprieta:";
         TextMessage message = new TextMessage(payload);
 
@@ -175,7 +175,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessagePagaUscitaPrigione() throws Exception {
+     void testHandleMessagePagaUscitaPrigione() throws Exception {
         String payload = "PagaUscitaPrigione:";
         TextMessage message = new TextMessage(payload);
 
@@ -185,7 +185,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessageRichiestaUpdateProperties() throws Exception {
+     void testHandleMessageRichiestaUpdateProperties() throws Exception {
         String payload = "RichiestaUpdateProperties:";
         TextMessage message = new TextMessage(payload);
 
@@ -195,7 +195,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessageRispostaScambio() throws Exception {
+     void testHandleMessageRispostaScambio() throws Exception {
         String payload = "{ \"type\": \"!RispostaScambio\", \"exchangeAccepted\": true }";
         TextMessage message = new TextMessage(payload);
 
@@ -205,7 +205,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleTransportError() {
+     void testHandleTransportError() {
         when(session.getId()).thenReturn("sessionId");
         Throwable exception = new Exception("Test exception");
 
@@ -215,7 +215,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testAfterConnectionClosed() throws Exception {
+     void testAfterConnectionClosed() throws Exception {
         when(session.getId()).thenReturn("sessionId");
         CloseStatus status = CloseStatus.NORMAL;
 
@@ -225,12 +225,12 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testSupportsPartialMessages() {
+     void testSupportsPartialMessages() {
         assertFalse(webSocketConnectionDispatcher.supportsPartialMessages());
     }
 
    @Test
-    public void testHandleMessageEffettuaScambio() throws Exception {
+     void testHandleMessageEffettuaScambio() throws Exception {
         String payload = "{ \"type\": \"!EffettuaScambio\", \"data\": {\"key\": \"value\"} }";
         TextMessage message = new TextMessage(payload);
 
@@ -241,7 +241,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessageCostruisciCasa() throws Exception {
+     void testHandleMessageCostruisciCasa() throws Exception {
         PlayerProperties property = new PlayerProperties();
         property.setNome("propId");
         String payload = "{ \"type\": \"!CostruisciCasa\", \"property\": " + new ObjectMapper().writeValueAsString(property) + ", \"casine\": 2 }";
@@ -259,7 +259,7 @@ public class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    public void testHandleMessageIpotecaProprieta() throws Exception {
+     void testHandleMessageIpotecaProprieta() throws Exception {
         PlayerProperties property = new PlayerProperties();
         property.setNome("propId");
         String payload = "{ \"type\": \"!IpotecaProprieta\", \"property\": " + new ObjectMapper().writeValueAsString(property) + "}";
