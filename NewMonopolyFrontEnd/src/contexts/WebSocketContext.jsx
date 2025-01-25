@@ -77,8 +77,8 @@ export const WebSocketProvider = ({children}) => {
     const [partitaFinita, setPartitaFinita] = useState('');
     const [updateProperties, setUpdateProperties] = useState([]);
     useEffect(() => {
-        const ws = new WebSocket("https://8f4c-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
-        //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
+        //const ws = new WebSocket("https://8f4c-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
+        const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
         ws.onopen = () => {
             setSocket(ws);
             setConnected(true);
