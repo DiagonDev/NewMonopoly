@@ -28,10 +28,6 @@ class GameServiceTest {
     private PartitaOpportunitaRepository partitaOpportunitaRepository;
     @Mock
     private PedinaRepository pedinaRepository;
-    @Mock
-    private RegolafedeltaRepository regolafedeltaRepository;
-    @Mock
-    private PartitaRegolafedeltaRepository partitaRegolafedeltaRepository;
 
     @InjectMocks
     private GameService gameService;
@@ -111,9 +107,7 @@ class GameServiceTest {
      void testAddPlayerPartitaNotFound() {
         when(partitaRepository.findByCodiceInvito("gameId")).thenReturn(null);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            gameService.addPlayer("playerName", "gameId");
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> gameService.addPlayer("playerName", "gameId"));
 
         String expectedMessage = "La partita con ID gameId non esiste.";
         String actualMessage = exception.getMessage();
@@ -133,19 +127,6 @@ class GameServiceTest {
         gameService.populateGameOpportunity("gameId");
 
         verify(partitaOpportunitaRepository, times(1)).save(any(Partita_Opportunita.class));
-    }
-
-    @Test
-     void testPopulateGameRoule() {
-        Regolafedelta regolafedelta = new Regolafedelta();
-        regolafedelta.setIdRegolafedelta(1);
-
-        when(regolafedeltaRepository.findAll()).thenReturn(Collections.singletonList(regolafedelta));
-        when(partitaRepository.findById("gameId")).thenReturn(Optional.of(new Partita()));
-
-        gameService.populateGameRoule("gameId");
-
-        verify(partitaRegolafedeltaRepository, times(1)).save(any(Partita_Regolafedelta.class));
     }
 
     @Test

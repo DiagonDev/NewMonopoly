@@ -8,12 +8,10 @@ import unimib.dabancherz.newmonopoly.database.entity.Casella;
 import unimib.dabancherz.newmonopoly.database.entity.Giocatore;
 import unimib.dabancherz.newmonopoly.database.repository.CasellaRepository;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardWrapper;
-import unimib.dabancherz.newmonopoly.database.entity.Partita;
 import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PedinaRepository;
 import unimib.dabancherz.newmonopoly.database.service.GameService;
-import unimib.dabancherz.newmonopoly.singleton.GameBoardWrapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
