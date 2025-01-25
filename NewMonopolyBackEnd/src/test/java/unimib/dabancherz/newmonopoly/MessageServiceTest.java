@@ -227,7 +227,7 @@ class MessageServiceTest {
         verify(session, times(1)).sendMessage(messageCaptor.capture());
         TextMessage capturedMessage = messageCaptor.getValue();
 
-        String expectedMessage = objectMapper.writeValueAsString(Map.of("type", "errorName"));
+        String expectedMessage = objectMapper.writeValueAsString(Map.of("type", "errore, partita piena o nome già presente nella partita"));
         assertEquals(expectedMessage, capturedMessage.getPayload());
     }
 

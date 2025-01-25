@@ -71,11 +71,18 @@ public class GameService {
             throw new IllegalArgumentException("La partita con ID " + gameId + " non esiste.");
         }
         Giocatore nuovoGiocatore = new Giocatore();
-
+        System.out.println("lo stato della partita è:" + partita.getStato());
+        if((partita.getStato()).equals("Iniziata")){
+            nuovoGiocatore.setSaldo(1000);
+            nuovoGiocatore.setTipo("imprenditore");
+        }
+        else{
+            nuovoGiocatore.setSaldo(1500);
+            nuovoGiocatore.setTipo("giocatore");
+        }
         nuovoGiocatore.setIdpartita(partita);
         nuovoGiocatore.setNome(playerName);
-        nuovoGiocatore.setSaldo(1500);
-        nuovoGiocatore.setTipo("giocatore");
+
         nuovoGiocatore.setPuntiFedelta(0);
         giocatoreRepository.save(nuovoGiocatore);
     }

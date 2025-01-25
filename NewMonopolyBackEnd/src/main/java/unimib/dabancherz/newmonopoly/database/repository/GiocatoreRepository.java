@@ -14,6 +14,11 @@ import java.util.List;
 public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
     boolean existsByNomeAndIdpartita_CodiceInvito(String nome, String codiceInvito);
 
+    @Query(value = """
+        SELECT g.* FROM giocatore g WHERE g.idpartita = :idPartita AND g.idpedina IS NOT NULL
+    """, nativeQuery = true)
+    List<Giocatore> findGiocatoreWithPedina (@Param("idPartita") String gameId);
+
     @Query("SELECT g.idGiocatore FROM Giocatore g WHERE g.nome = :nomeGiocatore AND g.idpartita.codiceInvito = :idPartita")
     Integer findIdByNomeAndPartitaCodiceInvito(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
 

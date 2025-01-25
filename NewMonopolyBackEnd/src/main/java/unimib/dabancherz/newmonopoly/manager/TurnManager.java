@@ -43,6 +43,7 @@ public class TurnManager {
         String playerName = gameHandler.getPlayerNameBySession(session);
         Partita partita = partitaRepository.findByCodiceInvito(gameId);
         partita.setStato("Iniziata");
+        partitaRepository.save(partita);
         messageService.sendSystemMessage(gameId, "È il turno di: " + playerName, gameHandler.getGameSessions(), session);
 
         // Notifica ai giocatori
