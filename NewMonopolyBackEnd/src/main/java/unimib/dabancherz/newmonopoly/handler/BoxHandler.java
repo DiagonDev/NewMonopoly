@@ -3,16 +3,15 @@ package unimib.dabancherz.newmonopoly.handler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import unimib.dabancherz.newmonopoly.database.entity.Giocatore;
-import unimib.dabancherz.newmonopoly.manager.OpportunitaManager;
 import unimib.dabancherz.newmonopoly.MessageService;
-import unimib.dabancherz.newmonopoly.singleton.GameBoardSingleton;
+import unimib.dabancherz.newmonopoly.database.entity.Giocatore;
 import unimib.dabancherz.newmonopoly.database.entity.Opportunita;
 import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
 import unimib.dabancherz.newmonopoly.database.repository.OpportunitaRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaCasellaPrezzoproprietaRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaOpportunitaRepository;
-
+import unimib.dabancherz.newmonopoly.manager.OpportunitaManager;
+import unimib.dabancherz.newmonopoly.singleton.GameBoardSingleton;
 
 import java.util.List;
 import java.util.Map;
@@ -25,6 +24,7 @@ public class BoxHandler {
     private final PartitaOpportunitaRepository partitaOpportunitaRepository;
     private final OpportunitaRepository opportunitaRepository;
     private final OpportunitaManager opportunitaManager;
+    private final PropertyHandler propertyHandler;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     private static final String TYPEKEY = "type";
     private static final String DESCRIPTIONKEY = "description";
@@ -32,13 +32,14 @@ public class BoxHandler {
     private static final String IMPREVISTOKEY = "Imprevisto";
     private static final String PROBABILITAKEY = "Probabilità";
 
-    public BoxHandler(MessageService messageService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, OpportunitaRepository opportunitaRepository, OpportunitaManager opportunitaManager) {
+    public BoxHandler(MessageService messageService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, OpportunitaRepository opportunitaRepository, OpportunitaManager opportunitaManager, PropertyHandler propertyHandler) {
         this.messageService = messageService;
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;
         this.partitaOpportunitaRepository = partitaOpportunitaRepository;
         this.opportunitaRepository = opportunitaRepository;
         this.opportunitaManager = opportunitaManager;
+        this.propertyHandler = propertyHandler;
     }
 
     //posizione => il codice della cella dove il giocatore finisce dopo il lancio dadi
@@ -47,6 +48,7 @@ public class BoxHandler {
         Object parametri;
         String typeBox = pCPPRepository.findTipoByPosizione(posizione, gameId);
         String nomeCasella = pCPPRepository.findNomeCasellaByPosizioneAndGameId(posizione, gameId);
+        int corrispondenzaPunti = propertyHandler.numPuntiFedelta(playerName, gameId);
         String proprietario;
         String descrizione;
         String tipoAzione;
@@ -70,17 +72,30 @@ public class BoxHandler {
             case "Proprietà", "Stazione", "Società":
                 proprietario = pCPPRepository.findNomeGiocatoreByPosizioneAndGameId(posizione, gameId);
                 prezzoCasella = pCPPRepository.prezzoCasella(posizione, gameId);
+                Integer idProprietario = giocatoreRepository.findIdByNomeAndPartitaCodiceInvito(proprietario, gameId);
+                Integer count = pCPPRepository.countProprieta(proprietario, typeBox, gameId);
+                prezzoAffitto = pCPPRepository.calcolaAffitto(gameId, posizione, idProprietario, count);
+
+                int puntiFPrezzo = prezzoCasella*propertyHandler.numPuntiFedelta(proprietario,gameId);
                 if(proprietario == null)
-                    //TODO messaggio con quanti punti costa
-                    session.sendMessage(new TextMessage(messageService.createMessage(Map.of(TYPEKEY, "buy", "price", prezzoCasella, "nameBox", nomeCasella))));
+                    session.sendMessage(new TextMessage(messageService.createMessage(Map.of(TYPEKEY, "buy", "price", prezzoCasella,"points",puntiFPrezzo, "nameBox", nomeCasella))));
                 else if(!playerName.equals(proprietario)){
-                    //TODO se hai abbastanza punti fedeltà usa quelli se no usa i soldi
-                    Integer idProprietario = giocatoreRepository.findIdByNomeAndPartitaCodiceInvito(proprietario, gameId);
-                    Integer count = pCPPRepository.countProprieta(proprietario, typeBox, gameId);
-                    prezzoAffitto = pCPPRepository.calcolaAffitto(gameId, posizione, idProprietario, count);
-                    giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzoAffitto);
-                    giocatoreRepository.setSaldoGiocatore(proprietario, gameId, -prezzoAffitto);
-                    //TODO in caso setti i punti fedeltà
+                    Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(playerName, gameId);
+                    int puntiFedelta = giocatore.getPuntiFedelta();
+                    if(puntiFedelta >= puntiFPrezzo){
+                        giocatoreRepository.setPuntiGiocatore(playerName, gameId, puntiFPrezzo);
+                        giocatoreRepository.setPuntiGiocatore(proprietario, gameId, -puntiFPrezzo);
+                        giocatoreRepository.setSaldoGiocatore(proprietario, gameId, -prezzoAffitto);
+                    }else{
+                        if(puntiFedelta != 0)
+                            prezzoAffitto -= puntiFedelta / corrispondenzaPunti;
+                        giocatoreRepository.setPuntiGiocatore(playerName, gameId, puntiFedelta);
+                        giocatoreRepository.setPuntiGiocatore(proprietario, gameId, -(prezzoAffitto/corrispondenzaPunti));
+                        //sia che il saldo è sufficiente o meno gli scaliamo i soldi
+                        //così può andare in negativo e nel caso perdere
+                        giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzoAffitto);
+                        giocatoreRepository.setSaldoGiocatore(proprietario, gameId, -prezzoAffitto);
+                    }
                     session.sendMessage(new TextMessage(messageService.createMessage(Map.of(TYPEKEY, "payment", DESCRIPTIONKEY, "affitto","destination", proprietario, "payment", prezzoAffitto))));
                     messageService.updateBalance(gameSessions, gameId, playerName);
                     messageService.updateBalance(gameSessions, gameId, proprietario);
