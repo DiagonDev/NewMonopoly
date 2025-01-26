@@ -14,6 +14,7 @@ import unimib.dabancherz.newmonopoly.database.service.GameService;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,12 +30,11 @@ public class GameHandler {
     private final CasellaRepository casellaRepository;
 
     private final Map<String, List<WebSocketSession>> gameSessions = new ConcurrentHashMap<>();
-    private final Map<String, WebSocketSession> playerNameList = new ConcurrentHashMap<>();
+    private final Map<WebSocketSession, String> playerNameList = new HashMap<>();
 
     private final GameBoardWrapper gameBoardWrapper;
     private List<Integer> pedineNonUsate = new ArrayList<>();
 
-    // **Constructor Injection**
     public GameHandler(MessageService messageService,
                        GameService gameService,
                        GiocatoreRepository giocatoreRepository,
@@ -54,7 +54,7 @@ public class GameHandler {
         String playerName = messageParts[1];
         String difficulty = messageParts[2];
         String randomization = messageParts[3];
-        playerNameList.put(playerName, session);
+        playerNameList.put(session, playerName);
         String gameId = generateGameId();//crea l'ID del game
 
         gameSessions.putIfAbsent(gameId, new ArrayList<>()); // aggiunge il gameId alla lista delle partite
@@ -96,7 +96,7 @@ public class GameHandler {
             return;
         }
 
-        playerNameList.put(playerName, session);
+        playerNameList.put(session, playerName);
         gameBoardWrapper.setPlayerPosition(gameId, playerName, 1);
 
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
@@ -121,23 +121,20 @@ public class GameHandler {
     }
 
     public String getPlayerNameBySession(WebSocketSession session) {
-        for (Map.Entry<String, WebSocketSession> entry : playerNameList.entrySet()) {       // Scorre la mappa playerNameList per trovare la sessione corrispondente
-            String playerName = entry.getKey();  // Nome del giocatore
-            WebSocketSession playerSession = entry.getValue();  // Sessione del giocatore
-            if (playerSession.equals(session))      // Se la sessione corrisponde a quella passata, restituisci il nome del giocatore
-                return playerName;
-        }
-        return null;    // Se la sessione non è trovata, restituisci null
+        return playerNameList.get(session);  // Recupera direttamente il nome del giocatore associato alla sessione
     }
 
     public WebSocketSession getSessionByPlayerName(String playerName, String gameId) {
-        for (Map.Entry<String, WebSocketSession> entry : playerNameList.entrySet()) {       // Scorre la mappa playerNameList per trovare il nome corrispondente e l'ID della partita
-            String key = entry.getKey();  // Nome del giocatore, potenzialmente connesso a un ID di partita
-            WebSocketSession session = entry.getValue();  // Sessione WebSocket
-            if (key.equals(playerName) && getGameIdBySession(session).equals(gameId))   // Verifica che il nome e l'ID della partita siano corretti
-                return session; // Restituisce la sessione corrispondente
+        for (Map.Entry<WebSocketSession, String> entry : playerNameList.entrySet()) {
+            WebSocketSession session = entry.getKey();
+            String storedPlayerName = entry.getValue();
+
+            // Controlla se il nome e l'ID della partita corrispondono
+            if (storedPlayerName.equals(playerName) && gameId.equals(playerNameList.get(session))) {
+                return session;
+            }
         }
-        return null;        // Se non trova la sessione, restituisce null
+        return null; // Nessuna sessione trovata
     }
 
     public Map<String, List<WebSocketSession>> getGameSessions() {
@@ -170,7 +167,7 @@ public class GameHandler {
             }
         }
         // Rimuove il giocatore dalla mappa dei nomi
-        playerNameList.values().removeIf(existingSession -> existingSession.equals(session));
+        playerNameList.entrySet().removeIf(entry -> entry.getKey().equals(session));
     }
 
     public void choosePedina(String[] messageParts, WebSocketSession session) throws Exception {
@@ -178,6 +175,8 @@ public class GameHandler {
         String gameId = getGameIdBySession(session);
         String playerName = getPlayerNameBySession(session);    //tropo il giocatore associato alla sessione
 
+        System.out.println(playerName);
+        System.out.println(gameId);
         giocatoreRepository.updatePedinaForGiocatore(playerName, Integer.parseInt(idPedina), gameId);  //Assegna la pedina al giocatore nel database
         pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
         messageService.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);
