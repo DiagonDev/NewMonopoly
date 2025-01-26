@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.MessageService;
-import unimib.dabancherz.newmonopoly.database.entity.Casella;
 import unimib.dabancherz.newmonopoly.database.entity.Giocatore;
 import unimib.dabancherz.newmonopoly.database.repository.CasellaRepository;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardWrapper;
@@ -69,7 +68,7 @@ public class GameHandler {
         gameBoardWrapper.createGame(gameId);//crea il singleton per la partita con codicePartita = gameId
         gameBoardWrapper.setPlayerPosition(gameId, playerName, 1);//imposta nel singleton che il giocatore parte dalla casella 1
         gameService.createGameAndPlayer(playerName, difficulty, randomization, gameId);//crea la partita nel database, più informazioni in GameService
-        List<Casella> boxOrder = casellaRepository.findByOrder(gameId);
+        int[] boxOrder = casellaRepository.findByOrder(gameId);
 
         //GESTIONE MESSAGGI
         messageService.sendBoxOrderMessage(boxOrder, gameSessions, gameId); //serve per mandare le caselle ordinate
@@ -85,7 +84,8 @@ public class GameHandler {
     public void joinGame(String[] messageParts, WebSocketSession session) throws Exception {
         String playerName = messageParts[1];
         String gameId = messageParts[2];
-
+        int[] boxOrder = casellaRepository.findByOrder(gameId);
+        messageService.sendBoxOrderMessage(boxOrder, gameSessions, gameId); //serve per mandare le caselle ordinate
         if (giocatoreRepository.existsByNomeAndIdpartita_CodiceInvito(playerName, gameId)) {
             messageService.sendErrorMessage(session);
             return; // Esce dalla funzione senza aggiungere il giocatore
