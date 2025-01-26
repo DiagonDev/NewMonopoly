@@ -72,15 +72,17 @@ public class BoxHandler {
             case "Proprietà", "Stazione", "Società":
                 proprietario = pCPPRepository.findNomeGiocatoreByPosizioneAndGameId(posizione, gameId);
                 prezzoCasella = pCPPRepository.prezzoCasella(posizione, gameId);
-                Integer idProprietario = giocatoreRepository.findIdByNomeAndPartitaCodiceInvito(proprietario, gameId);
-                Integer count = pCPPRepository.countProprieta(proprietario, typeBox, gameId);
-                prezzoAffitto = pCPPRepository.calcolaAffitto(gameId, posizione, idProprietario, count);
 
-                int puntiFPrezzo = prezzoCasella*propertyHandler.numPuntiFedelta(proprietario,gameId);
-                if(proprietario == null)
+                if(proprietario == null){
+                    int puntiFPrezzo = prezzoCasella*propertyHandler.numPuntiFedelta(playerName,gameId);
                     session.sendMessage(new TextMessage(messageService.createMessage(Map.of(TYPEKEY, "buy", "price", prezzoCasella,"points",puntiFPrezzo, "nameBox", nomeCasella))));
-                else if(!playerName.equals(proprietario)){
-                    Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(playerName, gameId);
+                }else if(!playerName.equals(proprietario)){
+                    Integer idProprietario = giocatoreRepository.findIdByNomeAndPartitaCodiceInvito(proprietario, gameId);
+                    Integer count = pCPPRepository.countProprieta(proprietario, typeBox, gameId);
+                    prezzoAffitto = pCPPRepository.calcolaAffitto(gameId, posizione, idProprietario, count);
+
+                    int puntiFPrezzo = prezzoCasella*propertyHandler.numPuntiFedelta(proprietario,gameId);
+                    Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(gameId, proprietario);
                     int puntiFedelta = giocatore.getPuntiFedelta();
                     if(puntiFedelta >= puntiFPrezzo){
                         giocatoreRepository.setPuntiGiocatore(playerName, gameId, puntiFPrezzo);

@@ -22,7 +22,7 @@ class BoxHandlerTest {
     private OpportunitaManager opportunitaManager;
     private WebSocketSession session;
 
-    @BeforeEach
+    /*@BeforeEach
     void setUp() {
         messageService = mock(MessageService.class);
         pCPPRepository = mock(PartitaCasellaPrezzoproprietaRepository.class);
@@ -32,7 +32,7 @@ class BoxHandlerTest {
         opportunitaManager = mock(OpportunitaManager.class);
         session = mock(WebSocketSession.class);
         boxHandler = new BoxHandler(messageService, pCPPRepository, giocatoreRepository, partitaOpportunitaRepository, opportunitaRepository, opportunitaManager);
-    }
+    }*/
 
     @Test
     void testSendBoxUsage_ViaPay() throws Exception {

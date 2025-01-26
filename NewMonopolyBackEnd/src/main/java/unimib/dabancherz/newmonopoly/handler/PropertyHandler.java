@@ -53,9 +53,9 @@ public class PropertyHandler {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
 
-        int corrispondenzaPunti = numPuntiFedelta(gameId, playerName);
+        int corrispondenzaPunti = numPuntiFedelta(playerName, gameId);
         int prezzoCasella = pCPPRepository.prezzoCasella2(messageParts[1], gameId);
-        Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(playerName, gameId);
+        Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(gameId, playerName);
         int puntiFedelta = giocatore.getPuntiFedelta();
         if(puntiFedelta != 0) {
             if (puntiFedelta >= prezzoCasella * corrispondenzaPunti)     //controlla se ha abbastanza punti fedeltà
@@ -234,20 +234,21 @@ public class PropertyHandler {
 
     //Restituisce quanto corrisponde 1€ in punti fedelta in base al tipo di giocatore e al livello della partita
     public Integer numPuntiFedelta(String playerName, String gameId){
+        System.out.println("giocatre:" + playerName + "\n partita:" + gameId);
         Partita partita = partitaRepository.findByCodiceInvito(gameId);
         Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(gameId, playerName);
         String livello = partita.getLivelloDifficolta();
         switch (livello){
             case "Facile":
-                if (giocatore.getTipo().equals("Imprenditore"))
+                if (giocatore.getTipo().equals("imprenditore"))
                     return 4;
                 else return 2;
             case "Medio":
-                if (giocatore.getTipo().equals("Imprenditore"))
+                if (giocatore.getTipo().equals("imprenditore"))
                     return 8;
                 else return 4;
             case "Difficile":
-                if (giocatore.getTipo().equals("Imprenditore"))
+                if (giocatore.getTipo().equals("imprenditore"))
                     return 16;
                 else return 8;
             default:

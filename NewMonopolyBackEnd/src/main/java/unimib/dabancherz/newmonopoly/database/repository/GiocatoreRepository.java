@@ -12,7 +12,10 @@ import java.util.List;
 
 @Repository
 public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
-    Giocatore findGiocatoreByIdpartita_CodiceInvitoAndNome(String idpartitaCodiceInvito, String nome);
+    @Query(value = """
+        SELECT g.* FROM giocatore g WHERE g.idpartita = :idPartita AND g.nome = :nome
+    """, nativeQuery = true)
+    Giocatore findGiocatoreByIdpartita_CodiceInvitoAndNome(String idPartita, String nome);
 
     boolean existsByNomeAndIdpartita_CodiceInvito(String nome, String codiceInvito);
 
