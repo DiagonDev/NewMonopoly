@@ -61,7 +61,7 @@ const PlayersStatsRectangle = () => {
                 <div key={index} className="player"  >
                     <p id={`playerId${index + 1}`}>{player.name}</p>
                     <p id={`playerSaldo${index + 1}`}>{player.balance}€</p>
-                    <p id={`playerPoints${index + 1}`}>{player.points}€</p>
+                    <p id={`playerPoints${index + 1}`}>{player.points}p</p>
                 </div>
             ))}
         </div>

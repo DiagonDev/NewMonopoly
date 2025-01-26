@@ -31,7 +31,7 @@ export const WebSocketProvider = ({children}) => {
         dice2: 0,
     });
     const [diceRolled, setDiceRolled] = useState(false);
-    const [diceRolled2, setDiceRolled2] = useState(false);
+    const [diceRolled2, setDiceRolled2] = useState(true);
 
     const [startTurn, setStartTurn] = useState({
         flag: false,
@@ -173,6 +173,11 @@ export const WebSocketProvider = ({children}) => {
                     console.log("pawns available", message.content);
                     setPawnsAvailable(message.content);
                 } else if (message.type === 'diceRolled') {
+                    setExitPrison(0);
+                    setBuyReturn((prevState) => ({
+                        ...prevState, // Copia il vecchio stato
+                        flag: false, // Aggiorna solo dice1  
+                    }));
                     setBuy((prevState) => ({
                         ...prevState, // Copia il vecchio stato
                         flag: false, // Aggiorna solo dice1  
@@ -185,15 +190,14 @@ export const WebSocketProvider = ({children}) => {
                         ...prevState, // Copia il vecchio stato
                         flag: false, // Aggiorna solo dice1  
                     }));
-                    if((message.dice1===message.dice2)&&(!prison)){
+                    if((message.dice1===message.dice2)&&(!prison)&&diceRolled2){
                         setDiceRolled2(false);
-                    }else {
+                    }else{
                         setDiceRolled2(true);
                     }
+
                     setDiceRolled(true);
-                    if(message.dice1===message.dice2){
-                        setPrison(false);
-                    }
+                    
                     console.log("diceRolled", message.dice1, message.dice2);
                     setdiceResult((prevState) => ({
                         ...prevState, // Copia il vecchio stato
@@ -202,7 +206,8 @@ export const WebSocketProvider = ({children}) => {
                     }));
                     
                 } else if (message.type === 'turn') {
-                    setExitPrison(0);
+                    
+                    setDiceRolled2(true);
                     setBuyReturn((prevState) => ({
                         ...prevState,
                         flag: false,
@@ -308,9 +313,11 @@ export const WebSocketProvider = ({children}) => {
                         flag: false,
                     }));
                 }else if (message.type === 'prison') {
+                    console.log("prison");
                     setPrison(true);
                     setExitPrison(0);
                 }else if (message.type === 'exitPrison') {
+                    console.log("uscita : ", message.flag)
                     if(message.flag){
                         setPrison(false);
                         setExitPrison(1);
