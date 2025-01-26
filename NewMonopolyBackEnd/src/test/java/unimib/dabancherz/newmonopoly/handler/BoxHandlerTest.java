@@ -125,7 +125,7 @@ class BoxHandlerTest {
         Map<String, List<WebSocketSession>> gameSessions = Map.of(gameId, List.of(session));
         Object parametri = new Object();
 
-        when(opportunitaManager.gestisciPrigione(parametri, gameId, playerName)).thenReturn(newPosizione);
+        when(opportunitaManager.gestisciPrigione(parametri, gameId, playerName, session)).thenReturn(newPosizione);
 
         boxHandler.gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, "Imprevisto", session);
 

@@ -11,6 +11,7 @@ import unimib.dabancherz.newmonopoly.database.repository.OpportunitaRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaCasellaPrezzoproprietaRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaOpportunitaRepository;
 import unimib.dabancherz.newmonopoly.manager.OpportunitaManager;
+import unimib.dabancherz.newmonopoly.manager.PrisonManager;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardSingleton;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class BoxHandler {
     private final OpportunitaRepository opportunitaRepository;
     private final OpportunitaManager opportunitaManager;
     private final PropertyHandler propertyHandler;
+    private final PrisonManager prisonManager;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     private static final String TYPEKEY = "type";
     private static final String DESCRIPTIONKEY = "description";
@@ -32,7 +34,7 @@ public class BoxHandler {
     private static final String IMPREVISTOKEY = "Imprevisto";
     private static final String PROBABILITAKEY = "Probabilità";
 
-    public BoxHandler(MessageService messageService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, OpportunitaRepository opportunitaRepository, OpportunitaManager opportunitaManager, PropertyHandler propertyHandler) {
+    public BoxHandler(MessageService messageService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, OpportunitaRepository opportunitaRepository, OpportunitaManager opportunitaManager, PropertyHandler propertyHandler, PrisonManager prisonManager) {
         this.messageService = messageService;
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;
@@ -40,6 +42,7 @@ public class BoxHandler {
         this.opportunitaRepository = opportunitaRepository;
         this.opportunitaManager = opportunitaManager;
         this.propertyHandler = propertyHandler;
+        this.prisonManager = prisonManager;
     }
 
     //posizione => il codice della cella dove il giocatore finisce dopo il lancio dadi
@@ -110,6 +113,7 @@ public class BoxHandler {
                 Thread.sleep(1000);
                 messageService.sendPawnMove(pawnId, playerName, 11, gameSessions, gameId);
                 gameBoard.setPlayerPrison(gameId, playerName, true);
+                prisonManager.sendPrisonMessage(session);
                 break;
             case IMPREVISTOKEY, PROBABILITAKEY:
                 descrizione = partitaOpportunitaRepository.findDescrizione(gameId, typeBox);
@@ -157,7 +161,7 @@ public class BoxHandler {
                 sendBoxUsage(nomeGiocatore, session, idCasella, idPartita, gameSessions, pawnId, false);
                 break;
             case "vai_in_prigione":
-                idCasella = opportunitaManager.gestisciPrigione(parametri, idPartita, nomeGiocatore);
+                idCasella = opportunitaManager.gestisciPrigione(parametri, idPartita, nomeGiocatore, session);
                 messageService.sendPawnMove(pawnId, nomeGiocatore, idCasella, gameSessions, idPartita);
                 break;
             case ESCIPRIGIONEKEY:

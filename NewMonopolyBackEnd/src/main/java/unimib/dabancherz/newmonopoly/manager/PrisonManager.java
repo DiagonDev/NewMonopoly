@@ -50,7 +50,7 @@ public class PrisonManager {
         messageService.sendSystemMessage(gameId, playerName + " è uscito di prigione", gameHandler.getGameSessions(), session);
     }
 
-    private void sendPrisonMessage(WebSocketSession session) throws Exception {
+    public void sendPrisonMessage(WebSocketSession session) throws Exception {
         String prisonMessage = new ObjectMapper().writeValueAsString(Map.of(
                 "type", "prison"
         ));
@@ -87,7 +87,7 @@ public class PrisonManager {
             giocatoreRepository.setSaldoGiocatore(playerName, gameId, 50);
             messageService.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
             gameBoard.setPlayerCountRoll(gameId, playerName, 0);
-            messageService.exitPrisonMessage(false, session);
+            messageService.exitPrisonMessage(true, session);
         }
     }
 }

@@ -1,6 +1,7 @@
 package unimib.dabancherz.newmonopoly.manager;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardSingleton;
 import unimib.dabancherz.newmonopoly.database.entity.classiparametri.*;
 import unimib.dabancherz.newmonopoly.database.repository.*;
@@ -11,13 +12,15 @@ public class OpportunitaManager {
     private final PartitaCasellaPrezzoproprietaRepository pCPPRepository;
     private final GiocatoreRepository giocatoreRepository;
     private final PartitaOpportunitaRepository partitaOpportunitaRepository;
+    private final PrisonManager prisonManager;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     private final String PROBABILITAKEY = "Probabilità";
 
-    public OpportunitaManager(PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository) {
+    public OpportunitaManager(PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, PrisonManager prisonManager) {
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;
         this.partitaOpportunitaRepository = partitaOpportunitaRepository;
+        this.prisonManager = prisonManager;
     }
 
     public void gestisciImporto(Object parametri, String idPartita, String nomeGiocatore) {
@@ -70,12 +73,13 @@ public class OpportunitaManager {
         return idCasella;
     }
 
-    public int gestisciPrigione(Object parametri, String idPartita, String nomeGiocatore){
+    public int gestisciPrigione(Object parametri, String idPartita, String nomeGiocatore, WebSocketSession session) throws Exception {
         IdCasella idCasellaDeserializzato = (IdCasella) parametri;
         int idCasella = idCasellaDeserializzato.getId_casella();
 
         gameBoard.setPlayerPosition(idPartita, nomeGiocatore, idCasella);
         gameBoard.setPlayerPrison(idPartita, nomeGiocatore, true);
+        prisonManager.sendPrisonMessage(session);
         return idCasella;
     }
 
