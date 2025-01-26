@@ -35,7 +35,6 @@ public class PropertyHandler {
         this.partitaRepository = partitaRepository;
     }
 
-    //TODO: acquista proprietà con punti fedeltà
     public void acquistaProprieta(String[] messageParts, WebSocketSession session) throws Exception {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
@@ -43,15 +42,41 @@ public class PropertyHandler {
         int prezzoCasella = pCPPRepository.prezzoCasella2(messageParts[1], gameId);
         int saldoGiocatore = giocatoreRepository.saldoGiocatore(playerName, gameId);
 
-        if(saldoGiocatore > prezzoCasella)
-            completaAcquistoProprieta(gameId, playerName, messageParts[1], prezzoCasella, session);
-        else
+        if(saldoGiocatore > prezzoCasella) {
+            giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzoCasella);
+            completaAcquistoProprieta(gameId, playerName, messageParts[1], session);
+        }else
             messageService.inviaMessaggio(session, "acquistoFallito");
     }
 
-    public void completaAcquistoProprieta(String gameId, String playerName, String nomeProprieta, int prezzo, WebSocketSession session) throws Exception {
+    public void acquistaProprietaPunti(String[] messageParts, WebSocketSession session) throws Exception {
+        String gameId = gameHandler.getGameIdBySession(session);
+        String playerName = gameHandler.getPlayerNameBySession(session);
+
+        int corrispondenzaPunti = numPuntiFedelta(gameId, playerName);
+        int prezzoCasella = pCPPRepository.prezzoCasella2(messageParts[1], gameId);
+        Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(playerName, gameId);
+        int puntiFedelta = giocatore.getPuntiFedelta();
+        if(puntiFedelta != 0) {
+            if (puntiFedelta >= prezzoCasella * corrispondenzaPunti)     //controlla se ha abbastanza punti fedeltà
+                giocatoreRepository.setPuntiGiocatore(playerName, gameId, prezzoCasella * corrispondenzaPunti);
+            else {                                                       // fa la combinazione di soldi e punti fedeltà
+                int saldoGiocatore = giocatore.getSaldo();
+                int prezzo = (prezzoCasella * corrispondenzaPunti - puntiFedelta) / corrispondenzaPunti;
+                if (saldoGiocatore >= prezzo) {                    //controlla se ha abbastanza soldi
+                    giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzo);
+                    giocatoreRepository.setPuntiGiocatore(playerName, gameId, prezzoCasella * corrispondenzaPunti);
+                } else {
+                    messageService.inviaMessaggio(session, "acquistoFallito");
+                    return;
+                }
+            }
+            completaAcquistoProprieta(gameId, playerName, messageParts[1], session);
+        } else acquistaProprieta(messageParts, session);
+    }
+
+    public void completaAcquistoProprieta(String gameId, String playerName, String nomeProprieta, WebSocketSession session) throws Exception {
         pCPPRepository.setProprietario(playerName, gameId, nomeProprieta);
-        giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzo);
         messageService.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
 
         messageService.inviaMessaggio(session, "acquistoRiuscito");
@@ -207,6 +232,7 @@ public class PropertyHandler {
         return offertaMonetaria;
     }
 
+    //Restituisce quanto corrisponde 1€ in punti fedelta in base al tipo di giocatore e al livello della partita
     public Integer numPuntiFedelta(String playerName, String gameId){
         Partita partita = partitaRepository.findByCodiceInvito(gameId);
         Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(gameId, playerName);
@@ -214,16 +240,16 @@ public class PropertyHandler {
         switch (livello){
             case "Facile":
                 if (giocatore.getTipo().equals("Imprenditore"))
-                    return 8;
-                else return 10;
+                    return 4;
+                else return 2;
             case "Medio":
                 if (giocatore.getTipo().equals("Imprenditore"))
-                    return 6;
-                else return 8;
+                    return 8;
+                else return 4;
             case "Difficile":
                 if (giocatore.getTipo().equals("Imprenditore"))
-                    return 4;
-                else return 6;
+                    return 16;
+                else return 8;
             default:
                 throw new IllegalArgumentException("Tipo di messaggio non supportato");
         }

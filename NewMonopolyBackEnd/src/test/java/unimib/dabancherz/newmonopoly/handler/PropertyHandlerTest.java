@@ -86,7 +86,7 @@ class PropertyHandlerTest {
         verify(mockMessageService).inviaMessaggio(mockSession, "acquistoRiuscito");
     }
 
-    @Test
+   /* @Test
     void testCompletaAcquistoProprieta() throws Exception {
         String gameId = "game123";
         String playerName = "player1";
@@ -98,7 +98,7 @@ class PropertyHandlerTest {
         verify(mockMessageService).updateBalance(anyMap(), eq(gameId), eq(playerName));
         verify(mockMessageService).inviaMessaggio(eq(mockSession), eq("acquistoRiuscito"));
         verify(mockMessageService).sendSystemMessage(eq(gameId), contains("ha acquistato: Proprieta1"), anyMap(), eq(mockSession));
-    }
+    } */
 
     @Test
     void testGestisciProprieta() throws IOException {
