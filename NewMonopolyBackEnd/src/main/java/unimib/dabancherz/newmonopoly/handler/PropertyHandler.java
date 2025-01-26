@@ -65,7 +65,7 @@ public class PropertyHandler {
                 int prezzo = (prezzoCasella * corrispondenzaPunti - puntiFedelta) / corrispondenzaPunti;
                 if (saldoGiocatore >= prezzo) {                    //controlla se ha abbastanza soldi
                     giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzo);
-                    giocatoreRepository.setPuntiGiocatore(playerName, gameId, prezzoCasella * corrispondenzaPunti);
+                    giocatoreRepository.setPuntiGiocatore(playerName, gameId, puntiFedelta);
                 } else {
                     messageService.inviaMessaggio(session, "acquistoFallito");
                     return;
@@ -234,7 +234,6 @@ public class PropertyHandler {
 
     //Restituisce quanto corrisponde 1€ in punti fedelta in base al tipo di giocatore e al livello della partita
     public Integer numPuntiFedelta(String playerName, String gameId){
-        System.out.println("giocatre:" + playerName + "\n partita:" + gameId);
         Partita partita = partitaRepository.findByCodiceInvito(gameId);
         Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(gameId, playerName);
         String livello = partita.getLivelloDifficolta();

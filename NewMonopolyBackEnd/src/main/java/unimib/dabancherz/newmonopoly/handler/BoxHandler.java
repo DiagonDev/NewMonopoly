@@ -48,7 +48,6 @@ public class BoxHandler {
         Object parametri;
         String typeBox = pCPPRepository.findTipoByPosizione(posizione, gameId);
         String nomeCasella = pCPPRepository.findNomeCasellaByPosizioneAndGameId(posizione, gameId);
-        int corrispondenzaPunti = propertyHandler.numPuntiFedelta(playerName, gameId);
         String proprietario;
         String descrizione;
         String tipoAzione;
@@ -80,22 +79,24 @@ public class BoxHandler {
                     Integer idProprietario = giocatoreRepository.findIdByNomeAndPartitaCodiceInvito(proprietario, gameId);
                     Integer count = pCPPRepository.countProprieta(proprietario, typeBox, gameId);
                     prezzoAffitto = pCPPRepository.calcolaAffitto(gameId, posizione, idProprietario, count);
-
-                    int puntiFPrezzo = prezzoCasella*propertyHandler.numPuntiFedelta(proprietario,gameId);
-                    Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(gameId, proprietario);
+                    int corrispondenzaPunti = propertyHandler.numPuntiFedelta(playerName, gameId);
+                    int puntiFAffittoPrezzo = prezzoAffitto*propertyHandler.numPuntiFedelta(playerName,gameId);
+                    Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(gameId, playerName);
                     int puntiFedelta = giocatore.getPuntiFedelta();
-                    if(puntiFedelta >= puntiFPrezzo){
-                        giocatoreRepository.setPuntiGiocatore(playerName, gameId, puntiFPrezzo);
-                        giocatoreRepository.setPuntiGiocatore(proprietario, gameId, -puntiFPrezzo);
+
+                    if(puntiFedelta >= puntiFAffittoPrezzo){
+                        giocatoreRepository.setPuntiGiocatore(playerName, gameId, puntiFAffittoPrezzo);
+                        giocatoreRepository.setPuntiGiocatore(proprietario, gameId, -puntiFAffittoPrezzo);
                         giocatoreRepository.setSaldoGiocatore(proprietario, gameId, -prezzoAffitto);
                     }else{
+                        int prezzoAffitto2 = prezzoAffitto;
                         if(puntiFedelta != 0)
-                            prezzoAffitto -= puntiFedelta / corrispondenzaPunti;
+                            prezzoAffitto2 = prezzoAffitto - puntiFedelta / corrispondenzaPunti;
                         giocatoreRepository.setPuntiGiocatore(playerName, gameId, puntiFedelta);
-                        giocatoreRepository.setPuntiGiocatore(proprietario, gameId, -(prezzoAffitto/corrispondenzaPunti));
+                        giocatoreRepository.setPuntiGiocatore(proprietario, gameId, -puntiFAffittoPrezzo);
                         //sia che il saldo è sufficiente o meno gli scaliamo i soldi
                         //così può andare in negativo e nel caso perdere
-                        giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzoAffitto);
+                        giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzoAffitto2);
                         giocatoreRepository.setSaldoGiocatore(proprietario, gameId, -prezzoAffitto);
                     }
                     session.sendMessage(new TextMessage(messageService.createMessage(Map.of(TYPEKEY, "payment", DESCRIPTIONKEY, "affitto","destination", proprietario, "payment", prezzoAffitto))));
