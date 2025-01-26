@@ -8,6 +8,7 @@ import PlayersStatsRectangle from "./PlayersStatsRectangle.jsx";
 import {WebSocketContext} from "../contexts/WebSocketContext.jsx";
 import SelectPawn from "../pages/SelectPawn.jsx";
 import {BoardSection} from "./GameOutside/BoardSection.jsx";
+import {boxPositionMock} from "./boxPositionMock.jsx";
 
 const GameBoard = () => {
     const {
@@ -112,7 +113,11 @@ const GameBoard = () => {
     // Creare un array di numeri da 1 a 40
     const num_squares = Array.from({length: 40}, (_, index) => index + 1);
     //PROVVISORIO SOLO PER MOCKARE
-    const shuffled_squares = num_squares.sort(() => Math.random() - 0.5);
+    const [shuffled_squares, setShuffled_squares] = useState([]);
+    useEffect(() => {
+       setShuffled_squares(boxPositionMock);
+    }, [playerJoin]);
+
 
     /**
      * players={playerPositions.map((pos, index) => (pos === id ? index : null))

@@ -2,6 +2,7 @@ package unimib.dabancherz.newmonopoly;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import unimib.daBancherz.NewMonopoly.NewMonopolyApplication;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 

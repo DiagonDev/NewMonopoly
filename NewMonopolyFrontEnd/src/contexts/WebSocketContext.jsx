@@ -78,6 +78,7 @@ export const WebSocketProvider = ({children}) => {
     });
     const [partitaFinita, setPartitaFinita] = useState('');
     const [updateProperties, setUpdateProperties] = useState([]);
+    const [boxPosition, setBoxPosition] = useState([]);
     useEffect(() => {
         //const ws = new WebSocket("https://8f4c-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
         const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
@@ -328,6 +329,8 @@ export const WebSocketProvider = ({children}) => {
                     setPartitaFinita(message.flag);
                 }else if(message.type === 'updateProperties'){
                     setUpdateProperties(message.properties);
+                }else if(message.type === 'boxOrder'){
+                    setBoxPosition(message.content);
                 }
             };
 
@@ -376,7 +379,8 @@ export const WebSocketProvider = ({children}) => {
                 exitPrison,
                 partitaFinita,
                 updateProperties,
-                errorName
+                errorName,
+                boxPosition
             }}>
             {children}
         </WebSocketContext.Provider>
