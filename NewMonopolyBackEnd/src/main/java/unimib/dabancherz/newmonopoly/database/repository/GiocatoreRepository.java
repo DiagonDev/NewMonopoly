@@ -43,7 +43,7 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
     @Query("SELECT g.nome FROM Giocatore g WHERE g.idGiocatore = :idGiocatore")
     String findNomeByidGiocatore(@Param("idGiocatore") Integer idGiocatore);
 
-    @Query("SELECT g.nome FROM Giocatore g WHERE g.idpartita.codiceInvito = :idPartita AND g.idGiocatore < :idGiocatore")
+    @Query("SELECT g.nome FROM Giocatore g WHERE g.idpartita.codiceInvito = :idPartita AND g.idGiocatore < :idGiocatore ORDER BY g.idGiocatore")
     List<String> findGiocatoriConIdMinore(@Param("idPartita") String idPartita, @Param("idGiocatore") Integer idGiocatore);
 
     @Query("SELECT g.nome FROM Giocatore g WHERE g.idpartita.codiceInvito = :idPartita")
@@ -52,8 +52,10 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
     @Query("SELECT COUNT(g) FROM Giocatore g WHERE g.idpartita.codiceInvito = :idPartita")
     Integer countGiocatoriByPartita(@Param("idPartita") String idPartita);
 
-    @Query("SELECT g.idpedina.idPedina FROM Giocatore g  WHERE g.nome=:playername AND g.idpartita.codiceInvito = :idPartita")
-    Integer findPedinaFromGiocatore(@Param("playername") String playername, @Param("idPartita") String idPartita);
+    @Query(value = """
+            SELECT g.idpedina FROM Giocatore g  WHERE g.nome= :playerName AND g.idpartita = :idPartita
+    """, nativeQuery = true)
+    Integer findPedinaFromGiocatore(@Param("playerName") String playerName, @Param("idPartita") String idPartita);
 
     //Aggiorna i soldi
     @Modifying

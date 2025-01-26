@@ -132,6 +132,10 @@ public class MessageService {
         sendToGame(Map.of(TYPEKEY, SYSTEMKEY, CONTENTKEY, playerName + " si è disconnesso dalla partita."), gameSessions, gameId);
     }
 
+    public void sendDisconnected(Map<String, List<WebSocketSession>> gameSessions, String gameId, String playerName) throws IOException {
+        sendToGame(Map.of(TYPEKEY, "deletePlayer", PLAYERNAMEKEY, playerName), gameSessions, gameId);
+    }
+
     public String createTurnMessage (boolean turn, String playerName) throws IOException {
         return createMessage(Map.of(TYPEKEY, "turn", CONTENTKEY, turn, "playername", playerName));
     }

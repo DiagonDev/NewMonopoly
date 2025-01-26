@@ -2,6 +2,7 @@ package unimib.dabancherz.newmonopoly.webSocket;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistration;
+import unimib.dabancherz.newmonopoly.dispatcher.WebSocketConnectionDispatcher;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
