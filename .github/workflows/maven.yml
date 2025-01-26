@@ -2,9 +2,9 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "main", "randomizzazione-imprenditore-puntiFedeltà" ]
+    branches: [ "randomizzazione-imprenditore-puntiFedeltà" ]
   pull_request:
-    branches: [ "main", "randomizzazione-imprenditore-puntiFedeltà" ]
+    branches: [ "randomizzazione-imprenditore-puntiFedeltà" ]
 
 jobs:
   build:
