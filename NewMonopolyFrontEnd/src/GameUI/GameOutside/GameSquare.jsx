@@ -4,13 +4,12 @@ import { SquareConfigData } from "./SquareData";
 import { SquareInfo } from "./SquareInfo";
 import { SquareType } from "./SquareType.jsx";
 
-const GameSquare = ({ id , players}) => {
+// eslint-disable-next-line react/prop-types
+const GameSquare = ({ id , section, players}) => {
     if (!id) {
         console.error("Missing id prop for GameSquare");
         return null;
     }
-
-    const section = SquareConfigData.get(id)?.section;
     const squareType = SquareConfigData.get(id)?.type;
 
     const sectionMap = new Map([

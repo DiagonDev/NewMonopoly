@@ -7,6 +7,7 @@ import ChatFather from "./ChatFather.jsx";
 import PlayersStatsRectangle from "./PlayersStatsRectangle.jsx";
 import {WebSocketContext} from "../contexts/WebSocketContext.jsx";
 import SelectPawn from "../pages/SelectPawn.jsx";
+import {BoardSection} from "./GameOutside/BoardSection.jsx";
 
 const GameBoard = () => {
     const {
@@ -38,7 +39,7 @@ const GameBoard = () => {
         if (playerPawn) { // Supponendo che playerMove arrivi dal WebSocket
             setPlayerPositions((prevPositions) => {
                 const newPositions = [...prevPositions];
-                newPositions[playerPawn.pawnId-1] = playerPawn.offset;
+                newPositions[playerPawn.pawnId - 1] = playerPawn.offset;
                 return newPositions;
             });
         }
@@ -89,7 +90,7 @@ const GameBoard = () => {
         }
         console.log(isGameStarted);
     }, [playerJoin]);
-    
+
     useEffect(() => {
         setIsRolled(diceRolled);
     }, [diceRolled]);
@@ -110,6 +111,8 @@ const GameBoard = () => {
 
     // Creare un array di numeri da 1 a 40
     const num_squares = Array.from({length: 40}, (_, index) => index + 1);
+    //PROVVISORIO SOLO PER MOCKARE
+    const shuffled_squares = num_squares.sort(() => Math.random() - 0.5);
 
     /**
      * players={playerPositions.map((pos, index) => (pos === id ? index : null))
@@ -121,10 +124,15 @@ const GameBoard = () => {
      */
     return (
         <div className="board">
-            {num_squares.map((id) => (
+            {shuffled_squares.map((id, index) => (
                 <GameSquare
                     id={id}
                     key={id}
+                    section={
+                        index < 10 ? BoardSection.Bottom :
+                            index < 20 ? BoardSection.Left :
+                                index < 30 ? BoardSection.Top : BoardSection.Right
+                    }
                     players={playerPositions.map((pos, index) => (pos === id ? index : null))
                         .filter((p) => p !== null)}
 
@@ -189,9 +197,10 @@ const GameBoard = () => {
             <div className="horizontal-line"></div>
             <div className="rectangle-top-right">
                 <div className="grid-item">
-                    {activeComponent === "BaseRectangle" && <BaseRectangle playerProperties = {playerProperties} />}
+                    {activeComponent === "BaseRectangle" && <BaseRectangle playerProperties={playerProperties}/>}
                     {activeComponent === "RollDice" && <RollDice/>}
-                    {activeComponent === "GestisciProprieta" && <GestisciProprieta playerProperties = {playerProperties} />}
+                    {activeComponent === "GestisciProprieta" &&
+                        <GestisciProprieta playerProperties={playerProperties}/>}
                 </div>
             </div>
             <div className="rectangle-bot-left">
