@@ -183,7 +183,7 @@ public class MessageService {
     }
 
     //serve per mandare un messaggio contenete la lista di caselle ordinate da stampare
-    public void sendBoxOrderMessage(List<Casella> caselle, Map<String, List<WebSocketSession>> gameSessions, String gameId) throws IOException {
+    public void sendBoxOrderMessage(int[] caselle, Map<String, List<WebSocketSession>> gameSessions, String gameId) throws IOException {
         sendToGame(Map.of(TYPEKEY, "boxOrder", CONTENTKEY, caselle), gameSessions, gameId);
     }
 }

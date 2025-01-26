@@ -18,10 +18,10 @@ public interface CasellaRepository extends JpaRepository<Casella, Long> {
     int countByColore(@Param("colore") String colore);
 
     @Query(value = """
-        SELECT c.* FROM Casella c
+        SELECT c.id_casella FROM Casella c
         JOIN public.partita_casella_prezzoproprieta pcp on c.id_casella = pcp.idcasella
         WHERE pcp.idpartita = :idPartita
         ORDER BY pcp.posizione
     """, nativeQuery = true)
-    List<Casella> findByOrder(@Param("idPartita") String idPartita);
+    int[] findByOrder(@Param("idPartita") String idPartita);
 }

@@ -6,7 +6,7 @@ const CostruisciCasa = ({ buildingProperties }) => {
     const { socket, connected } = useContext(WebSocketContext);
     const [selectedProperty, setSelectedProperty] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [casine, setCasine] = useState(0);
+    const [casine, setCasine] = useState(1);
 
     const MAX_CASE = 5; // Numero massimo di case consentite
 
