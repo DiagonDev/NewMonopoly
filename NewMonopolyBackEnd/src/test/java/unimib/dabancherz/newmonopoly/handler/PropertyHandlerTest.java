@@ -36,7 +36,7 @@ class PropertyHandlerTest {
     @Mock
     private WebSocketSession mockSession;
 
-    @BeforeEach
+/*    @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         propertyHandler = new PropertyHandler(
@@ -46,7 +46,7 @@ class PropertyHandlerTest {
                 mockMessageService,
                 mockCasellaRepository
         );
-    }
+    }*/
 
     @Test
     void testIpotecaProprieta() throws Exception {

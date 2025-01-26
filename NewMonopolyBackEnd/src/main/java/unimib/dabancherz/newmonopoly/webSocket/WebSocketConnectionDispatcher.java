@@ -76,6 +76,7 @@ public class WebSocketConnectionDispatcher implements WebSocketHandler {
                 case "SceltaPedina":
                     gameHandler.choosePedina(parts, session);
                     break;
+                    //TODO: aggiunta caso acquista proprietà  con punti
                 case "AcquistaProprieta":
                     propertyHandler.acquistaProprieta(parts, session);
                     break;

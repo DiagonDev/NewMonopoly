@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.MessageService;
+import unimib.dabancherz.newmonopoly.database.entity.Giocatore;
+import unimib.dabancherz.newmonopoly.database.entity.Partita;
 import unimib.dabancherz.newmonopoly.database.repository.*;
 import unimib.dabancherz.newmonopoly.model.PlayerProperties;
 
@@ -15,22 +17,25 @@ import java.util.Map;
 public class PropertyHandler {
     private final PartitaCasellaPrezzoproprietaRepository pCPPRepository;
     private final GiocatoreRepository giocatoreRepository;
+    private final CasellaRepository casellaRepository;
+    private final PartitaRepository partitaRepository;
     private final GameHandler gameHandler;
     private final MessageService messageService;
-    private final CasellaRepository casellaRepository;
     ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String PROPERTIES_KEY = "properties";
     private static final String UPDATEPROPERTIES_KEY = "updateProperties";
 
-    public PropertyHandler(PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, GameHandler gameHandler, MessageService messageService, CasellaRepository casellaRepository) {
+    public PropertyHandler(PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, GameHandler gameHandler, MessageService messageService, CasellaRepository casellaRepository, PartitaRepository partitaRepository) {
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;
         this.gameHandler = gameHandler;
         this.messageService = messageService;
         this.casellaRepository = casellaRepository;
+        this.partitaRepository = partitaRepository;
     }
 
+    //TODO: acquista proprietà con punti fedeltà
     public void acquistaProprieta(String[] messageParts, WebSocketSession session) throws Exception {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
@@ -200,5 +205,27 @@ public class PropertyHandler {
             throw new IllegalArgumentException("Tipo non valido per offertaMonetaria: " + offertaMonetariaObj.getClass());
         }
         return offertaMonetaria;
+    }
+
+    public Integer numPuntiFedelta(String playerName, String gameId){
+        Partita partita = partitaRepository.findByCodiceInvito(gameId);
+        Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(gameId, playerName);
+        String livello = partita.getLivelloDifficolta();
+        switch (livello){
+            case "Facile":
+                if (giocatore.getTipo().equals("Imprenditore"))
+                    return 8;
+                else return 10;
+            case "Medio":
+                if (giocatore.getTipo().equals("Imprenditore"))
+                    return 6;
+                else return 8;
+            case "Difficile":
+                if (giocatore.getTipo().equals("Imprenditore"))
+                    return 4;
+                else return 6;
+            default:
+                throw new IllegalArgumentException("Tipo di messaggio non supportato");
+        }
     }
 }

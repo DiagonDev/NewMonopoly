@@ -109,53 +109,35 @@ public class GameHandler {
 
     }
     public String getGameIdBySession(WebSocketSession session) {
-        // Scorre tutte le partite nella mappa
-        for (Map.Entry<String, List<WebSocketSession>> entry : gameSessions.entrySet()) {
+        for (Map.Entry<String, List<WebSocketSession>> entry : gameSessions.entrySet()) {  // Scorre tutte le partite nella mappa
             String gameId = entry.getKey();  // gameId
             List<WebSocketSession> playersInGame = entry.getValue();  // Lista di sessioni
-
-            // Scorre la lista delle sessioni associate al gameId
-            for (WebSocketSession playerSession : playersInGame) {
-                // Se la sessione corrisponde a quella passata, restituisci il gameId
-                if (playerSession.equals(session)) {
+            for (WebSocketSession playerSession : playersInGame) {  // Scorre la lista delle sessioni associate al gameId
+                if (playerSession.equals(session))        // Se la sessione corrisponde a quella passata, restituisci il gameId
                     return gameId;
-                }
             }
         }
-
-        // Se la sessione non è trovata in nessuna partita, ritorna null
-        return null;
+        return null;        // Se la sessione non è trovata in nessuna partita, ritorna null
     }
 
     public String getPlayerNameBySession(WebSocketSession session) {
-        // Scorre la mappa playerNameList per trovare la sessione corrispondente
-        for (Map.Entry<String, WebSocketSession> entry : playerNameList.entrySet()) {
+        for (Map.Entry<String, WebSocketSession> entry : playerNameList.entrySet()) {       // Scorre la mappa playerNameList per trovare la sessione corrispondente
             String playerName = entry.getKey();  // Nome del giocatore
             WebSocketSession playerSession = entry.getValue();  // Sessione del giocatore
-
-            // Se la sessione corrisponde a quella passata, restituisci il nome del giocatore
-            if (playerSession.equals(session)) {
+            if (playerSession.equals(session))      // Se la sessione corrisponde a quella passata, restituisci il nome del giocatore
                 return playerName;
-            }
         }
-
-        // Se la sessione non è trovata, restituisci null
-        return null;
+        return null;    // Se la sessione non è trovata, restituisci null
     }
 
     public WebSocketSession getSessionByPlayerName(String playerName, String gameId) {
-        // Scorre la mappa playerNameList per trovare il nome corrispondente e l'ID della partita
-        for (Map.Entry<String, WebSocketSession> entry : playerNameList.entrySet()) {
+        for (Map.Entry<String, WebSocketSession> entry : playerNameList.entrySet()) {       // Scorre la mappa playerNameList per trovare il nome corrispondente e l'ID della partita
             String key = entry.getKey();  // Nome del giocatore, potenzialmente connesso a un ID di partita
             WebSocketSession session = entry.getValue();  // Sessione WebSocket
-
-            // Verifica che il nome e l'ID della partita siano corretti
-            if (key.equals(playerName) && getGameIdBySession(session).equals(gameId))
+            if (key.equals(playerName) && getGameIdBySession(session).equals(gameId))   // Verifica che il nome e l'ID della partita siano corretti
                 return session; // Restituisce la sessione corrispondente
         }
-
-        // Se non trova la sessione, restituisce null
-        return null;
+        return null;        // Se non trova la sessione, restituisce null
     }
 
     public Map<String, List<WebSocketSession>> getGameSessions() {
@@ -165,7 +147,6 @@ public class GameHandler {
     //genera il codice gameID in modo incrementale partendo da game-0
     private String generateGameId() {
         int counter = 0;
-
         if (partitaRepository.findLastCodiceInvito() != null) {
             String[] lastGame = (partitaRepository.findLastCodiceInvito()).split("-");
             counter = Integer.parseInt(lastGame[1]);
@@ -176,7 +157,6 @@ public class GameHandler {
     @Transactional
     public void removePlayerFromGame(String gameId, WebSocketSession session) {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
-
         if (playersInGame != null) {
             String player = getPlayerNameBySession(session);
             gameService.deletePlayer(gameId, player);
@@ -189,7 +169,6 @@ public class GameHandler {
                 gameBoardWrapper.removePlayerFromGame(gameId, player);
             }
         }
-
         // Rimuove il giocatore dalla mappa dei nomi
         playerNameList.values().removeIf(existingSession -> existingSession.equals(session));
     }

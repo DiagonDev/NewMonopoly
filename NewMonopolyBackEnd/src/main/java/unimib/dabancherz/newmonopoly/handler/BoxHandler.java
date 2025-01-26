@@ -3,6 +3,7 @@ package unimib.dabancherz.newmonopoly.handler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import unimib.dabancherz.newmonopoly.database.entity.Giocatore;
 import unimib.dabancherz.newmonopoly.manager.OpportunitaManager;
 import unimib.dabancherz.newmonopoly.MessageService;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardSingleton;
@@ -70,14 +71,16 @@ public class BoxHandler {
                 proprietario = pCPPRepository.findNomeGiocatoreByPosizioneAndGameId(posizione, gameId);
                 prezzoCasella = pCPPRepository.prezzoCasella(posizione, gameId);
                 if(proprietario == null)
+                    //TODO messaggio con quanti punti costa
                     session.sendMessage(new TextMessage(messageService.createMessage(Map.of(TYPEKEY, "buy", "price", prezzoCasella, "nameBox", nomeCasella))));
                 else if(!playerName.equals(proprietario)){
+                    //TODO se hai abbastanza punti fedeltà usa quelli se no usa i soldi
                     Integer idProprietario = giocatoreRepository.findIdByNomeAndPartitaCodiceInvito(proprietario, gameId);
                     Integer count = pCPPRepository.countProprieta(proprietario, typeBox, gameId);
                     prezzoAffitto = pCPPRepository.calcolaAffitto(gameId, posizione, idProprietario, count);
                     giocatoreRepository.setSaldoGiocatore(playerName, gameId, prezzoAffitto);
                     giocatoreRepository.setSaldoGiocatore(proprietario, gameId, -prezzoAffitto);
-
+                    //TODO in caso setti i punti fedeltà
                     session.sendMessage(new TextMessage(messageService.createMessage(Map.of(TYPEKEY, "payment", DESCRIPTIONKEY, "affitto","destination", proprietario, "payment", prezzoAffitto))));
                     messageService.updateBalance(gameSessions, gameId, playerName);
                     messageService.updateBalance(gameSessions, gameId, proprietario);

@@ -12,12 +12,14 @@ import java.util.List;
 
 @Repository
 public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
+    Giocatore findGiocatoreByIdpartita_CodiceInvitoAndNome(String idpartitaCodiceInvito, String nome);
+
     boolean existsByNomeAndIdpartita_CodiceInvito(String nome, String codiceInvito);
 
     @Query(value = """
         SELECT g.* FROM giocatore g WHERE g.idpartita = :idPartita AND g.idpedina IS NOT NULL
     """, nativeQuery = true)
-    List<Giocatore> findGiocatoreWithPedina (@Param("idPartita") String gameId);
+    List<Giocatore> findGiocatoreWithPedina(@Param("idPartita") String gameId);
 
     @Query("SELECT g.idGiocatore FROM Giocatore g WHERE g.nome = :nomeGiocatore AND g.idpartita.codiceInvito = :idPartita")
     Integer findIdByNomeAndPartitaCodiceInvito(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita);
@@ -51,7 +53,6 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
     Integer findPedinaFromGiocatore(@Param("playername") String playername, @Param("idPartita") String idPartita);
 
     //Aggiorna i soldi
-    // Il via sarà negativo perchè quando passi dal via devi prendere i soldi
     @Modifying
     @Transactional
     @Query(value = """
@@ -61,6 +62,18 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
                       AND idpartita= :idPartita
         """, nativeQuery = true)
     void setSaldoGiocatore(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("soldi") Integer soldi);
+
+    //Aggiorna punti fedelta
+    @Modifying
+    @Transactional
+    @Query(value = """
+        UPDATE giocatore
+            SET punti_fedelta = punti_fedelta - :punti
+                WHERE nome = :nomeGiocatore
+                      AND idpartita= :idPartita
+        """, nativeQuery = true)
+    void setPuntiGiocatore(@Param("nomeGiocatore") String nomeGiocatore, @Param("idPartita") String idPartita, @Param("punti") Integer punti);
+
 
     @Modifying
     @Transactional
@@ -78,6 +91,4 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
         WHERE idpartita = :idPartita
     """, nativeQuery = true)
     Integer contaGiocatoriInPartita(@Param("idPartita") String idPartita);
-
 }
-
