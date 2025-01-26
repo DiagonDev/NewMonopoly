@@ -70,9 +70,11 @@ public class MessageService {
     }
 
     public void sendJoinMessage(String playerName, Map<String, List<WebSocketSession>> gameSessions, String role, String gameId) throws IOException {
-        int balance = giocatoreRepository.saldoGiocatore(playerName, gameId);
+        Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(gameId, playerName);
+        int balance = giocatore.getSaldo();
+        int points = giocatore.getPuntiFedelta();
         sendToGame(Map.of(TYPEKEY, "join", PLAYERNAMEKEY, playerName, "userRole", role), gameSessions, gameId);
-        sendToGame(Map.of(TYPEKEY, "playersList", PLAYERNAMEKEY, playerName, BALANCEKEY, balance), gameSessions, gameId);
+        sendToGame(Map.of(TYPEKEY, "playersList", PLAYERNAMEKEY, playerName, BALANCEKEY, balance, POINTSKEY, points), gameSessions, gameId);
     }
 
     public void sendGameId(String gameId, WebSocketSession session) throws Exception {

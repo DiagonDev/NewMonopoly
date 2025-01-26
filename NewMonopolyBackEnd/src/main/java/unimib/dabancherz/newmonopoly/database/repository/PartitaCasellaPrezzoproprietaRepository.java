@@ -189,8 +189,8 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
                 prezzo_corrente = CASE
                     WHEN dati.tipo IN ('Proprietà', 'Stazione', 'Società') THEN dati.costo_acquisto *
                         CASE
-                            WHEN dati.livello_difficolta = 'Medio' THEN 1.05
-                            WHEN dati.livello_difficolta = 'Difficile' THEN 1.10
+                            WHEN dati.livello_difficolta = 'Medio' THEN 1.10
+                            WHEN dati.livello_difficolta = 'Difficile' THEN 1.20
                             ELSE 1
                         END
                         ELSE NULL
@@ -198,8 +198,8 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
                 prezzo_casa_corrente = CASE
                     WHEN dati.tipo = 'Proprietà' THEN dati.casa *
                         CASE
-                            WHEN dati.livello_difficolta = 'Medio' THEN 1.05
-                            WHEN dati.livello_difficolta = 'Difficile' THEN 1.10
+                            WHEN dati.livello_difficolta = 'Medio' THEN 1.10
+                            WHEN dati.livello_difficolta = 'Difficile' THEN 1.20
                             ELSE 1
                         END
                     ELSE pcp.prezzo_casa_corrente
@@ -222,7 +222,8 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
                 WHERE
                     pt.codice_invito = :idPartita
             ) AS dati
-            WHERE pcp.idcasella = dati.idcasella;
+            WHERE pcp.idcasella = dati.idcasella
+            AND pcp.idpartita = :idPartita;
     """, nativeQuery = true)
     void updatePrices(@Param("idPartita") String idPartita);
 
