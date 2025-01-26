@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import unimib.dabancherz.newmonopoly.database.entity.Casella;
 import unimib.dabancherz.newmonopoly.database.entity.Giocatore;
 import unimib.dabancherz.newmonopoly.database.repository.*;
 import unimib.dabancherz.newmonopoly.database.service.GameService;
@@ -94,9 +93,9 @@ public class MessageService {
     }
 
     public void sendPlayerAndBalance(String gameId, String playerName, WebSocketSession session, String role) throws Exception {
-        Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(gameId, playerName);
         List<String> playerJoined = gameService.getPlayersWithIdLowerThan(gameId, playerName);
         for (String player : playerJoined) {
+            Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(gameId, player);
             int balance = giocatore.getSaldo();
             int points = giocatore.getPuntiFedelta();
             session.sendMessage(new TextMessage(createMessage(Map.of(TYPEKEY, "playersList", PLAYERNAMEKEY, player, BALANCEKEY, balance, POINTSKEY, points))));
