@@ -17,11 +17,12 @@ export const WebSocketProvider = ({children}) => {
     const [playerBalance, setPlayerBalance] = useState({
         player: '',
         balance: 0,
+        points: 0,
     });
     const [playerList, setPlayerList] = useState({
         player: '',
         balance: 0,
-        pawn: 0,
+        points: 0,
     });
     
     const [pawnsAvailable, setPawnsAvailable] = useState([]);
@@ -58,6 +59,7 @@ export const WebSocketProvider = ({children}) => {
     const [buy, setBuy] = useState({
         flag: false,
         price: 0,
+        points: 0,
     })
     const [buyReturn, setBuyReturn] = useState({
         flag:false,
@@ -77,8 +79,8 @@ export const WebSocketProvider = ({children}) => {
     const [partitaFinita, setPartitaFinita] = useState('');
     const [updateProperties, setUpdateProperties] = useState([]);
     useEffect(() => {
-        //const ws = new WebSocket("https://8f4c-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
-        const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
+        const ws = new WebSocket("https://8f4c-84-33-128-253.ngrok-free.app/ws/gameNewMonopoly");
+        //const ws = new WebSocket("ws://localhost:8080/ws/gameNewMonopoly");
         ws.onopen = () => {
             setSocket(ws);
             setConnected(true);
@@ -145,7 +147,7 @@ export const WebSocketProvider = ({children}) => {
                         ...prevState, // Mantieni le altre proprietà, se esistono
                         player: message.playerName, // Aggiorna il nome del giocatore
                         balance: message.balance, // Aggiorna il bilancio
-                        pawn: message.pawn,
+                        points: message.points,
                     }));
                 }
 
@@ -160,6 +162,7 @@ export const WebSocketProvider = ({children}) => {
                         ...prevState, // Mantieni le altre proprietà, se esistono
                         player: message.playerName, // Aggiorna il nome del giocatore
                         balance: message.balance, // Aggiorna il bilancio
+                        points: message.points,
                     }));
                 }
                 /**
@@ -260,6 +263,7 @@ export const WebSocketProvider = ({children}) => {
                         ...prevState,
                         flag: true,
                         price: message.price,
+                        points: message.points
                     }));
 
                 } else if (message.type === 'nameBox') {

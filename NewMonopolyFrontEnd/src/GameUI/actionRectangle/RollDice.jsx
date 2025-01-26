@@ -44,6 +44,17 @@ const RollDice = () => {
             console.error('Connessione WebSocket non stabilita!');
         }
     };
+    const handleAcquistaPunti = () => {
+        if (socket && connected) {
+            // Invia un messaggio al server
+            socket.send(`AcquistaProprietaPunti:${nameBox}`);
+            console.log(`Messaggio inviato: AcquistaProprietaPunti:${nameBox}`);
+            setPurchased(true);
+        } else {
+            console.error('Connessione WebSocket non stabilita!');
+        }
+    };
+    
     const handleUscitaPrigione = () => {
         if (socket && connected) {
             // Invia un messaggio al server
@@ -143,9 +154,12 @@ const RollDice = () => {
             )}
             {isRolled && isBuy &&(
                 <div>
-                    <p>Questa proprietà è libera e costa {buy.price} </p>
+                    <p>Questa proprietà è libera e costa {buy.price}€ o {buy.points} punti</p>
                     <button onClick={handleAcquista}>
-                        Acquista
+                        Acquista coi soldi
+                    </button>
+                    <button onClick={handleAcquistaPunti}>
+                        Acquista coi punti
                     </button>
                    
                 </div>
@@ -159,7 +173,7 @@ const RollDice = () => {
             )}
             {(buyReturn.flag && !buyReturn.success) &&(
                 <div>
-                    <p>Non hai abbastanza soldi </p>
+                    <p>Non hai abbastanza soldi/punti </p>
                    
                 </div>
                 

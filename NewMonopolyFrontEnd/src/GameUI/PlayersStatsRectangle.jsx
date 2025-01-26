@@ -5,7 +5,7 @@ const INITIAL_BALANCE = 0; // Saldo iniziale per ogni giocatore
 
 const PlayersStatsRectangle = () => {
     const [players, setPlayers] = useState(
-        Array(MAX_PLAYERS).fill({ name: "Player", balance: INITIAL_BALANCE })
+        Array(MAX_PLAYERS).fill({ name: "Player", balance: INITIAL_BALANCE, points: 0 })
     );
     const { playerList, playerBalance } = useContext(WebSocketContext);
     
@@ -30,7 +30,8 @@ const PlayersStatsRectangle = () => {
                         nextPlayers[emptySlotIndex] = {
                             name: playerList.player, // Nome del giocatore dal messaggio
                             balance: playerList.balance,
-                            //color: colors[playerList.pawn] || "gray", // Assegna il colore
+                            points: playerList.points,
+                           
                         };
                     }
                 }
@@ -47,7 +48,7 @@ const PlayersStatsRectangle = () => {
             setPlayers((prevPlayers) => {
                 return prevPlayers.map((player) =>
                     player.name === playerBalance.player
-                        ? { ...player, balance: playerBalance.balance }
+                        ? { ...player, balance: playerBalance.balance, points:playerBalance.points }
                         : player
                 );
             });
@@ -60,6 +61,7 @@ const PlayersStatsRectangle = () => {
                 <div key={index} className="player"  >
                     <p id={`playerId${index + 1}`}>{player.name}</p>
                     <p id={`playerSaldo${index + 1}`}>{player.balance}€</p>
+                    <p id={`playerPoints${index + 1}`}>{player.points}€</p>
                 </div>
             ))}
         </div>
