@@ -756,6 +756,7 @@ button:focus-visible {
 .rollDiceDiv{
     overflow: auto;
     padding: 5px;
+    padding-top: 2rem;
 }
 
 .pawn-selection {
