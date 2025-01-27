@@ -51,6 +51,9 @@ const PropertyOwned = ({playerProperties, onPropertySelect}) => {
                         <br />
                         <div className="propertyContent">
                             {property.nome}
+                            <br/>
+                            <p>Case Possedute: </p>
+                            {property.numCasa}
                         </div>
                     </div>
                 </div>
