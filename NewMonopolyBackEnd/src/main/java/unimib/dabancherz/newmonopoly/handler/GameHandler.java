@@ -34,7 +34,6 @@ public class GameHandler {
     private final Map<WebSocketSession, String> playerNameList = new HashMap<>();
 
     private final GameBoardWrapper gameBoardWrapper;
-    private final TurnManager turnManager;
     private List<Integer> pedineNonUsate = new ArrayList<>();
 
     public GameHandler(MessageService messageService,
@@ -42,7 +41,7 @@ public class GameHandler {
                        GiocatoreRepository giocatoreRepository,
                        PartitaRepository partitaRepository,
                        PedinaRepository pedinaRepository, CasellaRepository casellaRepository,
-                       GameBoardWrapper gameBoardWrapper, TurnManager turnManager) {
+                       GameBoardWrapper gameBoardWrapper) {
         this.messageService = messageService;
         this.gameService = gameService;
         this.giocatoreRepository = giocatoreRepository;
@@ -50,7 +49,6 @@ public class GameHandler {
         this.pedinaRepository = pedinaRepository;
         this.casellaRepository = casellaRepository;
         this.gameBoardWrapper = gameBoardWrapper;
-        this.turnManager = turnManager;
     }
 
     public void createGame(String[] messageParts, WebSocketSession session) throws Exception {
