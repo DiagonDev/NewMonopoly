@@ -130,7 +130,7 @@ public class GameHandler {
             String storedPlayerName = entry.getValue();
 
             // Controlla se il nome e l'ID della partita corrispondono
-            if (storedPlayerName.equals(playerName) && gameId.equals(playerNameList.get(session))) {
+            if (storedPlayerName.equals(playerName) && gameId.equals(getGameIdBySession(session))) {
                 return session;
             }
         }
