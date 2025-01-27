@@ -1,7 +1,7 @@
 import {translateColor} from "../../../util/itToEnColors.jsx";
 import {useContext, useEffect, useState} from "react";
 import {WebSocketContext} from "../../../contexts/WebSocketContext.jsx";
-import {mockPlayerProperties} from "./PlayerPropertyMock.jsx";
+//import {mockPlayerProperties} from "./PlayerPropertyMock.jsx";
 
 const areAllPropertiesDifferent = (playerProperties, updateProperties) => {
     console.log(playerProperties);
@@ -13,8 +13,8 @@ const areAllPropertiesDifferent = (playerProperties, updateProperties) => {
     );
 };
 const buildingProperties = (updateProperties) => {
-    //const groupedProperties = updateProperties;
-    const groupedProperties = mockPlayerProperties;
+    const groupedProperties = updateProperties;
+    //const groupedProperties = mockPlayerProperties;
     groupedProperties.sort((a, b) => {
         if (a.colore === null) return 1; // Metti gli elementi con colore null alla fine
         if (b.colore === null) return -1;
