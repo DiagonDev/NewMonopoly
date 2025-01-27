@@ -19,6 +19,7 @@ export const WebSocketProvider = ({children}) => {
         balance: 0,
         points: 0,
     });
+    const [deletePlayer, setDeletePlayer]= useState('');
     const [playerList, setPlayerList] = useState({
         player: '',
         balance: 0,
@@ -333,6 +334,9 @@ export const WebSocketProvider = ({children}) => {
                 }else if(message.type === 'boxOrder'){
                     console.log("boxOrder", message.content);
                     setBoxPosition(message.content);
+                }else if(message.type === 'deletePlayer'){
+                    console.log("deletePlayer", message.playerName);
+                    setDeletePlayer(message.playerName);
                 }
             };
 
@@ -382,7 +386,8 @@ export const WebSocketProvider = ({children}) => {
                 partitaFinita,
                 updateProperties,
                 errorName,
-                boxPosition
+                boxPosition,
+                deletePlayer
             }}>
             {children}
         </WebSocketContext.Provider>
