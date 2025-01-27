@@ -59,14 +59,14 @@ const RiceviScambio = ({ onClose }) => {
                 {/* Quando ti richiede soldi aggiuntivi */}
                 {(flag===1) && (
                     <>
-                        <p>Ha offerto {exchangeRequest.property1.nome} per {exchangeRequest.property2.nome} + {Math.abs(exchangeRequest.money)}</p>
+                        <p>Ha offerto {exchangeRequest.property1.nome} + {Math.abs(exchangeRequest.money)} per {exchangeRequest.property2.nome} </p>
                     </>
                 )}
 
                 {/* Quando ti dà soldi aggiuntivi */}
                 {(flag===2) && (
                     <>
-                        <p>Ha offerto {exchangeRequest.property1.nome} + {Math.abs(exchangeRequest.money)} per {exchangeRequest.property2.nome}</p>
+                        <p>Ha offerto {exchangeRequest.property1.nome} per {exchangeRequest.property2.nome} + {Math.abs(exchangeRequest.money)}  </p>
                     </>
                 )}
 
