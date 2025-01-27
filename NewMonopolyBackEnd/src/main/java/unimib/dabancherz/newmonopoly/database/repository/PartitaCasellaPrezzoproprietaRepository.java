@@ -37,6 +37,29 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     """)
     List<PlayerProperties> findPlayerProperties(@Param("idPartita") String idPartita, @Param("nomeGiocatore") String nomeGiocatore);
 
+    @Modifying
+    @Transactional
+    @Query(value = """
+        WITH MediaPrezzi AS (
+            SELECT
+                c.colore AS colore,
+                AVG(pcpp.prezzo_casa_corrente) AS media_prezzo
+            FROM Partita_Casella_Prezzoproprieta pcpp
+            JOIN Casella c ON pcpp.idcasella = c.id_casella
+            WHERE pcpp.idpartita = :idpartita
+            GROUP BY c.colore
+        )
+        UPDATE Partita_Casella_Prezzoproprieta pcpp
+        SET prezzo_casa_corrente = (
+            SELECT mp.media_prezzo
+            FROM MediaPrezzi mp
+            JOIN Casella c ON pcpp.idcasella = c.id_casella
+            WHERE c.colore = mp.colore
+        )
+        WHERE pcpp.idpartita = :idpartita;
+    """, nativeQuery = true)
+    void setPrezzoCasa(@Param("idpartita") String idpartita);
+
     @Query("""
         SELECT new unimib.dabancherz.newmonopoly.model.PlayerProperties(
             pcp.prezzoCorrente,
@@ -237,7 +260,6 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     """, nativeQuery = true)
     void setPrezzoCorrente(@Param("costo") Integer costo, @Param("gameId") String gameId, @Param("posizione") Integer posizione);
 
-
     // Metodo per capire di che tipo è la casella
     @Query("SELECT p.idcasella.tipo FROM Partita_Casella_Prezzoproprieta p WHERE p.posizione = :posizione AND p.idpartita.codiceInvito = :idPartita")
     String findTipoByPosizione(@Param("posizione") Integer posizione, @Param("idPartita") String idPartita);
@@ -342,7 +364,6 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
           AND p.codice_invito = :idPartita
     """, nativeQuery = true)
     int countProprietaColore(@Param("nomeGiocatore") String nomeGiocatore, @Param("casellaColore") String casellaColore, @Param("idPartita") String idPartita);
-
 
     @Query(value = """
         SELECT COALESCE(SUM(pcp.num_casa), 0) AS total_casa

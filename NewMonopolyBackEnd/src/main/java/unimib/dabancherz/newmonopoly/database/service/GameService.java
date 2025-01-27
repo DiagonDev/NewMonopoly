@@ -47,6 +47,7 @@ public class GameService {
         else
             partitaCasellaPrezzoproprietaRepository.populateWithRandomizationFalse(gameId);
         partitaCasellaPrezzoproprietaRepository.updatePrices(gameId);
+        partitaCasellaPrezzoproprietaRepository.setPrezzoCasa(gameId);
         // Crea il giocatore
         Giocatore nuovoGiocatore = new Giocatore();
         nuovoGiocatore.setIdpartita(nuovaPartita);
