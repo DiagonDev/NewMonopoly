@@ -18,11 +18,13 @@ function App() {
     };
 
     useEffect(() => {
-        if (partitaFinita ==="Vittoria") {
+        if (partitaFinita === "Vittoria") {
             setIsWin(true);
+            setModalVisible(true);
         }
         else if (partitaFinita === "Sconfitta") {
             setIsWin(false);
+            setModalVisible(true);
         }
     }, [partitaFinita]);
     return (
