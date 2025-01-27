@@ -28,7 +28,9 @@ const GestisciProprieta = ({playerProperties}) => {
 
         // Filtra i gruppi con almeno 3 proprietà dello stesso colore
         const result = Object.values(groupedProperties).filter(group => group.length >= 3);
-        const result2 = Object.values(result).filter(group => group.length === 2 && (group.color === 'Marrone' || group.color === 'Blu'));
+        const result2 = Object.values(groupedProperties).filter(group =>
+            group.length === 2 && (group[0].color === 'Marrone' || group[0].color === 'Blu')
+        );
 
         setBuildingProperties(result.concat(result2).flat());
     }, [playerProperties]);
