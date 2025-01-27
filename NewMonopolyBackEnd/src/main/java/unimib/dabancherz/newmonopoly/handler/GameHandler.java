@@ -6,6 +6,7 @@ import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.MessageService;
 import unimib.dabancherz.newmonopoly.database.entity.Giocatore;
 import unimib.dabancherz.newmonopoly.database.repository.CasellaRepository;
+import unimib.dabancherz.newmonopoly.manager.TurnManager;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardWrapper;
 import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaRepository;
@@ -33,6 +34,7 @@ public class GameHandler {
     private final Map<WebSocketSession, String> playerNameList = new HashMap<>();
 
     private final GameBoardWrapper gameBoardWrapper;
+    private final TurnManager turnManager;
     private List<Integer> pedineNonUsate = new ArrayList<>();
 
     public GameHandler(MessageService messageService,
@@ -40,7 +42,7 @@ public class GameHandler {
                        GiocatoreRepository giocatoreRepository,
                        PartitaRepository partitaRepository,
                        PedinaRepository pedinaRepository, CasellaRepository casellaRepository,
-                       GameBoardWrapper gameBoardWrapper) {
+                       GameBoardWrapper gameBoardWrapper, TurnManager turnManager) {
         this.messageService = messageService;
         this.gameService = gameService;
         this.giocatoreRepository = giocatoreRepository;
@@ -48,6 +50,7 @@ public class GameHandler {
         this.pedinaRepository = pedinaRepository;
         this.casellaRepository = casellaRepository;
         this.gameBoardWrapper = gameBoardWrapper;
+        this.turnManager = turnManager;
     }
 
     public void createGame(String[] messageParts, WebSocketSession session) throws Exception {

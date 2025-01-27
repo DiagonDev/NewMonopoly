@@ -69,7 +69,6 @@ public class OpportunitaManager {
         } else {
             return 0;
         }
-        gameBoard.setPlayerPosition(idPartita, nomeGiocatore, idCasella);
         return idCasella;
     }
 

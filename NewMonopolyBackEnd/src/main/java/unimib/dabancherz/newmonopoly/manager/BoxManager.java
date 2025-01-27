@@ -155,9 +155,11 @@ public class BoxManager {
             case "sposta_avanti":
                 idCasella = opportunitaManager.gestisciSpostamento(parametri, posizione, idPartita, nomeGiocatore);
                 messageService.updateBalance(gameSessions, idPartita, nomeGiocatore);
-                messageService.sendPawnMove(pawnId, nomeGiocatore, idCasella, gameSessions, idPartita);
+                Integer posizioneAggiornata = pCPPRepository.findPosizioneByIdcasella_IdCasella(idPartita, idCasella);
+                gameBoard.setPlayerPosition(idPartita, nomeGiocatore, posizioneAggiornata);
+                messageService.sendPawnMove(pawnId, nomeGiocatore, posizioneAggiornata, gameSessions, idPartita);
                 Thread.sleep(2000);
-                sendBoxUsage(nomeGiocatore, session, idCasella, idPartita, gameSessions, pawnId, false);
+                sendBoxUsage(nomeGiocatore, session, posizioneAggiornata, idPartita, gameSessions, pawnId, false);
                 break;
             case "vai_in_prigione":
                 idCasella = opportunitaManager.gestisciPrigione(parametri, idPartita, nomeGiocatore, session);

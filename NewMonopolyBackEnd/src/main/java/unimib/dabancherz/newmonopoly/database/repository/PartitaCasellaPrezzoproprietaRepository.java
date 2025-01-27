@@ -37,6 +37,11 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
     """)
     List<PlayerProperties> findPlayerProperties(@Param("idPartita") String idPartita, @Param("nomeGiocatore") String nomeGiocatore);
 
+    @Query("""
+        SELECT pcp.posizione FROM Partita_Casella_Prezzoproprieta pcp WHERE pcp.idcasella.idCasella = :idCasella AND pcp.idpartita.codiceInvito = :idPartita
+    """)
+    Integer findPosizioneByIdcasella_IdCasella(@Param("idPartita") String idPartita, @Param("idCasella") Integer idCasella);
+
     @Modifying
     @Transactional
     @Query(value = """
