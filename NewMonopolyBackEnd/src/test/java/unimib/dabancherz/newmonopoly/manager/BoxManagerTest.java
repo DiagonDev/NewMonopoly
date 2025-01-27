@@ -1,10 +1,11 @@
-/*
 package unimib.dabancherz.newmonopoly.manager;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.MessageService;
 import unimib.dabancherz.newmonopoly.database.repository.*;
+import unimib.dabancherz.newmonopoly.handler.PropertyHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -20,9 +21,10 @@ class BoxManagerTest {
     private OpportunitaRepository opportunitaRepository;
     private OpportunitaManager opportunitaManager;
     private WebSocketSession session;
+    private PropertyHandler propertyHandler;
+    private PrisonManager prisonManager;
 
-    */
-/*@BeforeEach
+@BeforeEach
     void setUp() {
         messageService = mock(MessageService.class);
         pCPPRepository = mock(PartitaCasellaPrezzoproprietaRepository.class);
@@ -31,8 +33,10 @@ class BoxManagerTest {
         opportunitaRepository = mock(OpportunitaRepository.class);
         opportunitaManager = mock(OpportunitaManager.class);
         session = mock(WebSocketSession.class);
-        boxHandler = new BoxManager(messageService, pCPPRepository, giocatoreRepository, partitaOpportunitaRepository, opportunitaRepository, opportunitaManager);
-    }*//*
+        prisonManager = mock(PrisonManager.class);
+        propertyHandler = mock(PropertyHandler.class);
+        boxManager = new BoxManager(messageService, pCPPRepository, giocatoreRepository, partitaOpportunitaRepository, opportunitaRepository, opportunitaManager, propertyHandler, prisonManager);
+    }
 
 
     @Test
@@ -127,7 +131,6 @@ class BoxManagerTest {
         Object parametri = new Object();
 
         when(opportunitaManager.gestisciPrigione(parametri, gameId, playerName, session)).thenReturn(newPosizione);
-
         boxManager.gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, "Imprevisto", session);
 
         verify(messageService, times(1)).sendPawnMove(anyInt(), eq(playerName), eq(newPosizione), eq(gameSessions), eq(gameId));
@@ -146,4 +149,4 @@ class BoxManagerTest {
 
         verify(opportunitaManager, times(1)).gestisciUscitaPrigione(gameId, playerName, "Imprevisto");
     }
-}*/
+}
