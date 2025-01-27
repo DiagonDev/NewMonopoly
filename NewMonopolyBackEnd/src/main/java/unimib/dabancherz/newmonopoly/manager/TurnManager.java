@@ -57,6 +57,9 @@ public class TurnManager {
     public void notifyPlayersTurn(String gameId, String playerName, WebSocketSession session) throws Exception {
         String yourTurnMessage = messageService.createTurnMessage(true, playerName);
         String notYourTurnMessage = messageService.createTurnMessage(false, playerName);
+        if (yourTurnMessage == null || notYourTurnMessage == null) {
+            throw new IllegalArgumentException("Turn messages cannot be null");
+        }
         for (WebSocketSession playerSession : gameHandler.getGameSessions().get(gameId)) {
             if (!playerSession.equals(session)) {
                 playerSession.sendMessage(new TextMessage(notYourTurnMessage));
