@@ -42,7 +42,7 @@ public class BalanceManager {
     }
 
     public void handleWinPlayer(String gameId, String vincitore, WebSocketSession session) throws Exception {
-        messageService.sendSystemMessage(gameId, vincitore + "ha vinto la partita", gameHandler.getGameSessions(), session);
+        messageService.sendSystemMessage(gameId, vincitore + " ha vinto la partita", gameHandler.getGameSessions(), session);
         messageService.sendVictoryMessage(session);
         gameHandler.removePlayerFromGame(gameId, session);
     }

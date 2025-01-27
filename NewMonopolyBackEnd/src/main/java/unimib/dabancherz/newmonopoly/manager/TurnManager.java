@@ -69,13 +69,14 @@ public class TurnManager {
     public void endTurn(WebSocketSession session) throws Exception {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
-        balanceManager.checkBalance(gameId, playerName, session);
 
         // Calcola l'indice della prossima sessione in modo circolare
         List<WebSocketSession> playersInGame = gameHandler.getGameSessions().get(gameId);
         int nextIndex = (playersInGame.indexOf(session) + 1) % playersInGame.size();
         WebSocketSession nextPlayer = playersInGame.get(nextIndex);
-        startTurn(nextPlayer);
+        balanceManager.checkBalance(gameId, playerName, session);
+        if(!(playersInGame.isEmpty()))
+            startTurn(nextPlayer);
     }
 
     public boolean lasciaPrigione( WebSocketSession session, int[] diceResults) throws Exception {
@@ -129,8 +130,10 @@ public class TurnManager {
     }
 
     public int[] rollDice(WebSocketSession session) throws Exception {
-        int diceR1 = secureRandom.nextInt(6) + 1; // Genera un numero casuale tra 1 e 6
-        int diceR2 = secureRandom.nextInt(6) + 1;
+        //int diceR1 = secureRandom.nextInt(6) + 1; // Genera un numero casuale tra 1 e 6
+        //int diceR2 = secureRandom.nextInt(6) + 1;
+        int diceR1=4;
+        int diceR2=1;
         messageService.sendDiceResults(session, diceR1, diceR2);
         return new int[]{diceR1, diceR2};
     }
