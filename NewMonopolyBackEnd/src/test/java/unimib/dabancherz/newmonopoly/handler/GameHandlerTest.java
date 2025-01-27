@@ -1,131 +1,163 @@
-/*
 package unimib.dabancherz.newmonopoly.handler;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.MessageService;
-import unimib.dabancherz.newmonopoly.database.repository.CasellaRepository;
-import unimib.dabancherz.newmonopoly.singleton.GameBoardWrapper;
-import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
-import unimib.dabancherz.newmonopoly.database.repository.PartitaRepository;
-import unimib.dabancherz.newmonopoly.database.repository.PedinaRepository;
+import unimib.dabancherz.newmonopoly.database.entity.*;
+import unimib.dabancherz.newmonopoly.database.repository.*;
 import unimib.dabancherz.newmonopoly.database.service.GameService;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import unimib.dabancherz.newmonopoly.singleton.GameBoardWrapper;
+import java.io.IOException;
+import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class GameHandlerTest {
-
-    private GameHandler gameHandler;
+    @Mock
     private MessageService messageService;
+    @Mock
     private GameService gameService;
+    @Mock
     private GiocatoreRepository giocatoreRepository;
+    @Mock
     private PartitaRepository partitaRepository;
+    @Mock
     private PedinaRepository pedinaRepository;
-    private CasellaRepository casellaRepository;;
+    @Mock
+    private CasellaRepository casellaRepository;
+    @Mock
     private GameBoardWrapper gameBoardWrapper;
+    @Mock
     private WebSocketSession session;
+    @InjectMocks
+    private GameHandler gameHandler;
 
     @BeforeEach
     void setUp() {
-        messageService = mock(MessageService.class);
-        gameService = mock(GameService.class);
-        giocatoreRepository = mock(GiocatoreRepository.class);
-        partitaRepository = mock(PartitaRepository.class);
-        pedinaRepository = mock(PedinaRepository.class);
-        casellaRepository = mock(CasellaRepository.class);
-        gameBoardWrapper = mock(GameBoardWrapper.class);
-        session = mock(WebSocketSession.class);
-
+        MockitoAnnotations.openMocks(this);
         gameHandler = new GameHandler(messageService, gameService, giocatoreRepository, partitaRepository, pedinaRepository, casellaRepository, gameBoardWrapper);
     }
-
     @Test
-    void testCreateGame() throws Exception {
+    void createGame() throws Exception {
         String[] messageParts = {"create", "player1", "easy", "random"};
-        String gameId = "game-1";
-        List<WebSocketSession> playersInGame = new ArrayList<>();
-        playersInGame.add(session);
-
+        when(casellaRepository.findByOrder(anyString())).thenReturn(new int[]{1, 2, 3});
+        when(pedinaRepository.findUnusedPedineByPartita(anyString())).thenReturn(new ArrayList<>());
         when(partitaRepository.findLastCodiceInvito()).thenReturn(null);
-        when(pedinaRepository.findUnusedPedineByPartita(gameId)).thenReturn(new ArrayList<>());
-
         gameHandler.createGame(messageParts, session);
-
-        verify(messageService, times(1)).sendGameId(eq(gameId), eq(session));
-        verify(messageService, times(1)).sendSystemMessage(eq(gameId), eq("#" + gameId), any(), eq(session));
-        verify(messageService, times(1)).notifyPlayerJoin(eq(gameId), eq("player1"), eq(session), any(), eq("ADMIN"));
-        verify(messageService, times(1)).sendTypePlayer(eq("ADMIN"), eq(session));
-        verify(messageService, times(1)).sendUnusedPedine(anyList(), any(), eq(gameId));
-
-        assertEquals(playersInGame, gameHandler.getGameSessions().get(gameId));
+        verify(messageService, times(1)).sendBoxOrderMessage(any(), any(), anyString());
+        verify(messageService, times(1)).sendGameId(anyString(), any());
+        verify(messageService, times(1)).sendSystemMessage(anyString(), anyString(), any(), any());
+        verify(messageService, times(1)).notifyPlayerJoin(anyString(), anyString(), any(), any(), eq("ADMIN"));
+        verify(messageService, times(1)).sendTypePlayer(anyString(), any());
+        verify(messageService, times(1)).sendUnusedPedine(any(), any(), anyString());
+        verify(gameBoardWrapper, times(1)).createGame(anyString());
+        verify(gameBoardWrapper, times(1)).setPlayerPosition(anyString(), anyString(), eq(1));
+        verify(gameService, times(1)).createGameAndPlayer(anyString(), anyString(), anyString(), anyString());
     }
-
     @Test
-    void testJoinGame() throws Exception {
-        String[] messageParts = {"join", "player2", "game-1"};
+    void joinGame() throws Exception {
+        String[] messageParts = {"join", "player1", "game-1"};
         String gameId = "game-1";
-        List<WebSocketSession> playersInGame = new ArrayList<>();
-        playersInGame.add(session);
-
-        when(giocatoreRepository.existsByNomeAndIdpartita_CodiceInvito("player2", gameId)).thenReturn(false);
-        when(giocatoreRepository.countGiocatoriByPartita(gameId)).thenReturn(5);
-        when(pedinaRepository.findUnusedPedineByPartita(gameId)).thenReturn(new ArrayList<>());
-        gameHandler.getGameSessions().put(gameId, playersInGame);
-
+        String playerName = "player1";
+        when(casellaRepository.findByOrder(gameId)).thenReturn(new int[]{1, 2, 3});
+        when(giocatoreRepository.existsByNomeAndIdpartita_CodiceInvito(playerName, gameId)).thenReturn(false);
+        when(gameService.getUnusedPedineByPartita(gameId)).thenReturn(new ArrayList<>());
+        doNothing().when(messageService).sendErrorMessage(any());
+        doNothing().when(messageService).sendErrorGameIdMessage(any(), anyString());
+        Map<String, List<WebSocketSession>> gameSessions = new HashMap<>();
+        gameSessions.put(gameId, new ArrayList<>());
+        var field = GameHandler.class.getDeclaredField("gameSessions");
+        field.setAccessible(true);
+        field.set(gameHandler, gameSessions);
+        Map<WebSocketSession, String> playerNameList = new HashMap<>();
+        var playerNameField = GameHandler.class.getDeclaredField("playerNameList");
+        playerNameField.setAccessible(true);
+        playerNameField.set(gameHandler, playerNameList);
         gameHandler.joinGame(messageParts, session);
-
-        verify(gameService, times(1)).addPlayer(eq("player2"), eq(gameId));
-        verify(messageService, times(1)).notifyPlayerJoin(eq(gameId), eq("player2"), eq(session), any(), eq("giocatore"));
-        verify(messageService, times(1)).sendUnusedPedine(anyList(), any(), eq(gameId));
-
-        assertTrue(gameHandler.getGameSessions().get(gameId).contains(session));
+        verify(gameService, times(1)).addPlayer(playerName, gameId);
+        verify(messageService, times(1)).notifyPlayerJoin(eq(gameId), eq(playerName), eq(session), any(), eq("giocatore"));
+        verify(messageService, times(1)).sendBoxOrderMessage(any(), any(), eq(gameId));
+        verify(messageService, times(1)).sendUnusedPedine(any(), any(), eq(gameId));
     }
-
     @Test
-    void testGetGameIdBySession() {
+    void getGameIdBySession() {
         String gameId = "game-1";
-        List<WebSocketSession> playersInGame = new ArrayList<>();
-        playersInGame.add(session);
-        gameHandler.getGameSessions().put(gameId, playersInGame);
-
+        List<WebSocketSession> sessions = Collections.singletonList(session);
+        gameHandler.getGameSessions().put(gameId, sessions);
         String result = gameHandler.getGameIdBySession(session);
-
         assertEquals(gameId, result);
     }
-
     @Test
-    void testGetPlayerNameBySession() throws Exception {
+    void getPlayerNameBySession() throws NoSuchFieldException, IllegalAccessException {
         String playerName = "player1";
-        // Use reflection to access the private playerNameList field
-        Field field = GameHandler.class.getDeclaredField("playerNameList");
+        var field = GameHandler.class.getDeclaredField("playerNameList");
         field.setAccessible(true);
-        Map<String, WebSocketSession> playerNameList = (Map<String, WebSocketSession>) field.get(gameHandler);
-        playerNameList.put(playerName, session);
-
+        @SuppressWarnings("unchecked")
+        Map<WebSocketSession, String> playerNameList = (Map<WebSocketSession, String>) field.get(gameHandler);
+        playerNameList.put(session, playerName);
         String result = gameHandler.getPlayerNameBySession(session);
-
         assertEquals(playerName, result);
     }
-
     @Test
-    void testGetSessionByPlayerName() throws Exception {
+    void getSessionByPlayerName() throws NoSuchFieldException, IllegalAccessException {
         String playerName = "player1";
         String gameId = "game-1";
-        // Use reflection to access the private playerNameList field
-        Field field = GameHandler.class.getDeclaredField("playerNameList");
+        var field = GameHandler.class.getDeclaredField("playerNameList");
         field.setAccessible(true);
-        Map<String, WebSocketSession> playerNameList = (Map<String, WebSocketSession>) field.get(gameHandler);
-        playerNameList.put(playerName, session);
-        gameHandler.getGameSessions().put(gameId, List.of(session));
-
+        @SuppressWarnings("unchecked")
+        Map<WebSocketSession, String> playerNameList = (Map<WebSocketSession, String>) field.get(gameHandler);
+        playerNameList.put(session, playerName);
+        gameHandler.getGameSessions().put(gameId, Collections.singletonList(session));
         WebSocketSession result = gameHandler.getSessionByPlayerName(playerName, gameId);
-
         assertEquals(session, result);
     }
-}*/
+    @Test
+    void generateGameId() {
+        when(partitaRepository.findLastCodiceInvito()).thenReturn("game-0");
+        String result = gameHandler.generateGameId();
+        assertEquals("game-1", result);
+    }
+    @Test
+    void choosePedina() throws Exception {
+        String[] messageParts = {"choosePedina", "1"};
+        String gameId = "game-1";
+        String playerName = "player1";
+        var field = GameHandler.class.getDeclaredField("playerNameList");
+        field.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        Map<WebSocketSession, String> playerNameList = (Map<WebSocketSession, String>) field.get(gameHandler);
+        playerNameList.put(session, playerName);
+        gameHandler.getGameSessions().put(gameId, Collections.singletonList(session));
+        when(gameService.getUnusedPedineByPartita(anyString())).thenReturn(new ArrayList<>());
+        gameHandler.choosePedina(messageParts, session);
+        verify(giocatoreRepository, times(1)).updatePedinaForGiocatore(eq(playerName), eq(1), eq(gameId));
+        verify(messageService, times(1)).sendUnusedPedine(any(), any(), anyString());
+        verify(messageService, times(1)).sendPawnMove(eq(1), eq(playerName), eq(1), any(), eq(gameId));
+    }
+    @Test
+    void sendPositionPawn() throws IOException, InterruptedException, NoSuchFieldException, IllegalAccessException {
+        String gameId = "game-1";
+        String playerName = "player1";
+        String anotherPlayerName = "player2";
+        Giocatore giocatore = new Giocatore();
+        giocatore.setNome(playerName);
+        Pedina pedina = new Pedina();
+        pedina.setIdPedina(1);
+        giocatore.setIdpedina(pedina);
+        List<Giocatore> giocatori = Collections.singletonList(giocatore);
+        when(giocatoreRepository.findGiocatoreWithPedina(gameId)).thenReturn(giocatori);
+        when(gameBoardWrapper.getPlayerPosition(gameId, playerName)).thenReturn(5);
+        var field = GameHandler.class.getDeclaredField("playerNameList");
+        field.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        Map<WebSocketSession, String> playerNameList = (Map<WebSocketSession, String>) field.get(gameHandler);
+        playerNameList.put(session, anotherPlayerName);
+        gameHandler.sendPositionPawn(gameId, session);
+        verify(messageService, times(1)).sendPlayerPawnPosition(eq(1), eq(playerName), eq(5), eq(session));
+    }
+}

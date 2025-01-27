@@ -145,7 +145,7 @@ public class GameHandler {
     }
 
     //genera il codice gameID in modo incrementale partendo da game-0
-    private String generateGameId() {
+    public String generateGameId() {
         int counter = 0;
         if (partitaRepository.findLastCodiceInvito() != null) {
             String[] lastGame = (partitaRepository.findLastCodiceInvito()).split("-");
@@ -159,8 +159,8 @@ public class GameHandler {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         if (playersInGame != null) {
             String player = getPlayerNameBySession(session);
-            Integer pownId = giocatoreRepository.findPedinaFromGiocatore(player, gameId);
-            messageService.sendPawnMove(pownId, player, 0, gameSessions, gameId);
+            Integer pawnId = giocatoreRepository.findPedinaFromGiocatore(player, gameId);
+            messageService.sendPawnMove(pawnId, player, 0, gameSessions, gameId);
             messageService.sendDisconnected(gameSessions, gameId, player);
             gameService.deletePlayer(gameId, player);
             playersInGame.remove(session); // Rimuove la sessione dalla lista dei giocatori
@@ -180,16 +180,12 @@ public class GameHandler {
         String idPedina = messageParts[1];
         String gameId = getGameIdBySession(session);
         String playerName = getPlayerNameBySession(session);    //tropo il giocatore associato alla sessione
-
-        System.out.println(playerName);
-        System.out.println(gameId);
         giocatoreRepository.updatePedinaForGiocatore(playerName, Integer.parseInt(idPedina), gameId);  //Assegna la pedina al giocatore nel database
         pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
         messageService.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);
         sendPositionPawn(gameId, session);
         messageService.sendPawnMove(Integer.parseInt(idPedina), playerName, 1, gameSessions, gameId);   // Invia un messaggio per spostare la pedina sul via
     }
-
 
     public void sendPositionPawn(String gameId, WebSocketSession session) throws IOException, InterruptedException {
         List<Giocatore> giocatori = giocatoreRepository.findGiocatoreWithPedina(gameId);
