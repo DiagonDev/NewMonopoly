@@ -48,10 +48,14 @@ const PropertyOwned = ({playerProperties, onPropertySelect}) => {
                         className="propertyColorBar"
                         style={{backgroundColor: translateColor(property.colore)}}
                     >
-                        <br />
+                        <br/>
                         <div className="propertyContent">
                             {property.nome}
-                            <br/>
+
+                        </div>
+                        <br/>
+                        <div>
+
                             <p>Case Possedute: </p>
                             {property.numCasa}
                         </div>
