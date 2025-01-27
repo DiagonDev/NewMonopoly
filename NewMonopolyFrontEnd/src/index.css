@@ -681,6 +681,7 @@ button:focus-visible {
     background-color: grey;
 }
 
+
 .propieta {
     display: flex;
     justify-content: space-around; /* Centra il contenuto orizzontalmente */
@@ -726,6 +727,7 @@ button:focus-visible {
     gap: 10px;
 }
 
+
 /*
 .player:nth-child(1) {
     background-color: green;
@@ -751,6 +753,10 @@ button:focus-visible {
     background-color: orange;
 }
 */
+.rollDiceDiv{
+    overflow: auto;
+    padding: 5px;
+}
 
 .pawn-selection {
     text-align: center;
