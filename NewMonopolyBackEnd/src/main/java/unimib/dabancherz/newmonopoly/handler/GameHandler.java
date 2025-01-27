@@ -6,7 +6,6 @@ import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.MessageService;
 import unimib.dabancherz.newmonopoly.database.entity.Giocatore;
 import unimib.dabancherz.newmonopoly.database.repository.CasellaRepository;
-import unimib.dabancherz.newmonopoly.manager.TurnManager;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardWrapper;
 import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaRepository;

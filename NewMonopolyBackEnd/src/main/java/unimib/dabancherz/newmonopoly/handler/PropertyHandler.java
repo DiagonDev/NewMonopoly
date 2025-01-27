@@ -23,8 +23,9 @@ public class PropertyHandler {
     private final MessageService messageService;
     ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String PROPERTIES_KEY = "properties";
+    private static final String PROPERTIESKEY = "properties";
     private static final String UPDATEPROPERTIES_KEY = "updateProperties";
+    private static final String IMPRENDITOREKEY = "imprenditore";
 
     public PropertyHandler(PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, GameHandler gameHandler, MessageService messageService, CasellaRepository casellaRepository, PartitaRepository partitaRepository) {
         this.pCPPRepository = pCPPRepository;
@@ -89,7 +90,7 @@ public class PropertyHandler {
         String playerName = gameHandler.getPlayerNameBySession(session);
         List<PlayerProperties> playerPropertiesList = pCPPRepository.findOtherPlayerProperties(gameId,playerName);
 
-        messageService.inviaMessaggio(session, "allProperties", PROPERTIES_KEY, playerPropertiesList);
+        messageService.inviaMessaggio(session, "allProperties", PROPERTIESKEY, playerPropertiesList);
     }
 
     public void gestisciCase(PlayerProperties property, Integer casine,  WebSocketSession session) throws Exception {
@@ -169,7 +170,7 @@ public class PropertyHandler {
 
     public void aggiornaProprieta(String gameId, String nomeGiocatore, WebSocketSession session) throws IOException {
         List<PlayerProperties> giocatorePropertiesList = pCPPRepository.findPlayerProperties(gameId, nomeGiocatore);
-        messageService.inviaMessaggio(session, UPDATEPROPERTIES_KEY, PROPERTIES_KEY, giocatorePropertiesList);
+        messageService.inviaMessaggio(session, UPDATEPROPERTIES_KEY, PROPERTIESKEY, giocatorePropertiesList);
     }
 
     public void completaScambio(String gameId, String nomeProprietario, String nomeRichiedente, PlayerProperties property1, PlayerProperties property2, Integer offertaMonetaria, WebSocketSession session, WebSocketSession sessionRichiedente) throws Exception {
@@ -195,10 +196,10 @@ public class PropertyHandler {
 
     public void aggiornaProprietaScambio(String gameId, String nomeProprietario, String nomeRichiedente, WebSocketSession session, WebSocketSession sessionRichiedente) throws IOException {
         List<PlayerProperties> proprietarioPropertiesList = pCPPRepository.findPlayerProperties(gameId, nomeProprietario);
-        messageService.inviaMessaggio(session, UPDATEPROPERTIES_KEY, PROPERTIES_KEY, proprietarioPropertiesList);
+        messageService.inviaMessaggio(session, UPDATEPROPERTIES_KEY, PROPERTIESKEY, proprietarioPropertiesList);
 
         List<PlayerProperties> richiedentePropertiesList = pCPPRepository.findPlayerProperties(gameId, nomeRichiedente);
-        messageService.inviaMessaggio(sessionRichiedente, UPDATEPROPERTIES_KEY, PROPERTIES_KEY, richiedentePropertiesList);
+        messageService.inviaMessaggio(sessionRichiedente, UPDATEPROPERTIES_KEY, PROPERTIESKEY, richiedentePropertiesList);
     }
 
     public void rifiutaScambio(String gameId, String nomeProprietario, String nomeRichiedente, WebSocketSession session) throws Exception {
@@ -232,22 +233,22 @@ public class PropertyHandler {
         return offertaMonetaria;
     }
 
-    //Restituisce quanto corrisponde 1€ in punti fedelta in base al tipo di giocatore e al livello della partita
+    //Restituisce quanto corrisponde 1€ in punti fedeltà in base al tipo di giocatore e al livello della partita
     public Integer numPuntiFedelta(String playerName, String gameId){
         Partita partita = partitaRepository.findByCodiceInvito(gameId);
         Giocatore giocatore = giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(gameId, playerName);
         String livello = partita.getLivelloDifficolta();
         switch (livello){
             case "Facile":
-                if (giocatore.getTipo().equals("imprenditore"))
+                if (giocatore.getTipo().equals(IMPRENDITOREKEY))
                     return 4;
                 else return 2;
             case "Medio":
-                if (giocatore.getTipo().equals("imprenditore"))
+                if (giocatore.getTipo().equals(IMPRENDITOREKEY))
                     return 8;
                 else return 4;
             case "Difficile":
-                if (giocatore.getTipo().equals("imprenditore"))
+                if (giocatore.getTipo().equals(IMPRENDITOREKEY))
                     return 16;
                 else return 8;
             default:

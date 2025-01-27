@@ -2,6 +2,8 @@ package unimib.dabancherz.newmonopoly.handler;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -42,6 +44,9 @@ class PropertyHandlerTest {
     private WebSocketSession session;
     @InjectMocks
     private PropertyHandler propertyHandler;
+
+    private final String IMPRENDITOREKEY = "imprenditore";
+    private final String FACILEKEY = "Facile";
 
     @BeforeEach
     public void setUp() {
@@ -130,9 +135,9 @@ class PropertyHandlerTest {
         String playerName1 = "player1";
         String playerName2 = "player2";
         PlayerProperties property1 = new PlayerProperties();
-        property1.setIdGiocatore(1); // Assicurati che l'ID del giocatore sia impostato
+        property1.setIdGiocatore(1);
         PlayerProperties property2 = new PlayerProperties();
-        property2.setIdGiocatore(2); // Assicurati che l'ID del giocatore sia impostato
+        property2.setIdGiocatore(2);
         Map<String, Object> data = new HashMap<>();
         data.put("property1", property1);
         data.put("property2", property2);
@@ -190,13 +195,12 @@ class PropertyHandlerTest {
     }
 
     @Test
-    public void testIpotecaProprieta() throws Exception {
+     void testIpotecaProprieta() throws Exception {
         PlayerProperties property = new PlayerProperties();
         property.setNome("property1");
         property.setPrezzoCorrente(200);
         String gameId = "game-1";
         String playerName = "player1";
-
         when(gameHandler.getGameIdBySession(session)).thenReturn(gameId);
         when(gameHandler.getPlayerNameBySession(session)).thenReturn(playerName);
         when(pCPPRepository.findPosizioneByNomeCasellaAndIdpartita(anyString(), anyString())).thenReturn(1);
@@ -224,20 +228,6 @@ class PropertyHandlerTest {
     }
 
     @Test
-    void testNumPuntiFedelta() {
-        String playerName = "player1";
-        String gameId = "game-1";
-        Giocatore giocatore = new Giocatore();
-        giocatore.setTipo("imprenditore");
-        Partita partita = new Partita();
-        partita.setLivelloDifficolta("Facile");
-        when(giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(anyString(), anyString())).thenReturn(giocatore);
-        when(partitaRepository.findByCodiceInvito(anyString())).thenReturn(partita);
-        int punti = propertyHandler.numPuntiFedelta(playerName, gameId);
-        assertEquals(4, punti);
-    }
-
-    @Test
     void testAcquistaProprietaPunti_SufficientPoints() throws Exception {
         String[] messageParts = {"acquista", "property1"};
         String gameId = "game-1";
@@ -245,9 +235,9 @@ class PropertyHandlerTest {
         Giocatore giocatore = new Giocatore();
         giocatore.setPuntiFedelta(400);
         giocatore.setSaldo(100);
-        giocatore.setTipo("imprenditore");
+        giocatore.setTipo(IMPRENDITOREKEY);
         Partita partita = new Partita();
-        partita.setLivelloDifficolta("Facile");
+        partita.setLivelloDifficolta(FACILEKEY);
         when(gameHandler.getGameIdBySession(session)).thenReturn(gameId);
         when(gameHandler.getPlayerNameBySession(session)).thenReturn(playerName);
         when(pCPPRepository.prezzoCasella2(anyString(), anyString())).thenReturn(100);
@@ -267,9 +257,9 @@ class PropertyHandlerTest {
         Giocatore giocatore = new Giocatore();
         giocatore.setPuntiFedelta(200);
         giocatore.setSaldo(100);
-        giocatore.setTipo("imprenditore");
+        giocatore.setTipo(IMPRENDITOREKEY);
         Partita partita = new Partita();
-        partita.setLivelloDifficolta("Facile");
+        partita.setLivelloDifficolta(FACILEKEY);
         when(gameHandler.getGameIdBySession(session)).thenReturn(gameId);
         when(gameHandler.getPlayerNameBySession(session)).thenReturn(playerName);
         when(pCPPRepository.prezzoCasella2(anyString(), anyString())).thenReturn(100);
@@ -289,9 +279,9 @@ class PropertyHandlerTest {
         Giocatore giocatore = new Giocatore();
         giocatore.setPuntiFedelta(100);
         giocatore.setSaldo(50);
-        giocatore.setTipo("imprenditore");
+        giocatore.setTipo(IMPRENDITOREKEY);
         Partita partita = new Partita();
-        partita.setLivelloDifficolta("Facile");
+        partita.setLivelloDifficolta(FACILEKEY);
         when(gameHandler.getGameIdBySession(session)).thenReturn(gameId);
         when(gameHandler.getPlayerNameBySession(session)).thenReturn(playerName);
         when(pCPPRepository.prezzoCasella2(anyString(), anyString())).thenReturn(100);
@@ -323,82 +313,27 @@ class PropertyHandlerTest {
         assertThrows(IllegalArgumentException.class, () -> propertyHandler.offertaMonetaria(data));
     }
 
-    @Test
-    void testNumPuntiFedelta_Facile_Imprenditore() {
+    @ParameterizedTest
+    @CsvSource({
+            "Facile, imprenditore, 4",
+            "Facile, giocatore, 2",
+            "Medio, imprenditore, 8",
+            "Medio, giocatore, 4",
+            "Difficile, imprenditore, 16",
+            "Difficile, giocatore, 8"
+    })
+    void testNumPuntiFedelta(String livelloDifficolta, String tipoGiocatore, int expectedPunti) {
         String playerName = "player1";
         String gameId = "game-1";
         Giocatore giocatore = new Giocatore();
-        giocatore.setTipo("imprenditore");
+        giocatore.setTipo(tipoGiocatore);
         Partita partita = new Partita();
-        partita.setLivelloDifficolta("Facile");
+        partita.setLivelloDifficolta(livelloDifficolta);
+
         when(giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(anyString(), anyString())).thenReturn(giocatore);
         when(partitaRepository.findByCodiceInvito(anyString())).thenReturn(partita);
+
         int punti = propertyHandler.numPuntiFedelta(playerName, gameId);
-        assertEquals(4, punti);
-    }
-    @Test
-    void testNumPuntiFedelta_Facile_NonImprenditore() {
-        String playerName = "player1";
-        String gameId = "game-1";
-        Giocatore giocatore = new Giocatore();
-        giocatore.setTipo("giocatore");
-        Partita partita = new Partita();
-        partita.setLivelloDifficolta("Facile");
-        when(giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(anyString(), anyString())).thenReturn(giocatore);
-        when(partitaRepository.findByCodiceInvito(anyString())).thenReturn(partita);
-        int punti = propertyHandler.numPuntiFedelta(playerName, gameId);
-        assertEquals(2, punti);
-    }
-    @Test
-    void testNumPuntiFedelta_Medio_Imprenditore() {
-        String playerName = "player1";
-        String gameId = "game-1";
-        Giocatore giocatore = new Giocatore();
-        giocatore.setTipo("imprenditore");
-        Partita partita = new Partita();
-        partita.setLivelloDifficolta("Medio");
-        when(giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(anyString(), anyString())).thenReturn(giocatore);
-        when(partitaRepository.findByCodiceInvito(anyString())).thenReturn(partita);
-        int punti = propertyHandler.numPuntiFedelta(playerName, gameId);
-        assertEquals(8, punti);
-    }
-    @Test
-    void testNumPuntiFedelta_Medio_NonImprenditore() {
-        String playerName = "player1";
-        String gameId = "game-1";
-        Giocatore giocatore = new Giocatore();
-        giocatore.setTipo("giocatore");
-        Partita partita = new Partita();
-        partita.setLivelloDifficolta("Medio");
-        when(giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(anyString(), anyString())).thenReturn(giocatore);
-        when(partitaRepository.findByCodiceInvito(anyString())).thenReturn(partita);
-        int punti = propertyHandler.numPuntiFedelta(playerName, gameId);
-        assertEquals(4, punti);
-    }
-    @Test
-    void testNumPuntiFedelta_Difficile_Imprenditore() {
-        String playerName = "player1";
-        String gameId = "game-1";
-        Giocatore giocatore = new Giocatore();
-        giocatore.setTipo("imprenditore");
-        Partita partita = new Partita();
-        partita.setLivelloDifficolta("Difficile");
-        when(giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(anyString(), anyString())).thenReturn(giocatore);
-        when(partitaRepository.findByCodiceInvito(anyString())).thenReturn(partita);
-        int punti = propertyHandler.numPuntiFedelta(playerName, gameId);
-        assertEquals(16, punti);
-    }
-    @Test
-    void testNumPuntiDifficile_NonImprenditore() {
-        String playerName = "player1";
-        String gameId = "game-1";
-        Giocatore giocatore = new Giocatore();
-        giocatore.setTipo("giocatore");
-        Partita partita = new Partita();
-        partita.setLivelloDifficolta("Difficile");
-        when(giocatoreRepository.findGiocatoreByIdpartita_CodiceInvitoAndNome(anyString(), anyString())).thenReturn(giocatore);
-        when(partitaRepository.findByCodiceInvito(anyString())).thenReturn(partita);
-        int punti = propertyHandler.numPuntiFedelta(playerName, gameId);
-        assertEquals(8, punti);
+        assertEquals(expectedPunti, punti);
     }
 }

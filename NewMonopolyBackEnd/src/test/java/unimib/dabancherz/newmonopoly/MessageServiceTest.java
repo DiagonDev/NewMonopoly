@@ -145,7 +145,7 @@ class MessageServiceTest {
         verify(session, times(1)).sendMessage(any(TextMessage.class));
     }
     @Test
-    public void testSendErrorMessage() throws IOException {
+     void testSendErrorMessage() throws IOException {
         messageService.sendErrorMessage(session);
         verify(session, times(1)).sendMessage(any(TextMessage.class));
     }

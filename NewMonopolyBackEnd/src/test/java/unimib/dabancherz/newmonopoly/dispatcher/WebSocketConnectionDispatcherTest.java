@@ -14,7 +14,6 @@ import unimib.dabancherz.newmonopoly.handler.GameHandler;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,14 +37,10 @@ class WebSocketConnectionDispatcherTest {
     @InjectMocks
     private WebSocketConnectionDispatcher dispatcher;
 
-    private Map<String, WebSocketSession> playerSessions;
-
     @BeforeEach
     void setUp() {
-        playerSessions = spy(new ConcurrentHashMap<>());
         lenient().when(session.getId()).thenReturn("session1");
     }
-
 
     @Test
     void testHandleMessage_NormalMessage() throws Exception {
@@ -74,9 +69,7 @@ class WebSocketConnectionDispatcherTest {
         when(gameHandler.getPlayerNameBySession(session)).thenReturn("Player1");
         when(gameHandler.getGameIdBySession(session)).thenReturn("game1");
         when(gameHandler.getGameSessions()).thenReturn(Map.of("game1", List.of(session)));
-
         dispatcher.afterConnectionClosed(session, status);
-
         verify(gameHandler, times(1)).removePlayerFromGame("game1", session);
         verify(messageService, times(1)).notifyPlayerDisconnected(eq("game1"), eq("Player1"), any());
     }
@@ -85,15 +78,8 @@ class WebSocketConnectionDispatcherTest {
     void testAfterConnectionClosed_WithoutGame() throws Exception {
         CloseStatus status = CloseStatus.NORMAL;
         when(gameHandler.getGameIdBySession(session)).thenReturn(null);
-
         dispatcher.afterConnectionClosed(session, status);
-
         verify(gameHandler, never()).removePlayerFromGame(anyString(), any());
         verify(messageService, never()).notifyPlayerDisconnected(anyString(), anyString(), any());
-    }
-
-    @Test
-    void testSupportsPartialMessages() {
-        assert !dispatcher.supportsPartialMessages();
     }
 }

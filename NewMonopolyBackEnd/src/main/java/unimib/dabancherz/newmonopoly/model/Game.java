@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class Game {
     private String gameId;  // ID univoco per la partita
-    private Map<String, Player> players = new HashMap<>();  // Mappa che associa il nome del giocatore all'oggetto Player
+    private final Map<String, Player> players = new HashMap<>();  // Mappa che associa il nome del giocatore all'oggetto Player
 
     // Costruttore della classe Game che accetta un gameId
     public Game(String gameId) {
