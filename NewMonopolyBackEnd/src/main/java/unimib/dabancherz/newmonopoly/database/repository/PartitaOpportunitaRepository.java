@@ -64,7 +64,7 @@ public interface PartitaOpportunitaRepository extends JpaRepository<Partita_Oppo
         SELECT COUNT(pp) > 0
         FROM Partita_Opportunita pp
         JOIN Opportunita o ON pp.idopportunita = o.id_opportunita
-        WHERE pp.idgiocatore= (SELECT id_Giocatore FROM Giocatore WHERE nome = :nomeGiocatore AND pp.idpartita = :idPartita)
+        WHERE pp.idgiocatore= (SELECT id_Giocatore FROM Giocatore WHERE nome = :nomeGiocatore AND idpartita = :idPartita)
         AND pp.idpartita = :idPartita
         AND o.tipo = :tipo
         LIMIT 1

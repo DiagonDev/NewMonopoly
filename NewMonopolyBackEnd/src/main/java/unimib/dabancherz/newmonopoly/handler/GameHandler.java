@@ -83,7 +83,8 @@ public class GameHandler {
 
     public void joinGame(String[] messageParts, WebSocketSession session) throws Exception {
         String playerName = messageParts[1];
-        String gameId = messageParts[2];
+        String gameId = messageParts[2].trim();
+
         int[] boxOrder = casellaRepository.findByOrder(gameId);
         if (giocatoreRepository.existsByNomeAndIdpartita_CodiceInvito(playerName, gameId)) {
             messageService.sendErrorMessage(session);

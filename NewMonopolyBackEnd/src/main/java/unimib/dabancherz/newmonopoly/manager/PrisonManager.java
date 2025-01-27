@@ -88,6 +88,7 @@ public class PrisonManager {
             messageService.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
             gameBoard.setPlayerCountRoll(gameId, playerName, 0);
             messageService.exitPrisonMessage(true, session);
+            messageService.sendSystemMessage(gameId, playerName + " è uscito di prigione", gameHandler.getGameSessions(), session);
         }
     }
 }

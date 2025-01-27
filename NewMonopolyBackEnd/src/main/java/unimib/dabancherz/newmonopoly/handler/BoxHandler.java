@@ -163,6 +163,8 @@ public class BoxHandler {
             case "vai_in_prigione":
                 idCasella = opportunitaManager.gestisciPrigione(parametri, idPartita, nomeGiocatore, session);
                 messageService.sendPawnMove(pawnId, nomeGiocatore, idCasella, gameSessions, idPartita);
+                gameBoard.setPlayerPrison(idPartita, nomeGiocatore, true);
+                prisonManager.sendPrisonMessage(session);
                 break;
             case ESCIPRIGIONEKEY:
                 opportunitaManager.gestisciUscitaPrigione(idPartita, nomeGiocatore, typeBox);
