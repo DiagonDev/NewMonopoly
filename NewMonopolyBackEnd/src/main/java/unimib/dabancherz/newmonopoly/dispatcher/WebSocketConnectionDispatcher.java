@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import unimib.dabancherz.newmonopoly.MessageService;
+import unimib.dabancherz.newmonopoly.database.repository.PartitaRepository;
 import unimib.dabancherz.newmonopoly.handler.GameHandler;
 import unimib.dabancherz.newmonopoly.manager.BalanceManager;
 import unimib.dabancherz.newmonopoly.manager.TurnManager;
