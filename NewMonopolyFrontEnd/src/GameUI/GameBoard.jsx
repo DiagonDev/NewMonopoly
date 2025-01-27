@@ -40,6 +40,19 @@ const GameBoard = () => {
     const handlePawnSelection = () => {
         setSelectedPawn(true);
     };
+    const handleAbbandonaPartita= () => {
+        if (socket && connected) {
+            // Invia un messaggio al server
+            socket.send('AbbandonaPartita:');
+            console.log('Messaggio inviato: AbbandonaPartita');
+
+            console.log("Partita abbandonata.");
+            
+        } else {
+            console.error('Connessione WebSocket non stabilita!');
+        }
+
+    };
 
     const handleStartGame = () => {
         if (socket && connected) {
@@ -192,6 +205,7 @@ const GameBoard = () => {
                                 <p>
                                     E il turno di {startTurn.playername}
                                 </p>
+                                <button onClick={handleAbbandonaPartita}>Abbandona partita</button>
                             </>
                         )}
                         </div>
