@@ -2,12 +2,13 @@ import React, { useState, useEffect, useContext } from "react";
 import { WebSocketContext } from "../eventListener/WebSocketContext";
 const MAX_PLAYERS = 6; // Numero massimo di giocatori
 const INITIAL_BALANCE = 0; // Saldo iniziale per ogni giocatore
+const INITIAL_POINTS = 0;
 
 const PlayersStatsRectangle = () => {
     const [players, setPlayers] = useState(
-        Array(MAX_PLAYERS).fill({ name: "Player", balance: INITIAL_BALANCE, points: 0 })
+        Array(MAX_PLAYERS).fill({ name: "Player", balance: INITIAL_BALANCE, points: INITIAL_POINTS })
     );
-    const { playerList, playerBalance } = useContext(WebSocketContext);
+    const { playerList, playerBalance, deletePlayer } = useContext(WebSocketContext);
     
     // Aggiunge un nuovo giocatore quando arriva un messaggio di join
     useEffect(() => {
@@ -54,6 +55,20 @@ const PlayersStatsRectangle = () => {
             });
         }
     }, [playerBalance]);
+
+    useEffect(() => {
+        if (playerBalance) {
+            
+            console.log(playerBalance.player, playerBalance.balance);
+            setPlayers((prevPlayers) => {
+                return prevPlayers.map((player) =>
+                    player.name === deletePlayer
+                        ? { ...player, name: "Player", balance: INITIAL_BALANCE, points:INITIAL_POINTS }
+                        : player
+                );
+            });
+        }
+    }, [deletePlayer]);
 
     return (
         <div className="player-container">
