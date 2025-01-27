@@ -1,9 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, {useContext, useState} from "react";
 import PropertyOwned from "./PropertyOwned.jsx";
-import { WebSocketContext } from "../../../contexts/WebSocketContext.jsx";
+import {WebSocketContext} from "../../../contexts/WebSocketContext.jsx";
 
-const CostruisciCasa = ({ buildingProperties }) => {
-    const { socket, connected } = useContext(WebSocketContext);
+const CostruisciCasa = ({buildingProperties}) => {
+    const {socket, connected} = useContext(WebSocketContext);
     const [selectedProperty, setSelectedProperty] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [casine, setCasine] = useState(1);
@@ -23,7 +23,7 @@ const CostruisciCasa = ({ buildingProperties }) => {
         if (socket && connected) {
             const message = {
                 type: "!CostruisciCasa",
-                property:  selectedProperty,
+                property: selectedProperty,
                 casine: casine,
             };
 
@@ -39,12 +39,12 @@ const CostruisciCasa = ({ buildingProperties }) => {
         setSelectedProperty(null);
     };
 
-    // Genera dinamicamente le opzioni disponibili
     const generateOptions = () => {
-        const currentHouses = selectedProperty?.numcasa || 0; // Case già costruite
+        const currentHouses = selectedProperty?.numCasa || 0; // Case già costruite
+        const maxHousesAvailable = MAX_CASE - currentHouses; // Case rimanenti da costruire
         const availableOptions = [];
 
-        for (let i = currentHouses + 1; i <= MAX_CASE; i++) {
+        for (let i = 1; i <= maxHousesAvailable; i++) {
             availableOptions.push(
                 <option key={i} value={i}>
                     {i}
@@ -55,11 +55,13 @@ const CostruisciCasa = ({ buildingProperties }) => {
         return availableOptions;
     };
 
+
     return (
         <>
             <PropertyOwned
                 playerProperties={buildingProperties}
                 onPropertySelect={handleSelectedProperty}
+                useBuildingProp={true}
             />
             {isModalOpen && (
                 <div className="modal">

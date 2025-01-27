@@ -10,7 +10,7 @@ const italianToEnglishColors = {
     viola: "purple",
     marrone: "brown",
     rosa: "pink",
-    ciano: "cyan"
+    azzurro: "cyan"
 };
 
 export const translateColor = (italianColor) => {
