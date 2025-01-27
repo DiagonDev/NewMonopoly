@@ -98,7 +98,6 @@ const RollDice = () => {
 
     return (
         <div className='rollDiceDiv'>
-            <p id='posizioneAttuale'>Posizione Attuale: Pos1</p>
             {/* Se isRolled è true, mostra la scritta con il risultato, altrimenti mostra il bottone */}
             {isRolled && (
                 <div>
