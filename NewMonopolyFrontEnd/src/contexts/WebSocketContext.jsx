@@ -315,6 +315,7 @@ export const WebSocketProvider = ({children}) => {
                     }));
                 }else if (message.type === 'prison') {
                     console.log("prison");
+                    setDiceRolled2("true");
                     setPrison(true);
                     setExitPrison(0);
                 }else if (message.type === 'exitPrison') {

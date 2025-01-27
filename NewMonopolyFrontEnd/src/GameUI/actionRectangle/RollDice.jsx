@@ -136,7 +136,7 @@ const RollDice = () => {
                     )}
                 </div>
             )}
-            {(isRolled && (!isRolled2&&!prison)) && (
+            {(isRolled && !isRolled2&&!prison) && (
                 <div>
                     <p>Hai fatto doppi dadi, rigioca un altro turno</p>
                 </div>

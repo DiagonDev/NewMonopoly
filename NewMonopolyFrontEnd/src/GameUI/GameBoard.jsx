@@ -21,7 +21,8 @@ const GameBoard = () => {
         diceRolled,
         diceRolled2,
         playerProperties,
-        boxPosition
+        boxPosition,
+        prison
     } = useContext(WebSocketContext); // Accesso al WebSocket
     const [isPlayerJoined, setIsPlayerJoined] = useState(false);
     const [activeComponent, setActiveComponent] = useState("BaseRectangle");
@@ -181,7 +182,7 @@ const GameBoard = () => {
                                     </button>
                                     <button
                                         onClick={handleEnd}
-                                        disabled={(!isMyTurn || !isRolled || !isRolled2)} // Disabilitato di default
+                                        disabled={(!isMyTurn || !isRolled || (!isRolled2&&!prison))} // Disabilitato di default
                                     >
                                         Termina il turno
                                     </button>
