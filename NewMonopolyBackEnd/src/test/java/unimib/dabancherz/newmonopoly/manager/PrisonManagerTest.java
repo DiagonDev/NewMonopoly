@@ -1,9 +1,9 @@
-/*
 package unimib.dabancherz.newmonopoly.manager;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.socket.TextMessage;
@@ -13,139 +13,147 @@ import unimib.dabancherz.newmonopoly.MessageService;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardSingleton;
 import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaOpportunitaRepository;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class PrisonManagerTest {
 
-    private PrisonManager prisonManager;
+    @Mock
+    private PartitaOpportunitaRepository partitaOpportunitaRepository;
+    @Mock
+    private GiocatoreRepository giocatoreRepository;
+    @Mock
+    private MessageService messageService;
+    @Mock
+    private GameHandler gameHandler;
+    @Mock
+    private WebSocketSession session;
+    @Mock
+    private GameBoardSingleton gameBoard;
 
-    @Mock
-    private PartitaOpportunitaRepository mockPartitaOpportunitaRepository;
-    @Mock
-    private GiocatoreRepository mockGiocatoreRepository;
-    @Mock
-    private MessageService mockMessageService;
-    @Mock
-    private GameHandler mockGameHandler;
-    @Mock
-    private GameBoardSingleton mockGameBoard;
-    @Mock
-    private WebSocketSession mockSession;
+    @InjectMocks
+    private PrisonManager prisonManager;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        prisonManager = new PrisonManager(mockPartitaOpportunitaRepository, mockGiocatoreRepository, mockMessageService, mockGameHandler);
-        prisonManager.gameBoard = mockGameBoard;  // Injecting the mock game board
+        prisonManager = new PrisonManager(partitaOpportunitaRepository, giocatoreRepository, messageService, gameHandler);
+        prisonManager.gameBoard = gameBoard; // Inject the mock GameBoardSingleton
     }
 
     @Test
-    void testIsPlayerInPrison() {
-        String gameId = "game123";
+    void isPlayerInPrison() {
+        String gameId = "game-1";
         String playerName = "player1";
-
-        when(mockGameBoard.isPlayerInPrison(gameId, playerName)).thenReturn(true);
-
+        when(gameBoard.isPlayerInPrison(gameId, playerName)).thenReturn(true);
         boolean result = prisonManager.isPlayerInPrison(gameId, playerName);
-
         assertTrue(result);
-        verify(mockGameBoard, times(1)).isPlayerInPrison(gameId, playerName);
+        verify(gameBoard, times(1)).isPlayerInPrison(gameId, playerName);
     }
 
     @Test
-    void testHandlePrisonPlayerWithProbabilityCard() throws Exception {
-        String gameId = "game123";
+    void handlePrisonPlayer_WithProbabilityCard() throws Exception {
+        String gameId = "game-1";
         String playerName = "player1";
-
-        when(mockPartitaOpportunitaRepository.possiedeCarta(playerName, gameId, "Probabilità")).thenReturn(true);
-
-        prisonManager.handlePrisonPlayer(gameId, playerName, mockSession);
-
-        verify(mockPartitaOpportunitaRepository).setGiocatore(gameId, null, "esci_prigione", "Probabilità");
-        verify(mockMessageService).exitPrisonMessage(true, mockSession);
-        verify(mockMessageService).sendSystemMessage(eq(gameId), contains("è uscito di prigione"), anyMap(), eq(mockSession));
+        when(partitaOpportunitaRepository.possiedeCarta(playerName, gameId, "Probabilità")).thenReturn(true);
+        prisonManager.handlePrisonPlayer(gameId, playerName, session);
+        verify(partitaOpportunitaRepository, times(1)).possiedeCarta(playerName, gameId, "Probabilità");
+        verify(partitaOpportunitaRepository, times(1)).setGiocatore(gameId, null, "esci_prigione", "Probabilità");
+        verify(gameBoard, times(1)).setPlayerPrison(gameId, playerName, false);
+        verify(gameBoard, times(1)).setPlayerCountRoll(gameId, playerName, 0);
+        verify(messageService, times(1)).exitPrisonMessage(true, session);
+        verify(messageService, times(1)).sendSystemMessage(eq(gameId), eq(playerName + " è uscito di prigione"), any(), eq(session));
     }
 
     @Test
-    void testHandlePrisonPlayerWithoutCards() throws Exception {
-        String gameId = "game123";
+    void handlePrisonPlayer_WithChanceCard() throws Exception {
+        String gameId = "game-1";
         String playerName = "player1";
-
-        when(mockPartitaOpportunitaRepository.possiedeCarta(playerName, gameId, "Probabilità")).thenReturn(false);
-        when(mockPartitaOpportunitaRepository.possiedeCarta(playerName, gameId, "Imprevisto")).thenReturn(false);
-
-        prisonManager.handlePrisonPlayer(gameId, playerName, mockSession);
-
-        ArgumentCaptor<TextMessage> captor = ArgumentCaptor.forClass(TextMessage.class);
-        verify(mockSession).sendMessage(captor.capture());
-        TextMessage textMessage = captor.getValue();
-        assertTrue(textMessage.getPayload().contains("\"type\":\"prison\""));
+        when(partitaOpportunitaRepository.possiedeCarta(playerName, gameId, "Probabilità")).thenReturn(false);
+        when(partitaOpportunitaRepository.possiedeCarta(playerName, gameId, "Imprevisto")).thenReturn(true);
+        prisonManager.handlePrisonPlayer(gameId, playerName, session);
+        verify(partitaOpportunitaRepository, times(1)).possiedeCarta(playerName, gameId, "Probabilità");
+        verify(partitaOpportunitaRepository, times(1)).possiedeCarta(playerName, gameId, "Imprevisto");
+        verify(partitaOpportunitaRepository, times(1)).setGiocatore(gameId, null, "esci_prigione", "Imprevisto");
+        verify(gameBoard, times(1)).setPlayerPrison(gameId, playerName, false);
+        verify(gameBoard, times(1)).setPlayerCountRoll(gameId, playerName, 0);
+        verify(messageService, times(1)).exitPrisonMessage(true, session);
+        verify(messageService, times(1)).sendSystemMessage(eq(gameId), eq(playerName + " è uscito di prigione"), any(), eq(session));
     }
 
     @Test
-    void testLasciaPrigioneSuccess() throws Exception {
-        String gameId = "game123";
+    void handlePrisonPlayer_WithoutCard() throws Exception {
+        String gameId = "game-1";
+        String playerName = "player1";
+        when(partitaOpportunitaRepository.possiedeCarta(playerName, gameId, "Probabilità")).thenReturn(false);
+        when(partitaOpportunitaRepository.possiedeCarta(playerName, gameId, "Imprevisto")).thenReturn(false);
+        prisonManager.handlePrisonPlayer(gameId, playerName, session);
+        verify(partitaOpportunitaRepository, times(1)).possiedeCarta(playerName, gameId, "Probabilità");
+        verify(partitaOpportunitaRepository, times(1)).possiedeCarta(playerName, gameId, "Imprevisto");
+    }
+
+    @Test
+    void sendPrisonMessage() throws Exception {
+        prisonManager.sendPrisonMessage(session);
+        String prisonMessage = new ObjectMapper().writeValueAsString(Map.of("type", "prison"));
+        verify(session, times(1)).sendMessage(new TextMessage(prisonMessage));
+    }
+
+    @Test
+    void lasciaPrigione_WithDoubleDice() throws Exception {
+        String gameId = "game-1";
         String playerName = "player1";
         int[] diceResults = {3, 3};
-
-        when(mockGameHandler.getGameIdBySession(mockSession)).thenReturn(gameId);
-        when(mockGameHandler.getPlayerNameBySession(mockSession)).thenReturn(playerName);
-
-        boolean result = prisonManager.lasciaPrigione(mockSession, diceResults);
-
+        when(gameHandler.getGameIdBySession(session)).thenReturn(gameId);
+        when(gameHandler.getPlayerNameBySession(session)).thenReturn(playerName);
+        boolean result = prisonManager.lasciaPrigione(session, diceResults);
         assertTrue(result);
-        verify(mockGameBoard).setPlayerPrison(gameId, playerName, false);
-        verify(mockGameBoard).setPlayerCountRoll(gameId, playerName, 0);
-        verify(mockMessageService).exitPrisonMessage(true, mockSession);
+        verify(gameBoard, times(1)).setPlayerPrison(gameId, playerName, false);
+        verify(gameBoard, times(1)).setPlayerCountRoll(gameId, playerName, 0);
+        verify(messageService, times(1)).exitPrisonMessage(true, session);
     }
 
     @Test
-    void testLasciaPrigioneFailure() throws Exception {
-        String gameId = "game123";
+    void lasciaPrigione_WithoutDoubleDice() throws Exception {
+        String gameId = "game-1";
         String playerName = "player1";
-        int[] diceResults = {3, 4};
-
-        when(mockGameHandler.getGameIdBySession(mockSession)).thenReturn(gameId);
-        when(mockGameHandler.getPlayerNameBySession(mockSession)).thenReturn(playerName);
-
-        boolean result = prisonManager.lasciaPrigione(mockSession, diceResults);
-
+        int[] diceResults = {1, 2};
+        when(gameHandler.getGameIdBySession(session)).thenReturn(gameId);
+        when(gameHandler.getPlayerNameBySession(session)).thenReturn(playerName);
+        when(gameBoard.getPlayerCountRoll(gameId, playerName)).thenReturn(2);
+        boolean result = prisonManager.lasciaPrigione(session, diceResults);
         assertFalse(result);
-        verify(mockGameBoard, never()).setPlayerPrison(gameId, playerName, false);
-        verify(mockMessageService, never()).exitPrisonMessage(true, mockSession);
+        verify(gameBoard, times(1)).setPlayerCountRoll(gameId, playerName, 3);
+        verify(messageService, never()).exitPrisonMessage(anyBoolean(), eq(session));
     }
 
     @Test
-    void testPayPrisonExitInsufficientBalance() throws Exception {
-        String gameId = "game123";
+    void payPrisonExit_WithInsufficientBalance() throws Exception {
+        String gameId = "game-1";
         String playerName = "player1";
-
-        when(mockGameHandler.getGameIdBySession(mockSession)).thenReturn(gameId);
-        when(mockGameHandler.getPlayerNameBySession(mockSession)).thenReturn(playerName);
-        when(mockGiocatoreRepository.saldoGiocatore(playerName, gameId)).thenReturn(30);
-
-        prisonManager.payPrisonExit(mockSession);
-
-        verify(mockMessageService).exitPrisonMessage(false, mockSession);
-        verify(mockGameBoard, never()).setPlayerPrison(gameId, playerName, false);
+        when(gameHandler.getGameIdBySession(session)).thenReturn(gameId);
+        when(gameHandler.getPlayerNameBySession(session)).thenReturn(playerName);
+        when(giocatoreRepository.saldoGiocatore(playerName, gameId)).thenReturn(30);
+        prisonManager.payPrisonExit(session);
+        verify(messageService, times(1)).exitPrisonMessage(false, session);
     }
 
     @Test
-    void testPayPrisonExitSufficientBalance() throws Exception {
-        String gameId = "game123";
+    void payPrisonExit_WithSufficientBalance() throws Exception {
+        String gameId = "game-1";
         String playerName = "player1";
-
-        when(mockGameHandler.getGameIdBySession(mockSession)).thenReturn(gameId);
-        when(mockGameHandler.getPlayerNameBySession(mockSession)).thenReturn(playerName);
-        when(mockGiocatoreRepository.saldoGiocatore(playerName, gameId)).thenReturn(100);
-
-        prisonManager.payPrisonExit(mockSession);
-
-        verify(mockGameBoard).setPlayerPrison(gameId, playerName, false);
-        verify(mockGiocatoreRepository).setSaldoGiocatore(playerName, gameId, 50);
-        verify(mockMessageService).updateBalance(anyMap(), eq(gameId), eq(playerName));
-        verify(mockMessageService).exitPrisonMessage(false, mockSession);
+        when(gameHandler.getGameIdBySession(session)).thenReturn(gameId);
+        when(gameHandler.getPlayerNameBySession(session)).thenReturn(playerName);
+        when(giocatoreRepository.saldoGiocatore(playerName, gameId)).thenReturn(100);
+        prisonManager.payPrisonExit(session);
+        verify(gameBoard, times(1)).setPlayerPrison(gameId, playerName, false);
+        verify(giocatoreRepository, times(1)).setSaldoGiocatore(playerName, gameId, 50);
+        verify(messageService, times(1)).updateBalance(any(), eq(gameId), eq(playerName));
+        verify(gameBoard, times(1)).setPlayerCountRoll(gameId, playerName, 0);
+        verify(messageService, times(1)).exitPrisonMessage(true, session);
+        verify(messageService, times(1)).sendSystemMessage(eq(gameId), eq(playerName + " è uscito di prigione"), any(), eq(session));
     }
-}*/
+}
