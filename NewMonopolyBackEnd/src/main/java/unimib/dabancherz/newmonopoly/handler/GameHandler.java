@@ -111,6 +111,7 @@ public class GameHandler {
         messageService.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);   //invia al giocatore la lista delle pedine disponibili
 
     }
+
     public String getGameIdBySession(WebSocketSession session) {
         for (Map.Entry<String, List<WebSocketSession>> entry : gameSessions.entrySet()) {  // Scorre tutte le partite nella mappa
             String gameId = entry.getKey();  // gameId
@@ -155,12 +156,19 @@ public class GameHandler {
     }
 
     @Transactional
-    public void removePlayerFromGame(String gameId, WebSocketSession session) throws IOException {
+    public void removePlayerFromGame(String gameId, WebSocketSession session) throws Exception {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         if (playersInGame != null) {
             String player = getPlayerNameBySession(session);
-            Integer pownId = giocatoreRepository.findPedinaFromGiocatore(player, gameId);
-            messageService.sendPawnMove(pownId, player, 0, gameSessions, gameId);
+            if(playersInGame.size()>2)
+                handleNegativeBalance(gameId, player, session);
+            else{
+                WebSocketSession sessionVincitore = playersInGame.get(0);
+                String vincitore = getPlayerNameBySession(sessionVincitore);
+                handleWinPlayer(gameId, vincitore, sessionVincitore);
+            }
+            Integer pawnId = giocatoreRepository.findPedinaFromGiocatore(player, gameId);
+            messageService.sendPawnMove(pawnId, player, 0, gameSessions, gameId);
             messageService.sendDisconnected(gameSessions, gameId, player);
             gameService.deletePlayer(gameId, player);
             playersInGame.remove(session); // Rimuove la sessione dalla lista dei giocatori
@@ -174,6 +182,16 @@ public class GameHandler {
         }
         // Rimuove il giocatore dalla mappa dei nomi
         playerNameList.entrySet().removeIf(entry -> entry.getKey().equals(session));
+    }
+
+    public void handleNegativeBalance(String gameId, String playerName, WebSocketSession session) throws Exception {
+        messageService.sendLoseMessage(session);
+        messageService.sendSystemMessage(gameId, playerName + " ha perso", getGameSessions(), session);
+    }
+
+    public void handleWinPlayer(String gameId, String vincitore, WebSocketSession session) throws Exception {
+        messageService.sendSystemMessage(gameId, vincitore + " ha vinto la partita", getGameSessions(), session);
+        messageService.sendVictoryMessage(session);
     }
 
     public void choosePedina(String[] messageParts, WebSocketSession session) throws Exception {
@@ -196,10 +214,10 @@ public class GameHandler {
 
         for (Giocatore giocatore : giocatori) {
             String playerName = giocatore.getNome();
-            if(!(playerName.equals(getPlayerNameBySession(session)))){
+            if (!(playerName.equals(getPlayerNameBySession(session)))) {
                 int pawnId = giocatore.getIdpedina().getIdPedina();
                 int position = gameBoardWrapper.getPlayerPosition(gameId, playerName);
-                messageService.sendPlayerPawnPosition(pawnId,playerName, position, session);
+                messageService.sendPlayerPawnPosition(pawnId, playerName, position, session);
             }
             Thread.sleep(20);
         }

@@ -70,6 +70,9 @@ public class MessageDispatcher {
             case "RichiestaUpdateProperties":
                 propertyHandler.updateProperties(session);
                 break;
+            case "AbbandonaPartita":
+                gameHandler.removePlayerFromGame(gameHandler.getGameIdBySession(session), session);
+                break;
             default:
                 throw new IllegalArgumentException("Tipo di messaggio non supportato: " + parts[0]);
         }

@@ -43,11 +43,11 @@ class WebSocketConnectionDispatcherTest {
     @InjectMocks
     private WebSocketConnectionDispatcher webSocketConnectionDispatcher;
 
-    @BeforeEach
+   /* @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         webSocketConnectionDispatcher = new WebSocketConnectionDispatcher(messageDispatcher, specialMessageDispatcher, gameHandler, messageService);
-    }
+    }*/
 
     /*@Test
     void testAfterConnectionEstablished() {

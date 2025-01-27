@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import unimib.dabancherz.newmonopoly.MessageService;
+import unimib.dabancherz.newmonopoly.database.repository.PartitaRepository;
 import unimib.dabancherz.newmonopoly.handler.GameHandler;
+import unimib.dabancherz.newmonopoly.singleton.GameBoardWrapper;
 
 import java.util.List;
 import java.util.Map;
@@ -18,13 +20,15 @@ public class WebSocketConnectionDispatcher implements WebSocketHandler {
     private final SpecialMessageDispatcher specialMessageDispatcher;
     private final GameHandler gameHandler;
     private final MessageService messageService;
+    private final GameBoardWrapper gameBoardWrapper;
 
     @Autowired
-    public WebSocketConnectionDispatcher(MessageDispatcher messageDispatcher, SpecialMessageDispatcher specialMessageDispatcher, GameHandler gameHandler, MessageService messageService) {
+    public WebSocketConnectionDispatcher(MessageDispatcher messageDispatcher, SpecialMessageDispatcher specialMessageDispatcher, GameHandler gameHandler, MessageService messageService, GameBoardWrapper gameBoardWrapper) {
         this.messageDispatcher = messageDispatcher;
         this.specialMessageDispatcher = specialMessageDispatcher;
         this.gameHandler = gameHandler;
         this.messageService = messageService;
+        this.gameBoardWrapper = gameBoardWrapper;
     }
 
     @Override
@@ -51,21 +55,10 @@ public class WebSocketConnectionDispatcher implements WebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        System.out.println("Connessione chiusa. ID sessione: " + session.getId());
-        playerSessions.remove(session.getId());
-
-        // Determina il nome del giocatore e il gameId associato alla sessione chiusa
-        String playerName = gameHandler.getPlayerNameBySession(session);
         String gameId = gameHandler.getGameIdBySession(session);
-        if (gameId != null) {
-            // Ottieni la lista di sessioni associate al gioco
-            List<WebSocketSession> gameSession = gameHandler.getGameSessions().get(gameId);
-            Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
-            // Rimuove il giocatore dalla partita
-            gameHandler.removePlayerFromGame(gameId, session);
-            if (gameSession != null && !gameSession.isEmpty())
-                messageService.notifyPlayerDisconnected(gameId, playerName, gameSessions);
-        }
+        String playerName = gameHandler.getPlayerNameBySession(session);
+        gameBoardWrapper.removePlayerFromGame(gameId, playerName);
+        messageService.sendSystemMessage(gameId, "ERRORE! " + playerName + " ha chiuso la pagina! La partita è stata eliminata", gameHandler.getGameSessions(), session);
     }
 
     @Override

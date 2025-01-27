@@ -128,10 +128,6 @@ public class MessageService {
         session.sendMessage(new TextMessage(createMessage(Map.of(TYPEKEY, "errorGameId", "gameId", gameId))));
     }
 
-    public void notifyPlayerDisconnected(String gameId, String playerName, Map<String, List<WebSocketSession>> gameSessions) throws Exception {
-        sendToGame(Map.of(TYPEKEY, SYSTEMKEY, CONTENTKEY, playerName + " si è disconnesso dalla partita."), gameSessions, gameId);
-    }
-
     public void sendDisconnected(Map<String, List<WebSocketSession>> gameSessions, String gameId, String playerName) throws IOException {
         sendToGame(Map.of(TYPEKEY, "deletePlayer", PLAYERNAMEKEY, playerName), gameSessions, gameId);
     }
