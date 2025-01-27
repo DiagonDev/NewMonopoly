@@ -1,4 +1,4 @@
-package unimib.dabancherz.newmonopoly.handler;
+package unimib.dabancherz.newmonopoly.manager;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -10,15 +10,14 @@ import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
 import unimib.dabancherz.newmonopoly.database.repository.OpportunitaRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaCasellaPrezzoproprietaRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaOpportunitaRepository;
-import unimib.dabancherz.newmonopoly.manager.OpportunitaManager;
-import unimib.dabancherz.newmonopoly.manager.PrisonManager;
+import unimib.dabancherz.newmonopoly.handler.PropertyHandler;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardSingleton;
 
 import java.util.List;
 import java.util.Map;
 
 @Component
-public class BoxHandler {
+public class BoxManager {
     private final MessageService messageService;
     private final PartitaCasellaPrezzoproprietaRepository pCPPRepository;
     private final GiocatoreRepository giocatoreRepository;
@@ -34,7 +33,7 @@ public class BoxHandler {
     private static final String IMPREVISTOKEY = "Imprevisto";
     private static final String PROBABILITAKEY = "Probabilità";
 
-    public BoxHandler(MessageService messageService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, OpportunitaRepository opportunitaRepository, OpportunitaManager opportunitaManager, PropertyHandler propertyHandler, PrisonManager prisonManager) {
+    public BoxManager(MessageService messageService, PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, OpportunitaRepository opportunitaRepository, OpportunitaManager opportunitaManager, PropertyHandler propertyHandler, PrisonManager prisonManager) {
         this.messageService = messageService;
         this.pCPPRepository = pCPPRepository;
         this.giocatoreRepository = giocatoreRepository;

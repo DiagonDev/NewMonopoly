@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.handler.GameHandler;
-import unimib.dabancherz.newmonopoly.handler.PawnHandler;
 import unimib.dabancherz.newmonopoly.MessageService;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardSingleton;
 import unimib.dabancherz.newmonopoly.database.entity.Partita;
@@ -25,17 +24,17 @@ public class TurnManager {
     private final PartitaRepository partitaRepository;
     private final GiocatoreRepository giocatoreRepository;
     private final SecureRandom secureRandom = new SecureRandom();
-    private final PawnHandler pawnHandler;
+    private final PawnManager pawnManager;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
-    public TurnManager(GameHandler gameHandler, MessageService messageService, PrisonManager prisonManager, BalanceManager balanceManager, PartitaRepository partitaRepository, GiocatoreRepository giocatoreRepository, PawnHandler pawnHandler) {
+    public TurnManager(GameHandler gameHandler, MessageService messageService, PrisonManager prisonManager, BalanceManager balanceManager, PartitaRepository partitaRepository, GiocatoreRepository giocatoreRepository, PawnManager pawnManager) {
         this.gameHandler = gameHandler;
         this.messageService = messageService;
         this.prisonManager = prisonManager;
         this.balanceManager = balanceManager;
         this.partitaRepository = partitaRepository;
         this.giocatoreRepository = giocatoreRepository;
-        this.pawnHandler = pawnHandler;
+        this.pawnManager = pawnManager;
     }
 
     public void startTurn(WebSocketSession session) throws Exception {
@@ -112,10 +111,11 @@ public class TurnManager {
             else gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, 0);
 
             if(gameBoard.getPlayerCountRollDoubleDice(gameId, playerName) == 3){
+                prisonManager.sendPrisonMessage(session);
                 gameBoard.setPlayerPrison(gameId, playerName, true);
                 gameBoard.setPlayerCountRollDoubleDice(gameId, playerName, 0);
                 gameBoard.setPlayerCountRoll(gameId, playerName, 0);
-                pawnHandler.movimentoPedina(gameId, playerName, 11, pawnId, session,viaPay);
+                pawnManager.movimentoPedina(gameId, playerName, 11, pawnId, session,viaPay);
             }else{
                 newPosition = totDice + playerPosition;
 
@@ -123,7 +123,7 @@ public class TurnManager {
                     newPosition -= 40;
                     viaPay = true;
                 }
-                pawnHandler.movimentoPedina(gameId, playerName, newPosition, pawnId, session,viaPay);
+                pawnManager.movimentoPedina(gameId, playerName, newPosition, pawnId, session,viaPay);
             }
         }
     }

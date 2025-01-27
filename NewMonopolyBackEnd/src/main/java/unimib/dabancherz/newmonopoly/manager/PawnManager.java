@@ -1,22 +1,23 @@
-package unimib.dabancherz.newmonopoly.handler;
+package unimib.dabancherz.newmonopoly.manager;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.MessageService;
+import unimib.dabancherz.newmonopoly.handler.GameHandler;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardSingleton;
 
 @Component
-public class PawnHandler {
+public class PawnManager {
 
     private final GameHandler gameHandler;
     private final MessageService messageService;
-    private final BoxHandler boxHandler;
+    private final BoxManager boxManager;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
 
-    public PawnHandler(GameHandler gameHandler, MessageService messageService, BoxHandler boxHandler) {
+    public PawnManager(GameHandler gameHandler, MessageService messageService, BoxManager boxManager) {
         this.gameHandler = gameHandler;
         this.messageService = messageService;
-        this.boxHandler = boxHandler;
+        this.boxManager = boxManager;
     }
 
     public void movimentoPedina(String gameId, String playerName, int newPosition, int pawnId, WebSocketSession session, boolean viaPay) throws Exception {
@@ -24,6 +25,6 @@ public class PawnHandler {
         //invia a tutti i giocatori che il "playername" si è postato di tot caselle "newPosition"
         messageService.sendPawnMove(pawnId, playerName, newPosition, gameHandler.getGameSessions(), gameId);
         //metodo che mostra le opzioni disponibili da fare sulla casella dopo che ci si è finiti sopra
-        boxHandler.sendBoxUsage(playerName, session, newPosition, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
+        boxManager.sendBoxUsage(playerName, session, newPosition, gameId, gameHandler.getGameSessions(), pawnId, viaPay);
     }
 }

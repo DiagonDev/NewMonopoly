@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.handler.GameHandler;
-import unimib.dabancherz.newmonopoly.handler.PawnHandler;
 import unimib.dabancherz.newmonopoly.MessageService;
 import unimib.dabancherz.newmonopoly.database.entity.Partita;
 import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
@@ -27,7 +26,7 @@ class TurnManagerTest {
     private BalanceManager balanceManager;
     private PartitaRepository partitaRepository;
     private GiocatoreRepository giocatoreRepository;
-    private PawnHandler pawnHandler;
+    private PawnManager pawnManager;
     private WebSocketSession session;
 
     @BeforeEach
@@ -38,8 +37,8 @@ class TurnManagerTest {
         balanceManager = mock(BalanceManager.class);
         partitaRepository = mock(PartitaRepository.class);
         giocatoreRepository = mock(GiocatoreRepository.class);
-        pawnHandler = mock(PawnHandler.class);
-        turnManager = spy(new TurnManager(gameHandler, messageService, prisonManager, balanceManager, partitaRepository, giocatoreRepository, pawnHandler));
+        pawnManager = mock(PawnManager.class);
+        turnManager = spy(new TurnManager(gameHandler, messageService, prisonManager, balanceManager, partitaRepository, giocatoreRepository, pawnManager));
         session = mock(WebSocketSession.class);
     }
 
@@ -109,7 +108,7 @@ class TurnManagerTest {
         SecureRandom secureRandom = mock(SecureRandom.class);
         when(secureRandom.nextInt(6)).thenReturn(diceR1 - 1, diceR2 - 1);
 
-        TurnManager turnManagerWithMockedRandom = new TurnManager(gameHandler, messageService, prisonManager, balanceManager, partitaRepository, giocatoreRepository, pawnHandler) {
+        TurnManager turnManagerWithMockedRandom = new TurnManager(gameHandler, messageService, prisonManager, balanceManager, partitaRepository, giocatoreRepository, pawnManager) {
             @Override
             public int[] rollDice(WebSocketSession session) throws Exception {
                 int diceR1 = secureRandom.nextInt(6) + 1;

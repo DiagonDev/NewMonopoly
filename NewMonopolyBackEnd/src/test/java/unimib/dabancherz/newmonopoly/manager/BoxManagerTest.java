@@ -1,9 +1,7 @@
-package unimib.dabancherz.newmonopoly.handler;
+package unimib.dabancherz.newmonopoly.manager;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.socket.WebSocketSession;
-import unimib.dabancherz.newmonopoly.manager.OpportunitaManager;
 import unimib.dabancherz.newmonopoly.MessageService;
 import unimib.dabancherz.newmonopoly.database.repository.*;
 
@@ -11,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 import static org.mockito.Mockito.*;
 
-class BoxHandlerTest {
+class BoxManagerTest {
 
-    private BoxHandler boxHandler;
+    private BoxManager boxManager;
     private MessageService messageService;
     private PartitaCasellaPrezzoproprietaRepository pCPPRepository;
     private GiocatoreRepository giocatoreRepository;
@@ -31,7 +29,7 @@ class BoxHandlerTest {
         opportunitaRepository = mock(OpportunitaRepository.class);
         opportunitaManager = mock(OpportunitaManager.class);
         session = mock(WebSocketSession.class);
-        boxHandler = new BoxHandler(messageService, pCPPRepository, giocatoreRepository, partitaOpportunitaRepository, opportunitaRepository, opportunitaManager);
+        boxHandler = new BoxManager(messageService, pCPPRepository, giocatoreRepository, partitaOpportunitaRepository, opportunitaRepository, opportunitaManager);
     }*/
 
     @Test
@@ -46,7 +44,7 @@ class BoxHandlerTest {
         when(pCPPRepository.findNomeCasellaByPosizioneAndGameId(posizione, gameId)).thenReturn("Start");
         when(messageService.createMessage(Map.of("type", "nameBox", "name", "Start"))).thenReturn("{\"type\":\"nameBox\",\"name\":\"Start\"}");
 
-        boxHandler.sendBoxUsage(playerName, session, posizione, gameId, gameSessions, pawnId, true);
+        boxManager.sendBoxUsage(playerName, session, posizione, gameId, gameSessions, pawnId, true);
 
         verify(giocatoreRepository, times(1)).setSaldoGiocatore(playerName, gameId, -200);
         verify(messageService, times(1)).updateBalance(gameSessions, gameId, playerName);
@@ -64,7 +62,7 @@ class BoxHandlerTest {
         when(pCPPRepository.findNomeCasellaByPosizioneAndGameId(posizione, gameId)).thenReturn("Tax");
         when(messageService.createMessage(Map.of("type", "nameBox", "name", "Tax"))).thenReturn("{\"type\":\"nameBox\",\"name\":\"Tax\"}");
 
-        boxHandler.sendBoxUsage(playerName, session, posizione, gameId, gameSessions, pawnId, false);
+        boxManager.sendBoxUsage(playerName, session, posizione, gameId, gameSessions, pawnId, false);
 
         verify(giocatoreRepository, times(1)).setSaldoGiocatore(playerName, gameId, 200);
         verify(messageService, times(1)).updateBalance(gameSessions, gameId, playerName);
@@ -79,7 +77,7 @@ class BoxHandlerTest {
         Map<String, List<WebSocketSession>> gameSessions = Map.of(gameId, List.of(session));
         Object parametri = new Object();
 
-        boxHandler.gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, "Imprevisto", session);
+        boxManager.gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, "Imprevisto", session);
 
         verify(opportunitaManager, times(1)).gestisciImporto(parametri, gameId, playerName);
         verify(messageService, times(1)).updateBalance(gameSessions, gameId, playerName);
@@ -94,7 +92,7 @@ class BoxHandlerTest {
         Map<String, List<WebSocketSession>> gameSessions = Map.of(gameId, List.of(session));
         Object parametri = new Object();
 
-        boxHandler.gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, "Imprevisto", session);
+        boxManager.gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, "Imprevisto", session);
 
         verify(opportunitaManager, times(1)).gestisciImporto(parametri, gameId, playerName);
         verify(messageService, times(1)).updateBalance(gameSessions, gameId, playerName);
@@ -109,7 +107,7 @@ class BoxHandlerTest {
         Map<String, List<WebSocketSession>> gameSessions = Map.of(gameId, List.of(session));
         Object parametri = new Object();
 
-        boxHandler.gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, "Imprevisto", session);
+        boxManager.gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, "Imprevisto", session);
 
         verify(opportunitaManager, times(1)).gestisciPagamentoPossedimenti(parametri, gameId, playerName);
         verify(messageService, times(1)).updateBalance(gameSessions, gameId, playerName);
@@ -127,7 +125,7 @@ class BoxHandlerTest {
 
         when(opportunitaManager.gestisciPrigione(parametri, gameId, playerName, session)).thenReturn(newPosizione);
 
-        boxHandler.gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, "Imprevisto", session);
+        boxManager.gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, "Imprevisto", session);
 
         verify(messageService, times(1)).sendPawnMove(anyInt(), eq(playerName), eq(newPosizione), eq(gameSessions), eq(gameId));
     }
@@ -141,7 +139,7 @@ class BoxHandlerTest {
         Map<String, List<WebSocketSession>> gameSessions = Map.of(gameId, List.of(session));
         Object parametri = new Object();
 
-        boxHandler.gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, "Imprevisto", session);
+        boxManager.gestisciAzione(tipoAzione, parametri, gameId, playerName, posizione, gameSessions, "Imprevisto", session);
 
         verify(opportunitaManager, times(1)).gestisciUscitaPrigione(gameId, playerName, "Imprevisto");
     }

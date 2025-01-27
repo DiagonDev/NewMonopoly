@@ -154,10 +154,13 @@ public class GameHandler {
     }
 
     @Transactional
-    public void removePlayerFromGame(String gameId, WebSocketSession session) {
+    public void removePlayerFromGame(String gameId, WebSocketSession session) throws IOException {
         List<WebSocketSession> playersInGame = gameSessions.get(gameId);
         if (playersInGame != null) {
             String player = getPlayerNameBySession(session);
+            Integer pownId = giocatoreRepository.findPedinaFromGiocatore(player, gameId);
+            messageService.sendPawnMove(pownId, player, 0, gameSessions, gameId);
+            messageService.sendDisconnected(gameSessions, gameId, player);
             gameService.deletePlayer(gameId, player);
             playersInGame.remove(session); // Rimuove la sessione dalla lista dei giocatori
             gameBoardWrapper.removePlayerFromGame(gameId, player);
