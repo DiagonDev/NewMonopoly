@@ -29,14 +29,21 @@ public class BalanceManager {
             messageService.updateProperties(gameId, playerName, session);
         List<WebSocketSession> playersInGame = gameHandler.getGameSessions().get(gameId);
         if(playersInGame.size() == 1){
-            WebSocketSession vincitore = playersInGame.get(0);
-            messageService.sendVictoryMessage(vincitore);
+            WebSocketSession sessionVincitore = playersInGame.get(0);
+            String vincitore = gameHandler.getPlayerNameBySession(sessionVincitore);
+            handleWinPlayer(gameId, vincitore, sessionVincitore);
         }
     }
 
     public void handleNegativeBalance(String gameId, String playerName, WebSocketSession session) throws Exception {
         messageService.sendLoseMessage(session);
         messageService.sendSystemMessage(gameId, playerName + " ha perso", gameHandler.getGameSessions(), session);
+        gameHandler.removePlayerFromGame(gameId, session);
+    }
+
+    public void handleWinPlayer(String gameId, String vincitore, WebSocketSession session) throws Exception {
+        messageService.sendSystemMessage(gameId, vincitore + "ha vinto la partita", gameHandler.getGameSessions(), session);
+        messageService.sendVictoryMessage(session);
         gameHandler.removePlayerFromGame(gameId, session);
     }
 }
