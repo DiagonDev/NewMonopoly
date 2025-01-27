@@ -330,6 +330,7 @@ export const WebSocketProvider = ({children}) => {
                 }else if(message.type === 'updateProperties'){
                     setUpdateProperties(message.properties);
                 }else if(message.type === 'boxOrder'){
+                    console.log("boxOrder", message.content);
                     setBoxPosition(message.content);
                 }
             };

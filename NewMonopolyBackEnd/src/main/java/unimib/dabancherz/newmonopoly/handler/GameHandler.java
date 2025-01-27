@@ -85,7 +85,6 @@ public class GameHandler {
         String playerName = messageParts[1];
         String gameId = messageParts[2];
         int[] boxOrder = casellaRepository.findByOrder(gameId);
-        messageService.sendBoxOrderMessage(boxOrder, gameSessions, gameId); //serve per mandare le caselle ordinate
         if (giocatoreRepository.existsByNomeAndIdpartita_CodiceInvito(playerName, gameId)) {
             messageService.sendErrorMessage(session);
             return; // Esce dalla funzione senza aggiungere il giocatore
@@ -103,6 +102,8 @@ public class GameHandler {
         playersInGame.add(session);//aggiunge la sessione del giocatore alla lista di sessioni della partita a cuoi vuole partecipare
         gameService.addPlayer(playerName, gameId);//aggiunge il giocatore nel database alla partita assegnata
         messageService.notifyPlayerJoin(gameId, playerName, session, gameSessions, "giocatore");//invia a tutti i giocatori i messaggi di partecipazione alla partita
+
+        messageService.sendBoxOrderMessage(boxOrder, gameSessions, gameId); //serve per mandare le caselle ordinate
 
         pedineNonUsate = gameService.getUnusedPedineByPartita(gameId);
         messageService.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);   //invia al giocatore la lista delle pedine disponibili

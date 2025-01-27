@@ -20,7 +20,8 @@ const GameBoard = () => {
         playerPawn,
         diceRolled,
         diceRolled2,
-        playerProperties
+        playerProperties,
+        boxPosition
     } = useContext(WebSocketContext); // Accesso al WebSocket
     const [isPlayerJoined, setIsPlayerJoined] = useState(false);
     const [activeComponent, setActiveComponent] = useState("BaseRectangle");
@@ -34,18 +35,7 @@ const GameBoard = () => {
      * tiene la posizione dei player, quando scelgo una pedina, setto la posizione a 1. Ma dove?
      * Ad esempio se player sceglie pedina green(id 3) playerPositions sarà = [0,0,1,0,0,0]
      */
-    const [playerPositions, setPlayerPositions] = useState([0, 0, 0, 0, 0, 0]); // max 6 giocatori
-    // LASCIARE WARNING
-    useEffect(() => {
-        if (playerPawn) { // Supponendo che playerMove arrivi dal WebSocket
-            setPlayerPositions((prevPositions) => {
-                const newPositions = [...prevPositions];
-                newPositions[playerPawn.pawnId - 1] = playerPawn.offset;
-                return newPositions;
-            });
-        }
-        console.log("playerPositions", playerPositions);
-    }, [playerPawn]);
+
     const handlePawnSelection = () => {
         setSelectedPawn(true);
     };
@@ -110,14 +100,23 @@ const GameBoard = () => {
         }
     }, [startTurn]);
 
-    // Creare un array di numeri da 1 a 40
-    const num_squares = Array.from({length: 40}, (_, index) => index + 1);
-    //PROVVISORIO SOLO PER MOCKARE
     const [shuffled_squares, setShuffled_squares] = useState([]);
     useEffect(() => {
-       setShuffled_squares(boxPositionMock);
-    }, [playerJoin]);
+       setShuffled_squares(boxPosition);
+    }, [boxPosition]);
 
+    const [playerPositions, setPlayerPositions] = useState([0, 0, 0, 0, 0, 0]); // max 6 giocatori
+    // LASCIARE WARNING
+    useEffect(() => {
+        if (playerPawn) {
+            setPlayerPositions((prevPositions) => {
+                const newPositions = [...prevPositions];
+                newPositions[playerPawn.pawnId - 1] = boxPosition[playerPawn.offset-1];
+                return newPositions;
+            });
+        }
+        console.log("playerPositions", playerPositions);
+    }, [playerPawn]);
 
     /**
      * players={playerPositions.map((pos, index) => (pos === id ? index : null))
