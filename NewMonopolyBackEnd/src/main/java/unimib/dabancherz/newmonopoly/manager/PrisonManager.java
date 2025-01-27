@@ -37,9 +37,9 @@ public class PrisonManager {
             exitPrison(gameId, playerName, session, "Probabilità");
         } else if (partitaOpportunitaRepository.possiedeCarta(playerName, gameId, "Imprevisto")) {
             exitPrison(gameId, playerName, session, "Imprevisto");
-        } else {
-            sendPrisonMessage(session);
-        }
+        }/* else {
+            messageService.exitPrisonMessage(false, session);
+        }*/
     }
 
     private void exitPrison(String gameId, String playerName, WebSocketSession session, String cardKey) throws Exception {
