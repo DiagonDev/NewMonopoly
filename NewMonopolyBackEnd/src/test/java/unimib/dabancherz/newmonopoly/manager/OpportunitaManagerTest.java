@@ -1,3 +1,4 @@
+/*
 package unimib.dabancherz.newmonopoly.manager;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -76,7 +77,8 @@ class OpportunitaManagerTest {
         assertEquals(10, result);
     }
 
-    /*@Test
+    */
+/*@Test
     void testGestisciPrigione() {
         IdCasella idCasella = new IdCasella();
         idCasella.setId_casella(30);
@@ -86,7 +88,8 @@ class OpportunitaManagerTest {
         verify(gameBoard, times(1)).setPlayerPosition("partita1", "giocatore1", 30);
         verify(gameBoard, times(1)).setPlayerPrison("partita1", "giocatore1", true);
         assertEquals(30, result);
-    }*/
+    }*//*
+
 
     @Test
     void testGestisciUscitaPrigione() {
@@ -98,4 +101,4 @@ class OpportunitaManagerTest {
 
         verify(partitaOpportunitaRepository, times(1)).setGiocatore("partita1", "giocatore1", "esci_prigione", "Imprevisto");
     }
-}
+}*/

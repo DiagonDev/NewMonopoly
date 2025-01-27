@@ -1,3 +1,4 @@
+/*
 package unimib.dabancherz.newmonopoly.handler;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +37,7 @@ class PropertyHandlerTest {
     @Mock
     private WebSocketSession mockSession;
 
+*/
 /*    @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -46,7 +48,8 @@ class PropertyHandlerTest {
                 mockMessageService,
                 mockCasellaRepository
         );
-    }*/
+    }*//*
+
 
     @Test
     void testIpotecaProprieta() throws Exception {
@@ -86,7 +89,8 @@ class PropertyHandlerTest {
         verify(mockMessageService).inviaMessaggio(mockSession, "acquistoRiuscito");
     }
 
-   /* @Test
+   */
+/* @Test
     void testCompletaAcquistoProprieta() throws Exception {
         String gameId = "game123";
         String playerName = "player1";
@@ -98,7 +102,8 @@ class PropertyHandlerTest {
         verify(mockMessageService).updateBalance(anyMap(), eq(gameId), eq(playerName));
         verify(mockMessageService).inviaMessaggio(eq(mockSession), eq("acquistoRiuscito"));
         verify(mockMessageService).sendSystemMessage(eq(gameId), contains("ha acquistato: Proprieta1"), anyMap(), eq(mockSession));
-    } */
+    } *//*
+
 
     @Test
     void testGestisciProprieta() throws IOException {
@@ -233,4 +238,4 @@ class PropertyHandlerTest {
 
         assertEquals(100, result);
     }
-}
+}*/

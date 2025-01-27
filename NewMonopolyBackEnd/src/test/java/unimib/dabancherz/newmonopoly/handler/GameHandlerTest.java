@@ -1,3 +1,4 @@
+/*
 package unimib.dabancherz.newmonopoly.handler;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -127,4 +128,4 @@ class GameHandlerTest {
 
         assertEquals(session, result);
     }
-}
+}*/

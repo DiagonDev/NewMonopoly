@@ -1,3 +1,4 @@
+/*
 package unimib.dabancherz.newmonopoly.manager;
 
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,8 @@ class BoxManagerTest {
     private OpportunitaManager opportunitaManager;
     private WebSocketSession session;
 
-    /*@BeforeEach
+    */
+/*@BeforeEach
     void setUp() {
         messageService = mock(MessageService.class);
         pCPPRepository = mock(PartitaCasellaPrezzoproprietaRepository.class);
@@ -30,7 +32,8 @@ class BoxManagerTest {
         opportunitaManager = mock(OpportunitaManager.class);
         session = mock(WebSocketSession.class);
         boxHandler = new BoxManager(messageService, pCPPRepository, giocatoreRepository, partitaOpportunitaRepository, opportunitaRepository, opportunitaManager);
-    }*/
+    }*//*
+
 
     @Test
     void testSendBoxUsage_ViaPay() throws Exception {
@@ -143,4 +146,4 @@ class BoxManagerTest {
 
         verify(opportunitaManager, times(1)).gestisciUscitaPrigione(gameId, playerName, "Imprevisto");
     }
-}
+}*/

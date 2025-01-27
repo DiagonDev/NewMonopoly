@@ -130,10 +130,8 @@ public class TurnManager {
     }
 
     public int[] rollDice(WebSocketSession session) throws Exception {
-        //int diceR1 = secureRandom.nextInt(6) + 1; // Genera un numero casuale tra 1 e 6
-        //int diceR2 = secureRandom.nextInt(6) + 1;
-        int diceR1=4;
-        int diceR2=1;
+        int diceR1 = secureRandom.nextInt(6) + 1; // Genera un numero casuale tra 1 e 6
+        int diceR2 = secureRandom.nextInt(6) + 1;
         messageService.sendDiceResults(session, diceR1, diceR2);
         return new int[]{diceR1, diceR2};
     }

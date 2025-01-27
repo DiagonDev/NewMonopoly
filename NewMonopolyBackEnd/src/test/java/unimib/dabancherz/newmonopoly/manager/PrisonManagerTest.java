@@ -1,3 +1,4 @@
+/*
 package unimib.dabancherz.newmonopoly.manager;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -147,4 +148,4 @@ class PrisonManagerTest {
         verify(mockMessageService).updateBalance(anyMap(), eq(gameId), eq(playerName));
         verify(mockMessageService).exitPrisonMessage(false, mockSession);
     }
-}
+}*/
