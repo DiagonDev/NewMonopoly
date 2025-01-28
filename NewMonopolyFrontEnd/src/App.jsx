@@ -17,7 +17,7 @@ function App() {
     const navigate = useNavigate();
     const closeModal = () => {
         setModalVisible(false);
-        navigate("/");
+        
     };
 
     useEffect(() => {
