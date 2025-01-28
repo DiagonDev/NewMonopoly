@@ -1,6 +1,6 @@
 import {translateColor} from "../../../util/itToEnColors.jsx";
 import {useContext, useEffect, useState} from "react";
-import {WebSocketContext} from "../../../contexts/WebSocketContext.jsx";
+import {WebSocketContext} from "../../../eventListener/WebSocketContext.jsx";
 //import {mockPlayerProperties} from "./PlayerPropertyMock.jsx";
 
 const areAllPropertiesDifferent = (playerProperties, updateProperties) => {
