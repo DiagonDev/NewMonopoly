@@ -3,7 +3,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import IpotecaProprieta from "./gestioneProprieta/IpotecaProprieta.jsx";
 import CostruisciCasa from "./gestioneProprieta/CostruisciCasa.jsx";
 import ScambiaProprieta from "./gestioneProprieta/ScambiaProprieta.jsx";
-import {WebSocketContext} from "../../contexts/WebSocketContext.jsx";
+import {WebSocketContext} from "../../eventListener/WebSocketContext.jsx";
 
 
 const GestisciProprieta = ({playerProperties}) => {

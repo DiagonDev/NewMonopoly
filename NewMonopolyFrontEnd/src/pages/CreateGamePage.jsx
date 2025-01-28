@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { WebSocketContext } from "../contexts/WebSocketContext";
+import { WebSocketContext } from "../eventListener/WebSocketContext";
 import { useNavigate } from 'react-router-dom';
 
 

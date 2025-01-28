@@ -1,5 +1,5 @@
 import React, {useContext, useState, useEffect} from "react";
-import {WebSocketContext} from "../contexts/WebSocketContext.jsx";
+import {WebSocketContext} from "../eventListener/WebSocketContext.jsx";
 import {useNavigate} from "react-router-dom";
 import {pawnColors} from "./pawnColors.jsx";
 

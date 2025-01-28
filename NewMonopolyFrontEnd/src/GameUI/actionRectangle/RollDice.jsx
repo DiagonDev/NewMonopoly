@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import { WebSocketContext } from '../../contexts/WebSocketContext';
+import { WebSocketContext } from '../../eventListener/WebSocketContext';
 import {pawnColors} from "../../pages/pawnColors.jsx";
 
 const RollDice = () => {

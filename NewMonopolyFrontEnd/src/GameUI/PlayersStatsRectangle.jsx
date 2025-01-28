@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { WebSocketContext } from "../contexts/WebSocketContext";
+import { WebSocketContext } from "../eventListener/WebSocketContext";
 const MAX_PLAYERS = 6; // Numero massimo di giocatori
 const INITIAL_BALANCE = 0; // Saldo iniziale per ogni giocatore
 

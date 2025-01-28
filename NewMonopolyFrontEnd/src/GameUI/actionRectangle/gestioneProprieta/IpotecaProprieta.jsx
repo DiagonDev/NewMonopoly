@@ -1,4 +1,4 @@
-import {WebSocketContext} from "../../../contexts/WebSocketContext.jsx";
+import {WebSocketContext} from "../../../eventListener/WebSocketContext.jsx";
 import {useContext, useState} from "react";
 import PropertyOwned from "./PropertyOwned.jsx";
 

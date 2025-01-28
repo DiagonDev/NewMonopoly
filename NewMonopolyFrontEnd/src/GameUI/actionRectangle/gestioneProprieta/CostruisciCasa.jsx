@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import PropertyOwned from "./PropertyOwned.jsx";
-import { WebSocketContext } from "../../../contexts/WebSocketContext.jsx";
+import { WebSocketContext } from "../../../eventListener/WebSocketContext.jsx";
 
 const CostruisciCasa = ({ buildingProperties }) => {
     const { socket, connected } = useContext(WebSocketContext);

@@ -3,7 +3,7 @@ import WelcomePage from './pages/WelcomePage'; // Importa il componente WelcomeP
 import CreateGamePage from './pages/CreateGamePage';
 import JoinGamePage from './pages/JoinGamePage';
 import './App.css';
-import {WebSocketContext} from "./contexts/WebSocketContext";
+import {WebSocketContext} from "./eventListener/WebSocketContext";
 import GameBoard from "./GameUI/GameBoard.jsx";
 import WinLoseModal from "./modals/WinLoseModal.jsx";
 import {useContext, useEffect, useState} from "react";

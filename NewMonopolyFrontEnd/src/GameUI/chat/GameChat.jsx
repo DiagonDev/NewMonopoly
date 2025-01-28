@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { WebSocketContext } from "../../contexts/WebSocketContext";
+import { WebSocketContext } from "../../eventListener/WebSocketContext";
 
 
 

@@ -5,7 +5,7 @@ import RollDice from "./actionRectangle/RollDice.jsx";
 import GestisciProprieta from "./actionRectangle/GestisciProprieta.jsx";
 import ChatFather from "./ChatFather.jsx";
 import PlayersStatsRectangle from "./PlayersStatsRectangle.jsx";
-import {WebSocketContext} from "../contexts/WebSocketContext.jsx";
+import {WebSocketContext} from "../eventListener/WebSocketContext.jsx";
 import SelectPawn from "../pages/SelectPawn.jsx";
 import {BoardSection} from "./GameOutside/BoardSection.jsx";
 import {boxPositionMock} from "./boxPositionMock.jsx";

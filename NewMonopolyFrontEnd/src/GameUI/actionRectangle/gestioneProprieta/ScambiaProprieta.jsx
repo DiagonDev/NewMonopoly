@@ -1,6 +1,6 @@
 import PropertyOwned from "./PropertyOwned.jsx";
 import React, {useContext, useState} from "react";
-import {WebSocketContext} from "../../../contexts/WebSocketContext.jsx";
+import {WebSocketContext} from "../../../eventListener/WebSocketContext.jsx";
 
 const ScambiaProprieta = ({playerProperties}) => {
     const {socket, connected, allProperties} = useContext(WebSocketContext);
