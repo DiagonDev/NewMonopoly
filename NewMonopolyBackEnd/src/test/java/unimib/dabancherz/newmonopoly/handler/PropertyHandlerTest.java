@@ -200,6 +200,7 @@ class PropertyHandlerTest {
         PlayerProperties property = new PlayerProperties();
         property.setNome("property1");
         property.setPrezzoCorrente(200);
+        property.setNumCasa(2);
         String gameId = "game-1";
         String playerName = "player1";
         when(gameHandler.getGameIdBySession(session)).thenReturn(gameId);
