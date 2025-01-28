@@ -7,22 +7,25 @@ import {WebSocketContext} from "./eventListener/WebSocketContext";
 import GameBoard from "./GameUI/GameBoard.jsx";
 import WinLoseModal from "./modals/WinLoseModal.jsx";
 import {useContext, useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 
 function App() {
     const [isWin, setIsWin] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const {partitaFinita} = useContext(WebSocketContext);
+    const navigate = useNavigate();
     const closeModal = () => {
         setModalVisible(false);
+        navigate("/");
     };
 
     useEffect(() => {
-        if (partitaFinita === "Vittoria") {
+        if (partitaFinita === "vittoria") {
             setIsWin(true);
             setModalVisible(true);
         }
-        else if (partitaFinita === "Sconfitta") {
+        else if (partitaFinita === "sconfitta") {
             setIsWin(false);
             setModalVisible(true);
         }
