@@ -8,7 +8,7 @@ const PlayersStatsRectangle = () => {
     const [players, setPlayers] = useState(
         Array(MAX_PLAYERS).fill({ name: "Player", balance: INITIAL_BALANCE, points: INITIAL_POINTS })
     );
-    const { playerList, playerBalance, deletePlayer } = useContext(WebSocketContext);
+    const { playerList, playerBalance, deletePlayer, partitaFinita } = useContext(WebSocketContext);
     
     // Aggiunge un nuovo giocatore quando arriva un messaggio di join
     useEffect(() => {
@@ -69,6 +69,18 @@ const PlayersStatsRectangle = () => {
             });
         }
     }, [deletePlayer]);
+
+    useEffect(() => {
+        if(partitaFinita!==''){
+            setPlayers((prevPlayers) => {
+                return prevPlayers.map((player) =>
+                        ({ ...player, name: "Player", balance: INITIAL_BALANCE, points:INITIAL_POINTS })
+                        
+                );
+            });
+        }
+        
+    }, [partitaFinita]);
 
     return (
         <div className="player-container">
