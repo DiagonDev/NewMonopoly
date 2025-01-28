@@ -11,6 +11,8 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.MessageService;
 import unimib.dabancherz.newmonopoly.handler.GameHandler;
+import unimib.dabancherz.newmonopoly.manager.BalanceManager;
+import unimib.dabancherz.newmonopoly.manager.TurnManager;
 
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,12 @@ class WebSocketConnectionDispatcherTest {
 
     @Mock
     private WebSocketSession session;
+
+    @Mock
+    private TurnManager turnManager;
+
+    @Mock
+    private BalanceManager balanceManager;
 
     @InjectMocks
     private WebSocketConnectionDispatcher dispatcher;
@@ -64,22 +72,11 @@ class WebSocketConnectionDispatcherTest {
     }
 
     @Test
-    void testAfterConnectionClosed_WithGame() throws Exception {
+    void testAfterConnectionClosed_MessageDispatcher() throws Exception {
         CloseStatus status = CloseStatus.NORMAL;
-        when(gameHandler.getPlayerNameBySession(session)).thenReturn("Player1");
-        when(gameHandler.getGameIdBySession(session)).thenReturn("game1");
-        when(gameHandler.getGameSessions()).thenReturn(Map.of("game1", List.of(session)));
-        dispatcher.afterConnectionClosed(session, status);
-        verify(gameHandler, times(1)).removePlayerFromGame("game1", session);
-        verify(messageService, times(1)).notifyPlayerDisconnected(eq("game1"), eq("Player1"), any());
-    }
 
-    @Test
-    void testAfterConnectionClosed_WithoutGame() throws Exception {
-        CloseStatus status = CloseStatus.NORMAL;
-        when(gameHandler.getGameIdBySession(session)).thenReturn(null);
         dispatcher.afterConnectionClosed(session, status);
-        verify(gameHandler, never()).removePlayerFromGame(anyString(), any());
-        verify(messageService, never()).notifyPlayerDisconnected(anyString(), anyString(), any());
+
+        verify(messageDispatcher, times(1)).afterConnectionClosed(session, status);
     }
 }

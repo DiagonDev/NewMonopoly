@@ -2,12 +2,16 @@ package unimib.dabancherz.newmonopoly.dispatcher;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
 import unimib.dabancherz.newmonopoly.MessageService;
 import unimib.dabancherz.newmonopoly.handler.ChatHandler;
 import unimib.dabancherz.newmonopoly.handler.GameHandler;
 import unimib.dabancherz.newmonopoly.handler.PropertyHandler;
 import unimib.dabancherz.newmonopoly.manager.TurnManager;
 import org.springframework.web.socket.WebSocketSession;
+
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class MessageDispatcher {
@@ -70,8 +74,29 @@ public class MessageDispatcher {
             case "RichiestaUpdateProperties":
                 propertyHandler.updateProperties(session);
                 break;
+            case "AbbandonaPartita":
+                turnManager.checkDelete(session);
+                break;
             default:
                 throw new IllegalArgumentException("Tipo di messaggio non supportato: " + parts[0]);
+        }
+    }
+
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        System.out.println("Connessione chiusa. ID sessione: " + session.getId());
+
+        // Determina il nome del giocatore e il gameId associato alla sessione chiusa
+        String playerName = gameHandler.getPlayerNameBySession(session);
+        String gameId = gameHandler.getGameIdBySession(session);
+        if (gameId != null) {
+            // Ottieni la lista di sessioni associate al gioco
+            List<WebSocketSession> gameSession = gameHandler.getGameSessions().get(gameId);
+            Map<String, List<WebSocketSession>> gameSessions = gameHandler.getGameSessions();
+            // Rimuove il giocatore dalla partita
+            turnManager.checkDeleteX(session);
+
+            if (gameSession != null && !gameSession.isEmpty())
+                messageService.notifyPlayerDisconnected(gameId, playerName, gameSessions);
         }
     }
 }

@@ -10,6 +10,7 @@ import unimib.dabancherz.newmonopoly.database.entity.Partita;
 import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaRepository;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
@@ -38,19 +39,22 @@ public class TurnManager {
     }
 
     public void startTurn(WebSocketSession session) throws Exception {
+        gameHandler.updateTurnSession(session);
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
         Partita partita = partitaRepository.findByCodiceInvito(gameId);
-        partita.setStato("Iniziata");
-        partitaRepository.save(partita);
-        messageService.sendSystemMessage(gameId, "È il turno di: " + playerName, gameHandler.getGameSessions(), session);
+        if (partita != null) {
+            partita.setStato("Iniziata");
+            partitaRepository.save(partita);
+            messageService.sendSystemMessage(gameId, "È il turno di: " + playerName, gameHandler.getGameSessions(), session);
 
-        // Notifica ai giocatori
-        notifyPlayersTurn(gameId, playerName, session);
+            // Notifica ai giocatori
+            notifyPlayersTurn(gameId, playerName, session);
 
-        // Gestione del giocatore in prigione
-        if (prisonManager.isPlayerInPrison(gameId, playerName)) {
-            prisonManager.handlePrisonPlayer(gameId, playerName, session);
+            // Gestione del giocatore in prigione
+            if (prisonManager.isPlayerInPrison(gameId, playerName)) {
+                prisonManager.handlePrisonPlayer(gameId, playerName, session);
+            }
         }
     }
 
@@ -72,11 +76,9 @@ public class TurnManager {
     public void endTurn(WebSocketSession session) throws Exception {
         String gameId = gameHandler.getGameIdBySession(session);
         String playerName = gameHandler.getPlayerNameBySession(session);
-
-        // Calcola l'indice della prossima sessione in modo circolare
         List<WebSocketSession> playersInGame = gameHandler.getGameSessions().get(gameId);
-        int nextIndex = (playersInGame.indexOf(session) + 1) % playersInGame.size();
-        WebSocketSession nextPlayer = playersInGame.get(nextIndex);
+        // Calcola l'indice della prossima sessione in modo circolare
+        WebSocketSession nextPlayer = nextSessionTurn(session);
         balanceManager.checkBalance(gameId, playerName, session);
         if(!(playersInGame.isEmpty()))
             startTurn(nextPlayer);
@@ -132,11 +134,46 @@ public class TurnManager {
         }
     }
 
+
+
     public int[] rollDice(WebSocketSession session) throws Exception {
         int diceR1 = secureRandom.nextInt(6) + 1; // Genera un numero casuale tra 1 e 6
         int diceR2 = secureRandom.nextInt(6) + 1;
         messageService.sendDiceResults(session, diceR1, diceR2);
         return new int[]{diceR1, diceR2};
+    }
+
+    public WebSocketSession nextSessionTurn(WebSocketSession session) {
+        String gameId = gameHandler.getGameIdBySession(session);
+        List<WebSocketSession> playersInGame = gameHandler.getGameSessions().get(gameId);
+        int nextIndex = (playersInGame.indexOf(session) + 1) % playersInGame.size();
+        return playersInGame.get(nextIndex);
+    }
+
+    public void checkDelete(WebSocketSession session) throws Exception {
+        String gameId = gameHandler.getGameIdBySession(session);
+        if((gameHandler.getCurrentTurnSession()).equals(session)) {
+            WebSocketSession nextSession = nextSessionTurn(session);
+            gameHandler.removePlayerFromGame(gameId, session);
+            balanceManager.checkWin(gameId, session);
+            startTurn(nextSession);
+        }else{
+            balanceManager.handleNegativeBalance(session);
+            balanceManager.checkWin(gameId, session);
+        }
+    }
+
+    public void checkDeleteX(WebSocketSession session) throws Exception {
+        String gameId = gameHandler.getGameIdBySession(session);
+        if((gameHandler.getCurrentTurnSession()).equals(session)) {
+            WebSocketSession nextSession = nextSessionTurn(session);
+            gameHandler.removePlayerFromGame(gameId, session);
+            balanceManager.checkWin(gameId, session);
+            startTurn(nextSession);
+        }else{
+            gameHandler.removePlayerFromGame(gameId, session);
+            balanceManager.checkWin(gameId, session);
+        }
     }
 }
 

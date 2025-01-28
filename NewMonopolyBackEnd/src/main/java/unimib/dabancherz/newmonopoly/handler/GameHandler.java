@@ -34,6 +34,7 @@ public class GameHandler {
 
     private final GameBoardWrapper gameBoardWrapper;
     private List<Integer> pedineNonUsate = new ArrayList<>();
+    private WebSocketSession currentTurnSession = null;
 
     public GameHandler(MessageService messageService,
                        GameService gameService,
@@ -78,7 +79,8 @@ public class GameHandler {
         messageService.sendTypePlayer("ADMIN", session);//invia all'admin il tipo di giocatore che è
 
         pedineNonUsate = pedinaRepository.findUnusedPedineByPartita(gameId);
-        messageService.sendUnusedPedine(pedineNonUsate, gameSessions, gameId); //invia al giocatore la lista delle pedine disponibili
+        messageService.sendUnusedPedine(pedineNonUsate, gameSessions, gameId);//invia al giocatore la lista delle pedine disponibili
+        updateTurnSession(session);
     }
 
     public void joinGame(String[] messageParts, WebSocketSession session) throws Exception {
@@ -155,24 +157,27 @@ public class GameHandler {
 
     @Transactional
     public void removePlayerFromGame(String gameId, WebSocketSession session) throws IOException {
-        List<WebSocketSession> playersInGame = gameSessions.get(gameId);
-        if (playersInGame != null) {
-            String player = getPlayerNameBySession(session);
-            Integer pawnId = giocatoreRepository.findPedinaFromGiocatore(player, gameId);
-            messageService.sendPawnMove(pawnId, player, 0, gameSessions, gameId);
-            messageService.sendDisconnected(gameSessions, gameId, player);
-            gameService.deletePlayer(gameId, player);
-            playersInGame.remove(session); // Rimuove la sessione dalla lista dei giocatori
-            gameBoardWrapper.removePlayerFromGame(gameId, player);
-            // Se non ci sono più giocatori nella partita, rimuovi completamente la partita
-            if (playersInGame.isEmpty()) {
-                partitaRepository.deleteByCodiceInvito(gameId);
-                gameSessions.remove(gameId);
+        if(gameSessions.get(gameId) != null) {
+            List<WebSocketSession> playersInGame = gameSessions.get(gameId);
+            if (playersInGame != null) {
+                String player = getPlayerNameBySession(session);
+                Integer pawnId = giocatoreRepository.findPedinaFromGiocatore(player, gameId);
+                playersInGame.remove(session);
+                messageService.sendPawnMove(pawnId, player, 0, gameSessions, gameId);
+                messageService.sendDisconnected(gameSessions, gameId, player);
+                gameService.deletePlayer(gameId, player);
+                // Rimuove la sessione dalla lista dei giocatori
                 gameBoardWrapper.removePlayerFromGame(gameId, player);
+                // Se non ci sono più giocatori nella partita, rimuovi completamente la partita
+                if (playersInGame.isEmpty()) {
+                    partitaRepository.deleteByCodiceInvito(gameId);
+                    gameSessions.remove(gameId);
+                    gameBoardWrapper.removePlayerFromGame(gameId, player);
+                }
             }
+            // Rimuove il giocatore dalla mappa dei nomi
+            playerNameList.entrySet().removeIf(entry -> entry.getKey().equals(session));
         }
-        // Rimuove il giocatore dalla mappa dei nomi
-        playerNameList.entrySet().removeIf(entry -> entry.getKey().equals(session));
     }
 
     public void choosePedina(String[] messageParts, WebSocketSession session) throws Exception {
@@ -198,5 +203,16 @@ public class GameHandler {
             }
             Thread.sleep(20);
         }
+    }
+
+    public void updateTurnSession(WebSocketSession session) {
+        // Se la sessione attuale è diversa da quella salvata
+        if (currentTurnSession == null || !currentTurnSession.equals(session)) {
+            currentTurnSession = session;
+        }
+    }
+
+    public WebSocketSession getCurrentTurnSession() {
+        return currentTurnSession;
     }
 }

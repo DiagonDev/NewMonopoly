@@ -50,25 +50,6 @@ class BalanceManagerTest {
     }
 
     @Test
-    void testCheckBalanceNegative() throws Exception {
-        String gameId = "game123";
-        String playerName = "player1";
-        int saldoG = -100;
-
-        when(mockGiocatoreRepository.saldoGiocatore(playerName, gameId)).thenReturn(saldoG);
-        // Mock game sessions to have more than one player
-        when(mockGameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(mockSession, mock(WebSocketSession.class))));
-
-        balanceManager.checkBalance(gameId, playerName, mockSession);
-
-        verify(mockMessageService).sendLoseMessage(mockSession);
-        verify(mockMessageService).sendSystemMessage(eq(gameId), contains("ha perso"), anyMap(), eq(mockSession));
-        verify(mockGameHandler).removePlayerFromGame(gameId, mockSession);
-        verify(mockMessageService, never()).sendVictoryMessage(any());
-    }
-
-
-    @Test
     void testCheckBalanceSinglePlayer() throws Exception {
         String gameId = "game123";
         String playerName = "player1";
@@ -84,14 +65,45 @@ class BalanceManagerTest {
     }
 
     @Test
-    void testHandleNegativeBalance() throws Exception {
+    void testCheckBalanceNegative() throws Exception {
         String gameId = "game123";
         String playerName = "player1";
+        int saldoG = -10;
 
-        balanceManager.handleNegativeBalance(gameId, playerName, mockSession);
+        when(mockGiocatoreRepository.saldoGiocatore(playerName, gameId)).thenReturn(saldoG);
+        when(mockGameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(mockSession, mock(WebSocketSession.class))));
+        when(mockGameHandler.getGameIdBySession(mockSession)).thenReturn(gameId);
+        when(mockGameHandler.getPlayerNameBySession(mockSession)).thenReturn(playerName);
+
+        balanceManager.checkBalance(gameId, playerName, mockSession);
 
         verify(mockMessageService).sendLoseMessage(mockSession);
-        verify(mockMessageService).sendSystemMessage(eq(gameId), contains("ha perso"), anyMap(), eq(mockSession));
+        verify(mockMessageService).sendSystemMessage(eq(gameId), contains("ha perso"), any(), eq(mockSession));
         verify(mockGameHandler).removePlayerFromGame(gameId, mockSession);
     }
+
+    @Test
+    void testCheckWinWithMultiplePlayers() throws Exception {
+        String gameId = "game123";
+        when(mockGameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(mockSession, mock(WebSocketSession.class))));
+
+        balanceManager.checkWin(gameId, mockSession);
+
+        verify(mockMessageService, never()).sendVictoryMessage(any());
+    }
+
+    @Test
+    void testCheckWinWithSinglePlayer() throws Exception {
+        String gameId = "game123";
+        String playerName = "player1";
+        when(mockGameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(mockSession)));
+        when(mockGameHandler.getPlayerNameBySession(mockSession)).thenReturn(playerName);
+
+        balanceManager.checkWin(gameId, mockSession);
+
+        verify(mockMessageService).sendSystemMessage(eq(gameId), contains("ha vinto"), any(), eq(mockSession));
+        verify(mockMessageService).sendVictoryMessage(mockSession);
+        verify(mockGameHandler).removePlayerFromGame(gameId, mockSession);
+    }
+
 }
