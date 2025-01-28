@@ -56,6 +56,10 @@ public class MessageService {
         }
     }
 
+    public void notifyPlayerDisconnected(String gameId, String playerName, Map<String, List<WebSocketSession>> gameSessions) throws Exception {
+        sendToGame(Map.of(TYPEKEY, SYSTEMKEY, CONTENTKEY, playerName + " si è disconnesso dalla partita."), gameSessions, gameId);
+    }
+
     public void sendUnusedPedine(List<Integer> pedineNonUsate, Map<String, List<WebSocketSession>> gameSessions, String gameId) throws Exception {
         sendToGame(Map.of(TYPEKEY, "pawnsAvailable", CONTENTKEY, pedineNonUsate), gameSessions, gameId);
     }

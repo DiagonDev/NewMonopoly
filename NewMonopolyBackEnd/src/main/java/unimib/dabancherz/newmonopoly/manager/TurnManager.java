@@ -9,15 +9,12 @@ import unimib.dabancherz.newmonopoly.singleton.GameBoardSingleton;
 import unimib.dabancherz.newmonopoly.database.entity.Partita;
 import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaRepository;
-
-import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 
 @Component
 public class TurnManager {
-
     private final GameHandler gameHandler;
     private final MessageService messageService;
     private final PrisonManager prisonManager;
@@ -47,10 +44,8 @@ public class TurnManager {
             partita.setStato("Iniziata");
             partitaRepository.save(partita);
             messageService.sendSystemMessage(gameId, "È il turno di: " + playerName, gameHandler.getGameSessions(), session);
-
             // Notifica ai giocatori
             notifyPlayersTurn(gameId, playerName, session);
-
             // Gestione del giocatore in prigione
             if (prisonManager.isPlayerInPrison(gameId, playerName)) {
                 prisonManager.handlePrisonPlayer(gameId, playerName, session);

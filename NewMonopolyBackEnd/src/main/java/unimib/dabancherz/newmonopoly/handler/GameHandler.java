@@ -181,16 +181,6 @@ public class GameHandler {
         }
     }
 
-    public void handleNegativeBalance(String gameId, String playerName, WebSocketSession session) throws Exception {
-        messageService.sendLoseMessage(session);
-        messageService.sendSystemMessage(gameId, playerName + " ha perso", getGameSessions(), session);
-    }
-
-    public void handleWinPlayer(String gameId, String vincitore, WebSocketSession session) throws Exception {
-        messageService.sendSystemMessage(gameId, vincitore + " ha vinto la partita", getGameSessions(), session);
-        messageService.sendVictoryMessage(session);
-    }
-
     public void choosePedina(String[] messageParts, WebSocketSession session) throws Exception {
         String idPedina = messageParts[1];
         String gameId = getGameIdBySession(session);
@@ -207,7 +197,7 @@ public class GameHandler {
 
         for (Giocatore giocatore : giocatori) {
             String playerName = giocatore.getNome();
-            if (!(playerName.equals(getPlayerNameBySession(session)))) {
+            if(!(playerName.equals(getPlayerNameBySession(session)))) {
                 int pawnId = giocatore.getIdpedina().getIdPedina();
                 int position = gameBoardWrapper.getPlayerPosition(gameId, playerName);
                 messageService.sendPlayerPawnPosition(pawnId, playerName, position, session);
