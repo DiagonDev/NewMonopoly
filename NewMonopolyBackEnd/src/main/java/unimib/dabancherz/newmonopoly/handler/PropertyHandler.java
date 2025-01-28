@@ -157,7 +157,8 @@ public class PropertyHandler {
         String nomeGiocatore = gameHandler.getPlayerNameBySession(session);
         Integer prezzo = property.getPrezzoCorrente()/2;
         Integer posizione = pCPPRepository.findPosizioneByNomeCasellaAndIdpartita(nomeCasella, gameId);
-
+        if(property.getNumCasa()>0)
+            pCPPRepository.aggiungiCase(property.getColore(), -property.getNumCasa(),gameId);
         pCPPRepository.setPrezzoCorrente(prezzo, gameId, posizione);
         giocatoreRepository.setSaldoGiocatore(nomeGiocatore, gameId, - (prezzo) );
         messageService.updateBalance(gameHandler.getGameSessions(), gameId, nomeGiocatore);
