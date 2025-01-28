@@ -1,5 +1,5 @@
 import React from "react";
-import {pawnColors} from "../../../pages/pawnColors.jsx";
+import {pawnColors} from "../../pages/pawnColors.jsx";
 
 export const CentralParkDisplay = ({ id, players }) => {
     return (

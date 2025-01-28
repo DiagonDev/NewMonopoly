@@ -1,7 +1,7 @@
 import React from "react";
 import { NyThemeData } from "../NyTheme";
 import { ColorBar } from "./ColorBar";
-import {pawnColors} from "../../../pages/pawnColors.jsx";
+import {pawnColors} from "../../pages/pawnColors.jsx";
 
 export const PropertyDisplay = ({ id, players }) => {
     const txt = NyThemeData.get(id)?.name;

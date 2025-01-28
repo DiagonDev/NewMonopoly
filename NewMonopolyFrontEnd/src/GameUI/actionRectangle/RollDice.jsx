@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import { WebSocketContext } from '../../eventListener/WebSocketContext';
-import {pawnColors} from "../../pages/pawnColors.jsx";
+import {pawnColors} from "../pages/pawnColors.jsx";
 
 const RollDice = () => {
     const { socket, connected, diceResult, diceRolled, diceRolled2, payment, draw, buy , nameBox, buyReturn, prison, exitPrison} = useContext(WebSocketContext); // Accesso al WebSocket

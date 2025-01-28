@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLightbulb } from '@fortawesome/free-solid-svg-icons';
 import { faSubway } from '@fortawesome/free-solid-svg-icons';
 import { NyThemeData } from "../NyTheme";
-import {pawnColors} from "../../../pages/pawnColors.jsx";
+import {pawnColors} from "../../pages/pawnColors.jsx";
 
 export const UtilityDisplay = ({ id, players }) => {
     const txt = NyThemeData.get(id)?.name;

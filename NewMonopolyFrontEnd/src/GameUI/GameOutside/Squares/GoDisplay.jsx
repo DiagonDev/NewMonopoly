@@ -1,7 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandPointLeft } from '@fortawesome/free-solid-svg-icons';
-import {pawnColors} from "../../../pages/pawnColors.jsx";
+import {pawnColors} from "../../pages/pawnColors.jsx";
 
 // eslint-disable-next-line react/prop-types
 export const GoDisplay = ({id, players}) => {

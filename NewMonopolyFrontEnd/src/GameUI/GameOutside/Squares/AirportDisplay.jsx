@@ -2,7 +2,7 @@ import React from "react";
 import { NyThemeData } from "../NyTheme";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlane } from '@fortawesome/free-solid-svg-icons';
-import {pawnColors} from "../../../pages/pawnColors.jsx";
+import {pawnColors} from "../../pages/pawnColors.jsx";
 
 export const AirportDisplay = ({ id, players }) => {
     const txt = NyThemeData.get(id)?.name;
