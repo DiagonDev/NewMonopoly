@@ -17,8 +17,7 @@ public class GameService {
     private final OpportunitaRepository opportunitaRepository;
     private final PartitaOpportunitaRepository partitaOpportunitaRepository;
     private final PedinaRepository pedinaRepository;
-
-    private static final String errorePartita = "Partita non trovata";
+    private static final String ERRORE_PARTITA = "Partita non trovata";
 
     @Autowired
     public GameService(PartitaRepository partitaRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository, OpportunitaRepository opportunitaRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, PedinaRepository pedinaRepository) {
@@ -85,7 +84,7 @@ public class GameService {
         // Recupera tutte le probabilità
         List<Opportunita> listaOpportunita = opportunitaRepository.findAll();
         Partita partita = partitaRepository.findById(gameId)
-                .orElseThrow(() -> new RuntimeException(errorePartita));
+                .orElseThrow(() -> new RuntimeException(ERRORE_PARTITA));
 
         // Per ogni probabilità, crea un nuovo record in Partita_Probabilita
         for (Opportunita opportunita : listaOpportunita) {
