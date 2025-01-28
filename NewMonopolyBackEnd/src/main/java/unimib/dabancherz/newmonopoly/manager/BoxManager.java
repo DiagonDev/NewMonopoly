@@ -53,7 +53,8 @@ public class BoxManager {
         String proprietario;
         String descrizione;
         String tipoAzione;
-        int prezzoCasella, prezzoAffitto;
+        int prezzoCasella;
+        int prezzoAffitto;
 
         session.sendMessage(new TextMessage(messageService.createMessage(Map.of(TYPEKEY, "nameBox", "name", nomeCasella))));
 
@@ -133,7 +134,6 @@ public class BoxManager {
     }
 
     public void gestisciAzione(String tipoAzione, Object parametri, String idPartita, String nomeGiocatore, Integer posizione, Map<String, List<WebSocketSession>> gameSessions, String typeBox, WebSocketSession session) throws Exception {
-        //WebSocketSession session = gameHandler.getSessionByPlayerName(nomeGiocatore, idPartita);
         Integer pawnId = giocatoreRepository.findPedinaFromGiocatore(nomeGiocatore, idPartita);
         int idCasella;
         switch (tipoAzione) {
