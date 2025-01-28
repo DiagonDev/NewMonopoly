@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import unimib.dabancherz.newmonopoly.database.entity.Pedina;
-
 import java.util.List;
 
 // DAO per l'entità Pedina

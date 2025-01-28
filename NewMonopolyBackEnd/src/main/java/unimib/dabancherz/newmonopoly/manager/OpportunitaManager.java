@@ -14,7 +14,7 @@ public class OpportunitaManager {
     private final PartitaOpportunitaRepository partitaOpportunitaRepository;
     private final PrisonManager prisonManager;
     GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
-    private final String PROBABILITAKEY = "Probabilità";
+    private static final String probabilitakey = "Probabilità";
 
     public OpportunitaManager(PartitaCasellaPrezzoproprietaRepository pCPPRepository, GiocatoreRepository giocatoreRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, PrisonManager prisonManager) {
         this.pCPPRepository = pCPPRepository;
@@ -83,7 +83,7 @@ public class OpportunitaManager {
     }
 
     public void gestisciUscitaPrigione(String idPartita, String nomeGiocatore, String typeBox) {
-        if (typeBox.equals(PROBABILITAKEY)) {
+        if (typeBox.equals(probabilitakey)) {
             partitaOpportunitaRepository.setGiocatore(idPartita, nomeGiocatore,  "esci_prigione", "Probabilità");
         } else {
             partitaOpportunitaRepository.setGiocatore(idPartita, nomeGiocatore,  "esci_prigione", "Imprevisto");

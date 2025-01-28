@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unimib.dabancherz.newmonopoly.database.entity.*;
 import unimib.dabancherz.newmonopoly.database.repository.*;
-
 import java.util.Collections;
 import java.util.List;
 

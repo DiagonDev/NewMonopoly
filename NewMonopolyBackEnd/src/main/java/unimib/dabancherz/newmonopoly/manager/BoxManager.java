@@ -12,7 +12,6 @@ import unimib.dabancherz.newmonopoly.database.repository.PartitaCasellaPrezzopro
 import unimib.dabancherz.newmonopoly.database.repository.PartitaOpportunitaRepository;
 import unimib.dabancherz.newmonopoly.handler.PropertyHandler;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardSingleton;
-
 import java.util.List;
 import java.util.Map;
 

@@ -1,7 +1,6 @@
 package unimib.dabancherz.newmonopoly.singleton;
 
 import unimib.dabancherz.newmonopoly.model.Game;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

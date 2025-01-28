@@ -8,7 +8,6 @@ import unimib.dabancherz.newmonopoly.database.entity.Giocatore;
 import unimib.dabancherz.newmonopoly.database.entity.Partita;
 import unimib.dabancherz.newmonopoly.database.repository.*;
 import unimib.dabancherz.newmonopoly.model.PlayerProperties;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
