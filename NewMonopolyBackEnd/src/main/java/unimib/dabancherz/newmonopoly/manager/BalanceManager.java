@@ -5,7 +5,6 @@ import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.handler.GameHandler;
 import unimib.dabancherz.newmonopoly.MessageService;
 import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
-
 import java.util.List;
 
 @Component
@@ -28,7 +27,8 @@ public class BalanceManager {
         else
             messageService.updateProperties(gameId, playerName, session);
 
-        checkWin(gameId, session);
+        checkWin(gameId
+        );
     }
 
     public void handleNegativeBalance( WebSocketSession session) throws Exception {
@@ -45,7 +45,7 @@ public class BalanceManager {
         gameHandler.removePlayerFromGame(gameId, session);
     }
 
-    public void checkWin (String gameId, WebSocketSession session) throws Exception {
+    public void checkWin (String gameId) throws Exception {
         List<WebSocketSession> playersInGame = gameHandler.getGameSessions().get(gameId);
         if(playersInGame.size() == 1){
             WebSocketSession sessionVincitore = playersInGame.get(0);

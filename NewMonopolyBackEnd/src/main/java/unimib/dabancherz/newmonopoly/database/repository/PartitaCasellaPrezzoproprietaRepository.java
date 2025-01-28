@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import unimib.dabancherz.newmonopoly.database.entity.Partita_Casella_Prezzoproprieta;
 import unimib.dabancherz.newmonopoly.model.PlayerProperties;
-
 import java.util.List;
 
 @Repository

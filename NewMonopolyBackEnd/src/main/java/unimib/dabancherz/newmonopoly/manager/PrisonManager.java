@@ -9,11 +9,10 @@ import unimib.dabancherz.newmonopoly.MessageService;
 import unimib.dabancherz.newmonopoly.singleton.GameBoardSingleton;
 import unimib.dabancherz.newmonopoly.database.repository.GiocatoreRepository;
 import unimib.dabancherz.newmonopoly.database.repository.PartitaOpportunitaRepository;
-
 import java.util.Map;
 
 @Component
-public class PrisonManager {
+public class  PrisonManager {
 
     public GameBoardSingleton gameBoard = GameBoardSingleton.getInstance();
     private final PartitaOpportunitaRepository partitaOpportunitaRepository;
@@ -37,9 +36,7 @@ public class PrisonManager {
             exitPrison(gameId, playerName, session, "Probabilità");
         } else if (partitaOpportunitaRepository.possiedeCarta(playerName, gameId, "Imprevisto")) {
             exitPrison(gameId, playerName, session, "Imprevisto");
-        }/* else {
-            messageService.exitPrisonMessage(false, session);
-        }*/
+        }
     }
 
     private void exitPrison(String gameId, String playerName, WebSocketSession session, String cardKey) throws Exception {

@@ -77,6 +77,6 @@ class WebSocketConnectionDispatcherTest {
 
         dispatcher.afterConnectionClosed(session, status);
 
-        verify(messageDispatcher, times(1)).afterConnectionClosed(session, status);
+        verify(messageDispatcher, times(1)).afterConnectionClosed(session);
     }
 }

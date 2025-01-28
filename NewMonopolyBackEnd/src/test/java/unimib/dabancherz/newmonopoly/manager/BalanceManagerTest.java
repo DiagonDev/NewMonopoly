@@ -87,7 +87,7 @@ class BalanceManagerTest {
         String gameId = "game123";
         when(mockGameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(mockSession, mock(WebSocketSession.class))));
 
-        balanceManager.checkWin(gameId, mockSession);
+        balanceManager.checkWin(gameId);
 
         verify(mockMessageService, never()).sendVictoryMessage(any());
     }
@@ -99,7 +99,7 @@ class BalanceManagerTest {
         when(mockGameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(mockSession)));
         when(mockGameHandler.getPlayerNameBySession(mockSession)).thenReturn(playerName);
 
-        balanceManager.checkWin(gameId, mockSession);
+        balanceManager.checkWin(gameId);
 
         verify(mockMessageService).sendSystemMessage(eq(gameId), contains("ha vinto"), any(), eq(mockSession));
         verify(mockMessageService).sendVictoryMessage(mockSession);

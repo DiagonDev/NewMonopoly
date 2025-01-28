@@ -2,7 +2,6 @@ package unimib.dabancherz.newmonopoly.singleton;
 
 import org.springframework.stereotype.Component;
 import unimib.dabancherz.newmonopoly.model.Game;
-
 import java.util.Map;
 
 @Component

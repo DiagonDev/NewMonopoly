@@ -150,11 +150,11 @@ public class TurnManager {
         if((gameHandler.getCurrentTurnSession()).equals(session)) {
             WebSocketSession nextSession = nextSessionTurn(session);
             gameHandler.removePlayerFromGame(gameId, session);
-            balanceManager.checkWin(gameId, session);
+            balanceManager.checkWin(gameId);
             startTurn(nextSession);
         }else{
             balanceManager.handleNegativeBalance(session);
-            balanceManager.checkWin(gameId, session);
+            balanceManager.checkWin(gameId);
         }
     }
 
@@ -163,11 +163,11 @@ public class TurnManager {
         if((gameHandler.getCurrentTurnSession()).equals(session)) {
             WebSocketSession nextSession = nextSessionTurn(session);
             gameHandler.removePlayerFromGame(gameId, session);
-            balanceManager.checkWin(gameId, session);
+            balanceManager.checkWin(gameId);
             startTurn(nextSession);
         }else{
             gameHandler.removePlayerFromGame(gameId, session);
-            balanceManager.checkWin(gameId, session);
+            balanceManager.checkWin(gameId);
         }
     }
 }

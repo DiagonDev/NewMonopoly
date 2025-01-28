@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unimib.dabancherz.newmonopoly.database.entity.*;
 import unimib.dabancherz.newmonopoly.database.repository.*;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -18,8 +17,7 @@ public class GameService {
     private final OpportunitaRepository opportunitaRepository;
     private final PartitaOpportunitaRepository partitaOpportunitaRepository;
     private final PedinaRepository pedinaRepository;
-
-    private final String errorePartita = "Partita non trovata";
+    private static final String ERRORE_PARTITA = "Partita non trovata";
 
     @Autowired
     public GameService(PartitaRepository partitaRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository, OpportunitaRepository opportunitaRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, PedinaRepository pedinaRepository) {
@@ -67,7 +65,6 @@ public class GameService {
             throw new IllegalArgumentException("La partita con ID " + gameId + " non esiste.");
         }
         Giocatore nuovoGiocatore = new Giocatore();
-        System.out.println("lo stato della partita è:" + partita.getStato());
         if((partita.getStato()).equals("Iniziata")){
             nuovoGiocatore.setSaldo(1000);
             nuovoGiocatore.setTipo("imprenditore");
@@ -87,7 +84,7 @@ public class GameService {
         // Recupera tutte le probabilità
         List<Opportunita> listaOpportunita = opportunitaRepository.findAll();
         Partita partita = partitaRepository.findById(gameId)
-                .orElseThrow(() -> new RuntimeException(errorePartita));
+                .orElseThrow(() -> new RuntimeException(ERRORE_PARTITA));
 
         // Per ogni probabilità, crea un nuovo record in Partita_Probabilita
         for (Opportunita opportunita : listaOpportunita) {

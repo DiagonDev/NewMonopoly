@@ -45,11 +45,12 @@ class PropertyHandlerTest {
     @InjectMocks
     private PropertyHandler propertyHandler;
 
-    private final String IMPRENDITOREKEY = "imprenditore";
-    private final String FACILEKEY = "Facile";
+    private static final String IMPRENDITORE_KEY = "imprenditore";
+    private static final String FACILE_KEY = "Facile";
 
     @BeforeEach
     public void setUp() {
+
         MockitoAnnotations.openMocks(this);
         propertyHandler = new PropertyHandler(pCPPRepository, giocatoreRepository, gameHandler, messageService, casellaRepository, partitaRepository);
     }
@@ -200,6 +201,7 @@ class PropertyHandlerTest {
         PlayerProperties property = new PlayerProperties();
         property.setNome("property1");
         property.setPrezzoCorrente(200);
+        property.setNumCasa(2);
         String gameId = "game-1";
         String playerName = "player1";
         when(gameHandler.getGameIdBySession(session)).thenReturn(gameId);
@@ -236,9 +238,9 @@ class PropertyHandlerTest {
         Giocatore giocatore = new Giocatore();
         giocatore.setPuntiFedelta(400);
         giocatore.setSaldo(100);
-        giocatore.setTipo(IMPRENDITOREKEY);
+        giocatore.setTipo(IMPRENDITORE_KEY);
         Partita partita = new Partita();
-        partita.setLivelloDifficolta(FACILEKEY);
+        partita.setLivelloDifficolta(FACILE_KEY);
         when(gameHandler.getGameIdBySession(session)).thenReturn(gameId);
         when(gameHandler.getPlayerNameBySession(session)).thenReturn(playerName);
         when(pCPPRepository.prezzoCasella2(anyString(), anyString())).thenReturn(100);
@@ -258,9 +260,9 @@ class PropertyHandlerTest {
         Giocatore giocatore = new Giocatore();
         giocatore.setPuntiFedelta(200);
         giocatore.setSaldo(100);
-        giocatore.setTipo(IMPRENDITOREKEY);
+        giocatore.setTipo(IMPRENDITORE_KEY);
         Partita partita = new Partita();
-        partita.setLivelloDifficolta(FACILEKEY);
+        partita.setLivelloDifficolta(FACILE_KEY);
         when(gameHandler.getGameIdBySession(session)).thenReturn(gameId);
         when(gameHandler.getPlayerNameBySession(session)).thenReturn(playerName);
         when(pCPPRepository.prezzoCasella2(anyString(), anyString())).thenReturn(100);
@@ -280,9 +282,9 @@ class PropertyHandlerTest {
         Giocatore giocatore = new Giocatore();
         giocatore.setPuntiFedelta(100);
         giocatore.setSaldo(50);
-        giocatore.setTipo(IMPRENDITOREKEY);
+        giocatore.setTipo(IMPRENDITORE_KEY);
         Partita partita = new Partita();
-        partita.setLivelloDifficolta(FACILEKEY);
+        partita.setLivelloDifficolta(FACILE_KEY);
         when(gameHandler.getGameIdBySession(session)).thenReturn(gameId);
         when(gameHandler.getPlayerNameBySession(session)).thenReturn(playerName);
         when(pCPPRepository.prezzoCasella2(anyString(), anyString())).thenReturn(100);

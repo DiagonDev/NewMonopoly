@@ -8,7 +8,6 @@ import unimib.dabancherz.newmonopoly.database.entity.Giocatore;
 import unimib.dabancherz.newmonopoly.database.entity.Partita;
 import unimib.dabancherz.newmonopoly.database.repository.*;
 import unimib.dabancherz.newmonopoly.model.PlayerProperties;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -145,7 +144,7 @@ public class PropertyHandler {
         WebSocketSession sessionRichiedente = gameHandler.getSessionByPlayerName(nomeRichiedente, gameId);
 
         if (flag) {
-            completaScambio(gameId, nomeProprietario, nomeRichiedente, property1, property2, offertaMonetaria, session, sessionRichiedente);
+            completaScambio(nomeProprietario, nomeRichiedente, property1, property2, offertaMonetaria, session, sessionRichiedente);
         } else {
             rifiutaScambio(gameId, nomeProprietario, nomeRichiedente, session);
         }
@@ -174,9 +173,9 @@ public class PropertyHandler {
         messageService.inviaMessaggio(session, UPDATEPROPERTIES_KEY, PROPERTIESKEY, giocatorePropertiesList);
     }
 
-    public void completaScambio(String gameId, String nomeProprietario, String nomeRichiedente, PlayerProperties property1, PlayerProperties property2, Integer offertaMonetaria, WebSocketSession session, WebSocketSession sessionRichiedente) throws Exception {
+    public void completaScambio(String nomeProprietario, String nomeRichiedente, PlayerProperties property1, PlayerProperties property2, Integer offertaMonetaria, WebSocketSession session, WebSocketSession sessionRichiedente) throws Exception {
+        String gameId = gameHandler.getGameIdBySession(session);
         int saldoRichiedente = giocatoreRepository.saldoGiocatore(nomeRichiedente, gameId);
-
         if (saldoRichiedente > offertaMonetaria) {
             giocatoreRepository.setSaldoGiocatore(nomeRichiedente, gameId, offertaMonetaria);
             giocatoreRepository.setSaldoGiocatore(nomeProprietario, gameId, -offertaMonetaria);
@@ -228,10 +227,10 @@ public class PropertyHandler {
         int offertaMonetaria;
         Object offertaMonetariaObj = data.get("offertaMonetaria");
         // Gestione sicura di offertaMonetaria
-        if (offertaMonetariaObj instanceof String) {
-            offertaMonetaria = Integer.parseInt((String) offertaMonetariaObj); // Converti da stringa
-        } else if (offertaMonetariaObj instanceof Integer) {
-            offertaMonetaria = (Integer) offertaMonetariaObj; // Già un Integer, usa direttamente
+        if (offertaMonetariaObj instanceof String offertaStr) {
+            offertaMonetaria = Integer.parseInt(offertaStr); // Converti da stringa
+        } else if (offertaMonetariaObj instanceof Integer offertaInt) {
+            offertaMonetaria = offertaInt;
         } else {
             throw new IllegalArgumentException("Tipo non valido per offertaMonetaria: " + offertaMonetariaObj.getClass());
         }
