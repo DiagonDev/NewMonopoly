@@ -19,7 +19,7 @@ public class GameService {
     private final PartitaOpportunitaRepository partitaOpportunitaRepository;
     private final PedinaRepository pedinaRepository;
 
-    private final String errorePartita = "Partita non trovata";
+    private static final String errorePartita = "Partita non trovata";
 
     @Autowired
     public GameService(PartitaRepository partitaRepository, GiocatoreRepository giocatoreRepository, PartitaCasellaPrezzoproprietaRepository partitaCasellaPrezzoproprietaRepository, OpportunitaRepository opportunitaRepository, PartitaOpportunitaRepository partitaOpportunitaRepository, PedinaRepository pedinaRepository) {
@@ -67,7 +67,6 @@ public class GameService {
             throw new IllegalArgumentException("La partita con ID " + gameId + " non esiste.");
         }
         Giocatore nuovoGiocatore = new Giocatore();
-        System.out.println("lo stato della partita è:" + partita.getStato());
         if((partita.getStato()).equals("Iniziata")){
             nuovoGiocatore.setSaldo(1000);
             nuovoGiocatore.setTipo("imprenditore");

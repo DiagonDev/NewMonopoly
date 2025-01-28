@@ -82,9 +82,7 @@ public class MessageDispatcher {
         }
     }
 
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        System.out.println("Connessione chiusa. ID sessione: " + session.getId());
-
+    public void afterConnectionClosed(WebSocketSession session) throws Exception {
         // Determina il nome del giocatore e il gameId associato alla sessione chiusa
         String playerName = gameHandler.getPlayerNameBySession(session);
         String gameId = gameHandler.getGameIdBySession(session);
