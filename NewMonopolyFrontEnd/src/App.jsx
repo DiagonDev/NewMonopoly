@@ -1,20 +1,17 @@
-import {Routes, Route, Link} from 'react-router-dom';
-import WelcomePage from './pages/WelcomePage'; // Importa il componente WelcomePage
-import CreateGamePage from './pages/CreateGamePage';
-import JoinGamePage from './pages/JoinGamePage';
+import {Routes, Route} from 'react-router-dom';
+import WelcomePage from './GameUI/pages/WelcomePage'; // Importa il componente WelcomePage
+import CreateGamePage from './GameUI/pages/CreateGamePage';
+import JoinGamePage from './GameUI/pages/JoinGamePage';
 import './App.css';
 import {WebSocketContext} from "./eventListener/WebSocketContext";
 import GameBoard from "./GameUI/GameBoard.jsx";
-import WinLoseModal from "./modals/WinLoseModal.jsx";
+import WinLoseModal from "./GameUI/modals/WinLoseModal.jsx";
 import {useContext, useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
-
 
 function App() {
     const [isWin, setIsWin] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const {partitaFinita} = useContext(WebSocketContext);
-    const navigate = useNavigate();
     const closeModal = () => {
         setModalVisible(false);
         
