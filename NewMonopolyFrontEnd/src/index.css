@@ -711,7 +711,7 @@ button:focus-visible {
 }
 
 .chat-window {
-    width: 220px;
+    width: 240px;
     height: 120px;
     resize: none; /* Disabilita la possibilità di ridimensionare */
     overflow-y: auto; /* Scroll se i messaggi sono troppi */
@@ -754,7 +754,7 @@ button:focus-visible {
 }
 */
 .rollDiceDiv{
-    overflow: auto;
+    overflow-y: auto;
     padding: 5px;
     padding-top: 2rem;
 }
