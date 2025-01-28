@@ -413,7 +413,7 @@ public interface PartitaCasellaPrezzoproprietaRepository extends JpaRepository<P
                 SELECT c.id_casella
                 FROM casella c
                 WHERE c.colore = :colore
-            )
+            ) AND pcp.idpartita=:idPartita
     """, nativeQuery = true)
-    void aggiungiCase(@Param("colore") String colore, @Param("numeroCase") Integer numeroCase);
+    void aggiungiCase(@Param("colore") String colore, @Param("numeroCase") Integer numeroCase, @Param("idPartita") String idPartita);
 }

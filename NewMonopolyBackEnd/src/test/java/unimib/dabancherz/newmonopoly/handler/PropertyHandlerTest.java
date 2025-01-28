@@ -157,9 +157,11 @@ class PropertyHandlerTest {
         String playerName1 = "player1";
         String playerName2 = "player2";
         PlayerProperties property1 = new PlayerProperties();
-        property1.setIdGiocatore(1); // Imposta l'ID del giocatore
+        property1.setIdGiocatore(1);
+        property1.setNumCasa(0);
         PlayerProperties property2 = new PlayerProperties();
-        property2.setIdGiocatore(2); // Imposta l'ID del giocatore
+        property2.setIdGiocatore(2);
+        property2.setNumCasa(0);
         Map<String, Object> data = new HashMap<>();
         data.put("property1", property1);
         data.put("property2", property2);
@@ -174,7 +176,6 @@ class PropertyHandlerTest {
         verify(messageService, times(1)).sendSystemMessage(eq(gameId), anyString(), any(), eq(session));
         verify(messageService, times(1)).rispostaGestisciProprieta(anyString(), eq(session));
     }
-
     @Test
     void testRispostaScambio_Declined() throws Exception {
         String gameId = "game-1";

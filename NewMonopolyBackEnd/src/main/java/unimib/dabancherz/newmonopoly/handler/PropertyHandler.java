@@ -112,7 +112,7 @@ public class PropertyHandler {
     public void completaCostruzioneCase(String gameId, String playerName, String coloreCasella, int casine, int costoCasa, int countColore, WebSocketSession session) throws Exception {
         giocatoreRepository.setSaldoGiocatore(playerName, gameId, (casine * countColore * costoCasa));
         messageService.updateBalance(gameHandler.getGameSessions(), gameId, playerName);
-        pCPPRepository.aggiungiCase(coloreCasella, casine);
+        pCPPRepository.aggiungiCase(coloreCasella, casine, gameId);
 
         String content = playerName + " ha costruito " + casine + " case sulle proprietà di colore " + coloreCasella;
         messageService.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
@@ -183,7 +183,11 @@ public class PropertyHandler {
             messageService.updateBalance(gameHandler.getGameSessions(), gameId, nomeProprietario);
             pCPPRepository.setProprietario(nomeRichiedente, gameId, property2.getNome());
             pCPPRepository.setProprietario(nomeProprietario, gameId, property1.getNome());
-
+            if(property1.getNumCasa()>0)
+                pCPPRepository.aggiungiCase(property1.getColore(), -property1.getNumCasa(),gameId);
+            if(property2.getNumCasa()>0)
+                pCPPRepository.aggiungiCase(property2.getColore(), -property2.getNumCasa(),gameId);
+            
             messageService.rispostaGestisciProprieta("Scambio accettato", session);
             String content = nomeProprietario + " ha accettato lo scambio di " + nomeRichiedente + ". ";
             messageService.sendSystemMessage(gameId, content, gameHandler.getGameSessions(), session);
