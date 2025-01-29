@@ -9,7 +9,6 @@ import java.util.List;
 
 @Component
 public class BalanceManager {
-
     private final GiocatoreRepository giocatoreRepository;
     private final MessageService messageService;
     private final GameHandler gameHandler;

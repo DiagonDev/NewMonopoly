@@ -13,7 +13,6 @@ import java.util.Map;
 
 @Component
 public class MessageDispatcher {
-
     private final GameHandler gameHandler;
     private final ChatHandler chatHandler;
     private final TurnManager turnManager;

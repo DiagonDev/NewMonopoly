@@ -44,13 +44,11 @@ class PropertyHandlerTest {
     private WebSocketSession session;
     @InjectMocks
     private PropertyHandler propertyHandler;
-
     private static final String IMPRENDITORE_KEY = "imprenditore";
     private static final String FACILE_KEY = "Facile";
 
     @BeforeEach
     public void setUp() {
-
         MockitoAnnotations.openMocks(this);
         propertyHandler = new PropertyHandler(pCPPRepository, giocatoreRepository, gameHandler, messageService, casellaRepository, partitaRepository);
     }

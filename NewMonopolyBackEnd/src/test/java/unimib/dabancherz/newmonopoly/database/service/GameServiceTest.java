@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class GameServiceTest {
-
     @Mock
     private PartitaRepository partitaRepository;
     @Mock
@@ -32,6 +31,7 @@ class GameServiceTest {
     @BeforeEach
      void setUp() {
         MockitoAnnotations.openMocks(this);
+        gameService = new GameService(partitaRepository, giocatoreRepository, partitaCasellaPrezzoproprietaRepository, opportunitaRepository, partitaOpportunitaRepository, pedinaRepository);
     }
 
     @Test

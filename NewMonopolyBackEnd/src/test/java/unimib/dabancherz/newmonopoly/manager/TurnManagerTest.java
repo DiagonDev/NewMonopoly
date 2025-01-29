@@ -2,6 +2,9 @@ package unimib.dabancherz.newmonopoly.manager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.handler.GameHandler;
@@ -17,31 +20,32 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class TurnManagerTest {
-
+    @InjectMocks
     private TurnManager turnManager;
+    @Mock
     private GameHandler gameHandler;
+    @Mock
     private MessageService messageService;
+    @Mock
     private PrisonManager prisonManager;
+    @Mock
     private BalanceManager balanceManager;
+    @Mock
     private PartitaRepository partitaRepository;
+    @Mock
     private GiocatoreRepository giocatoreRepository;
+    @Mock
     private PawnManager pawnManager;
+    @Mock
     private WebSocketSession session;
+    @Mock
     private GameBoardSingleton gameBoard;
 
     @BeforeEach
     void setUp() {
-        gameHandler = mock(GameHandler.class);
-        messageService = mock(MessageService.class);
-        prisonManager = mock(PrisonManager.class);
-        balanceManager = mock(BalanceManager.class);
-        partitaRepository = mock(PartitaRepository.class);
-        giocatoreRepository = mock(GiocatoreRepository.class);
-        pawnManager = mock(PawnManager.class);
-        gameBoard = mock(GameBoardSingleton.class);
+        MockitoAnnotations.openMocks(this);
         turnManager = spy(new TurnManager(gameHandler, messageService, prisonManager, balanceManager, partitaRepository, giocatoreRepository, pawnManager));
         turnManager.gameBoard = gameBoard;
-        session = mock(WebSocketSession.class);
     }
 
     @Test

@@ -7,29 +7,24 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.MessageService;
-
 import static org.mockito.Mockito.*;
-
 import java.util.List;
 import java.util.Map;
 
 class ChatHandlerTest {
-
     @Mock
     private GameHandler gameHandler;
-
     @Mock
     private MessageService messageService;
-
     @Mock
     private WebSocketSession session;
-
     @InjectMocks
     private ChatHandler chatHandler;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        chatHandler = new ChatHandler(gameHandler, messageService);
     }
 
     @Test

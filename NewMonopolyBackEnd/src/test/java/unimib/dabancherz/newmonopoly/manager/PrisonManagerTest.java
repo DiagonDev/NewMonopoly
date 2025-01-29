@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class PrisonManagerTest {
-
     @Mock
     private PartitaOpportunitaRepository partitaOpportunitaRepository;
     @Mock
@@ -33,15 +32,14 @@ class PrisonManagerTest {
     private WebSocketSession session;
     @Mock
     private GameBoardSingleton gameBoard;
-
     @InjectMocks
     private PrisonManager prisonManager;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        prisonManager = new PrisonManager(partitaOpportunitaRepository, giocatoreRepository, messageService, gameHandler);
-        prisonManager.gameBoard = gameBoard; // Inject the mock GameBoardSingleton
+        prisonManager = spy(new PrisonManager(partitaOpportunitaRepository, giocatoreRepository, messageService, gameHandler));
+        prisonManager.gameBoard = gameBoard;
     }
 
     @Test

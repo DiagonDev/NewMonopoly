@@ -2,6 +2,7 @@ package unimib.dabancherz.newmonopoly.manager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.socket.WebSocketSession;
@@ -14,22 +15,21 @@ import java.util.Map;
 import static org.mockito.Mockito.*;
 
 class BalanceManagerTest {
-
+    @InjectMocks
     private BalanceManager balanceManager;
-
     @Mock
-    private GiocatoreRepository mockGiocatoreRepository;
+    private GiocatoreRepository giocatoreRepository;
     @Mock
-    private MessageService mockMessageService;
+    private MessageService messageService;
     @Mock
-    private GameHandler mockGameHandler;
+    private GameHandler gameHandler;
     @Mock
-    private WebSocketSession mockSession;
+    private WebSocketSession session;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        balanceManager = new BalanceManager(mockGiocatoreRepository, mockMessageService, mockGameHandler);
+        balanceManager = new BalanceManager(giocatoreRepository, messageService, gameHandler);
     }
 
     @Test
@@ -38,15 +38,15 @@ class BalanceManagerTest {
         String playerName = "player1";
         int saldoG = 100;
 
-        when(mockGiocatoreRepository.saldoGiocatore(playerName, gameId)).thenReturn(saldoG);
+        when(giocatoreRepository.saldoGiocatore(playerName, gameId)).thenReturn(saldoG);
         // Mock game sessions to have more than one player
-        when(mockGameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(mockSession, mock(WebSocketSession.class))));
+        when(gameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(session, mock(WebSocketSession.class))));
 
-        balanceManager.checkBalance(gameId, playerName, mockSession);
+        balanceManager.checkBalance(gameId, playerName, session);
 
-        verify(mockMessageService).updateProperties(gameId, playerName, mockSession);
-        verify(mockMessageService, never()).sendLoseMessage(any());
-        verify(mockMessageService, never()).sendVictoryMessage(any());
+        verify(messageService).updateProperties(gameId, playerName, session);
+        verify(messageService, never()).sendLoseMessage(any());
+        verify(messageService, never()).sendVictoryMessage(any());
     }
 
     @Test
@@ -55,13 +55,13 @@ class BalanceManagerTest {
         String playerName = "player1";
         int saldoG = 100;
 
-        when(mockGiocatoreRepository.saldoGiocatore(playerName, gameId)).thenReturn(saldoG);
-        when(mockGameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(mockSession)));
+        when(giocatoreRepository.saldoGiocatore(playerName, gameId)).thenReturn(saldoG);
+        when(gameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(session)));
 
-        balanceManager.checkBalance(gameId, playerName, mockSession);
+        balanceManager.checkBalance(gameId, playerName, session);
 
-        verify(mockMessageService).updateProperties(gameId, playerName, mockSession);
-        verify(mockMessageService).sendVictoryMessage(mockSession);
+        verify(messageService).updateProperties(gameId, playerName, session);
+        verify(messageService).sendVictoryMessage(session);
     }
 
     @Test
@@ -70,40 +70,40 @@ class BalanceManagerTest {
         String playerName = "player1";
         int saldoG = -10;
 
-        when(mockGiocatoreRepository.saldoGiocatore(playerName, gameId)).thenReturn(saldoG);
-        when(mockGameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(mockSession, mock(WebSocketSession.class))));
-        when(mockGameHandler.getGameIdBySession(mockSession)).thenReturn(gameId);
-        when(mockGameHandler.getPlayerNameBySession(mockSession)).thenReturn(playerName);
+        when(giocatoreRepository.saldoGiocatore(playerName, gameId)).thenReturn(saldoG);
+        when(gameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(session, mock(WebSocketSession.class))));
+        when(gameHandler.getGameIdBySession(session)).thenReturn(gameId);
+        when(gameHandler.getPlayerNameBySession(session)).thenReturn(playerName);
 
-        balanceManager.checkBalance(gameId, playerName, mockSession);
+        balanceManager.checkBalance(gameId, playerName, session);
 
-        verify(mockMessageService).sendLoseMessage(mockSession);
-        verify(mockMessageService).sendSystemMessage(eq(gameId), contains("ha perso"), any(), eq(mockSession));
-        verify(mockGameHandler).removePlayerFromGame(gameId, mockSession);
+        verify(messageService).sendLoseMessage(session);
+        verify(messageService).sendSystemMessage(eq(gameId), contains("ha perso"), any(), eq(session));
+        verify(gameHandler).removePlayerFromGame(gameId, session);
     }
 
     @Test
     void testCheckWinWithMultiplePlayers() throws Exception {
         String gameId = "game123";
-        when(mockGameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(mockSession, mock(WebSocketSession.class))));
+        when(gameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(session, mock(WebSocketSession.class))));
 
         balanceManager.checkWin(gameId);
 
-        verify(mockMessageService, never()).sendVictoryMessage(any());
+        verify(messageService, never()).sendVictoryMessage(any());
     }
 
     @Test
     void testCheckWinWithSinglePlayer() throws Exception {
         String gameId = "game123";
         String playerName = "player1";
-        when(mockGameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(mockSession)));
-        when(mockGameHandler.getPlayerNameBySession(mockSession)).thenReturn(playerName);
+        when(gameHandler.getGameSessions()).thenReturn(Map.of(gameId, List.of(session)));
+        when(gameHandler.getPlayerNameBySession(session)).thenReturn(playerName);
 
         balanceManager.checkWin(gameId);
 
-        verify(mockMessageService).sendSystemMessage(eq(gameId), contains("ha vinto"), any(), eq(mockSession));
-        verify(mockMessageService).sendVictoryMessage(mockSession);
-        verify(mockGameHandler).removePlayerFromGame(gameId, mockSession);
+        verify(messageService).sendSystemMessage(eq(gameId), contains("ha vinto"), any(), eq(session));
+        verify(messageService).sendVictoryMessage(session);
+        verify(gameHandler).removePlayerFromGame(gameId, session);
     }
 
 }

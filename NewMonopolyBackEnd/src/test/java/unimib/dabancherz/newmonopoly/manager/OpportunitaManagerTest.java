@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class OpportunitaManagerTest {
-
     @Mock
     private PartitaCasellaPrezzoproprietaRepository pCPPRepository;
     @Mock
@@ -27,14 +26,14 @@ class OpportunitaManagerTest {
     private WebSocketSession session;
     @Mock
     private GameBoardSingleton gameBoard;
-
     @InjectMocks
     private OpportunitaManager opportunitaManager;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        opportunitaManager.gameBoard = gameBoard; // Inject the mock GameBoardSingleton
+        opportunitaManager = new OpportunitaManager(pCPPRepository, giocatoreRepository, partitaOpportunitaRepository, prisonManager);
+        opportunitaManager.gameBoard = gameBoard;
     }
 
     @Test

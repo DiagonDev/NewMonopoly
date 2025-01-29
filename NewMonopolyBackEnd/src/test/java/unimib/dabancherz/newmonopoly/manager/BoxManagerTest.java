@@ -2,41 +2,43 @@ package unimib.dabancherz.newmonopoly.manager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import unimib.dabancherz.newmonopoly.MessageService;
 import unimib.dabancherz.newmonopoly.database.repository.*;
 import unimib.dabancherz.newmonopoly.handler.PropertyHandler;
-import unimib.dabancherz.newmonopoly.singleton.GameBoardWrapper;
-
 import java.util.List;
 import java.util.Map;
 import static org.mockito.Mockito.*;
 
 class BoxManagerTest {
-
+    @InjectMocks
     private BoxManager boxManager;
+    @Mock
     private MessageService messageService;
+    @Mock
     private PartitaCasellaPrezzoproprietaRepository pCPPRepository;
+    @Mock
     private GiocatoreRepository giocatoreRepository;
+    @Mock
     private PartitaOpportunitaRepository partitaOpportunitaRepository;
+    @Mock
     private OpportunitaRepository opportunitaRepository;
+    @Mock
     private OpportunitaManager opportunitaManager;
+    @Mock
     private WebSocketSession session;
+    @Mock
     private PropertyHandler propertyHandler;
+    @Mock
     private PrisonManager prisonManager;
 
 @BeforeEach
     void setUp() {
-        messageService = mock(MessageService.class);
-        pCPPRepository = mock(PartitaCasellaPrezzoproprietaRepository.class);
-        giocatoreRepository = mock(GiocatoreRepository.class);
-        partitaOpportunitaRepository = mock(PartitaOpportunitaRepository.class);
-        opportunitaRepository = mock(OpportunitaRepository.class);
-        opportunitaManager = mock(OpportunitaManager.class);
-        session = mock(WebSocketSession.class);
-        prisonManager = mock(PrisonManager.class);
-        propertyHandler = mock(PropertyHandler.class);
+        MockitoAnnotations.openMocks(this);
         boxManager = spy(new BoxManager(messageService, pCPPRepository, giocatoreRepository, partitaOpportunitaRepository, opportunitaRepository, opportunitaManager, propertyHandler, prisonManager));
     }
 

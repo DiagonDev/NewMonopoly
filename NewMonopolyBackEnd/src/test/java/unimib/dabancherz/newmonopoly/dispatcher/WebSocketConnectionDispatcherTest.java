@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -20,33 +21,19 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class WebSocketConnectionDispatcherTest {
-
     @Mock
     private MessageDispatcher messageDispatcher;
-
     @Mock
     private SpecialMessageDispatcher specialMessageDispatcher;
-
-    @Mock
-    private GameHandler gameHandler;
-
-    @Mock
-    private MessageService messageService;
-
     @Mock
     private WebSocketSession session;
-
-    @Mock
-    private TurnManager turnManager;
-
-    @Mock
-    private BalanceManager balanceManager;
-
     @InjectMocks
     private WebSocketConnectionDispatcher dispatcher;
 
     @BeforeEach
     void setUp() {
+        MockitoAnnotations.openMocks(this);
+        dispatcher = new WebSocketConnectionDispatcher(messageDispatcher, specialMessageDispatcher);
         lenient().when(session.getId()).thenReturn("session1");
     }
 

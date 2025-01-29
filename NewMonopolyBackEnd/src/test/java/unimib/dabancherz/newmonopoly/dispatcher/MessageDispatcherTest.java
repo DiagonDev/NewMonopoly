@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class MessageDispatcherTest {
-
     @Mock
     private GameHandler gameHandler;
     @Mock
@@ -29,13 +28,13 @@ class MessageDispatcherTest {
     private MessageService messageService;
     @Mock
     private WebSocketSession session;
-
     @InjectMocks
     private MessageDispatcher messageDispatcher;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        messageDispatcher = new MessageDispatcher(gameHandler, chatHandler, turnManager, propertyHandler, messageService);
     }
 
     @Test

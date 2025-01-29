@@ -20,13 +20,10 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SpecialMessageDispatcherTest {
-
     @Mock
     private PropertyHandler propertyHandler;
-
     @Mock
     private WebSocketSession session;
-
     @InjectMocks
     private SpecialMessageDispatcher dispatcher;
 
