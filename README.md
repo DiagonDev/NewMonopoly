@@ -1,6 +1,6 @@
 # NewMonopoly 
 
-**NewMonopoly** is a desktop application that recreates and digitizes the classic board game logic of *Monopoly*. The project was developed as a university assignment for the Software Engineering course.
+**NewMonopoly** is a full stack application that recreates and digitizes the classic board game logic of *Monopoly*. The project was developed as a university assignment for the Software Engineering course.
 
 ---
 
