@@ -1,56 +1,56 @@
 # NewMonopoly 
 
-**NewMonopoly** è un'applicazione desktop che ricrea e digitalizza la classica logica di gioco da tavolo del *Monopoly*. Il progetto è stato sviluppato come elaborato universitario per il corso di Ingegneria del Software.
+**NewMonopoly** is a desktop application that recreates and digitizes the classic board game logic of *Monopoly*. The project was developed as a university assignment for the Software Engineering course.
 
 ---
 
-##  Tecnologie e Architettura
+##  Technologies and Architecture
 
-Il progetto è stato sviluppato applicando pattern architetturali e comportamentali per garantire modularità, testabilità e scalabilità:
+The project was developed by applying architectural and behavioral patterns to ensure modularity, testability and scalability:
 
-* **Event-Driven Architecture & WebSockets:** Comunicazione in tempo reale gestita tramite socket asincroni per la reattività degli eventi di gioco.
-* **Dispatcher Pattern (`WebSocketConnectorDispatcher`):** Centralizzazione della logica di routing dei messaggi per disaccoppiare lo smistamento dall'elaborazione.
-* **Service & Repository Pattern:** Separazione netta tra logica di business e persistenza dei dati (PostgreSQL).
-* **Manager/Handler Pattern (`TurnManager`, `GameHandler`):** Design basato su componenti con responsabilità isolate per la gestione di turni e partite.
-* **Singleton (`GameBoardSingleton`):** Gestione dello stato di gioco in un'unica istanza condivisa e sincronizzata.
-* **Observer Pattern (Frontend):** Sincronizzazione reattiva dello stato UI in React sfruttando gli hook del ciclo di vita (`useEffect`).
-* **Principi SOLID (SRP e OCP):** Classi a responsabilità singola ed elevata estendibilità del sistema senza modifiche al codice sorgente esistente.
-
----
-
-## Funzionalità Principali
-
-* **Gestione Tabellone e Turni:** Simulazione completa del tabellone di gioco, dei dadi e del movimento dei segnalini.
-* **Sistema Economico:** Compravendita delle proprietà, gestione di case/alberghi, ipoteche e transazioni bancarie.
-* **Carte Imprevisti e Probabilità:** Gestione dinamica degli eventi casuali durante la partita.
-* **Logica di Gioco & Regole:** Controllo automatico delle condizioni di bancarotta, della prigione e del vincitore finale.
+* **Event-Driven Architecture & WebSockets:** Real-time communication handled through asynchronous sockets for responsive game events.
+* **Dispatcher Pattern (`WebSocketConnectorDispatcher`):** Centralized message routing logic to decouple dispatching from processing.
+* **Service & Repository Pattern:** Clear separation between business logic and data persistence (PostgreSQL).
+* **Manager/Handler Pattern (`TurnManager`, `GameHandler`):** Component-based design with isolated responsibilities for managing turns and matches.
+* **Singleton (`GameBoardSingleton`):** Game state managed in a single shared and synchronized instance.
+* **Observer Pattern (Frontend):** Reactive synchronization of the UI state in React using lifecycle hooks (`useEffect`).
+* **SOLID Principles (SRP and OCP):** Single-responsibility classes and high system extensibility without modifying existing source code.
 
 ---
 
-## Team di Sviluppo
+## Main Features
 
-Progetto universitario realizzato da:
+* **Board and Turn Management:** Full simulation of the game board, dice and token movement.
+* **Economic System:** Buying and selling properties, managing houses/hotels, mortgages and bank transactions.
+* **Chance and Community Chest Cards:** Dynamic handling of random events during the match.
+* **Game Logic & Rules:** Automatic checking of bankruptcy conditions, jail and the final winner.
+
+---
+
+## Development Team
+
+University project developed by:
 * [Alessandro Messa](https://github.com/DiagonDev)
 * [Matteo Ronchi](https://github.com/MatteoRonchiDev)
-* [Francesca Tentori](https://github.com/FrancescaTentoriDev)
+* [Francesca Tentori](https://github.com/tentorifrancescaDev)
 * [Luca Teruzzi](https://github.com/LucaTeruUNIMIB)
 
 ---
 
-## Struttura del Progetto
+## Project Structure
 
 ```
-├── .github/                      # Workflows di CI/CD (GitHub Actions per rollback e deployment)
-├── NewMonopolyBackEnd/           # Sviluppo server-side (Spring Boot, PostgreSQL, WebSockets)
-├── NewMonopolyFrontEnd/          # Sviluppo client-side (React, HTML5, CSS3)
-├── RelazioneNewMonopoly.pdf      # Documentazione tecnica completa e dettagliata
-├── Diagramma di Gantt.xlsx       # Pianificazione e gestione tempistiche di progetto
-└── NewMonopoly.vpp               # Progetto Visual Paradigm (Diagrammi UML e modellazione)
+├── .github/                      # CI/CD workflows (GitHub Actions for rollback and deployment)
+├── NewMonopolyBackEnd/           # Server-side development (Spring Boot, PostgreSQL, WebSockets)
+├── NewMonopolyFrontEnd/          # Client-side development (React, HTML5, CSS3)
+├── RelazioneNewMonopoly.pdf      # Complete and detailed technical documentation
+├── Diagramma di Gantt.xlsx       # Project planning and timeline management
+└── NewMonopoly.vpp               # Visual Paradigm project (UML diagrams and modeling)
 
-> **Nota sulla Documentazione:** La relazione completa, l'analisi dei requisiti, gli schemi dell'architettura e tutti i diagrammi UML sono disponibili nel file **`RelazioneNewMonopoly.pdf`**.
+> **Documentation Note:** The full report, requirements analysis, architecture diagrams and all UML diagrams are available in the **`RelazioneNewMonopoly.pdf`** file.
 ```
 
-## Metodologia di Lavoro e CI/CD
+## Work Methodology and CI/CD
 
-* **Gestione del Progetto (Agile/Waterfall):** Il flusso di lavoro è stato pianificato e tracciato tramite **Diagramma di Gantt** per la suddivisione delle milestone, la gestione delle dipendenze e l'assegnazione dei compiti tra Frontend e Backend.
-* **Continuous Integration & Deployment (CI/CD):** Utilizzo di **GitHub Actions** (`.github/`) per l'automazione dei processi di build, testing e gestione dei rollback delle release.
+* **Project Management (Agile/Waterfall):** The workflow was planned and tracked using a **Gantt Chart** to break down milestones, manage dependencies and assign tasks between Frontend and Backend.
+* **Continuous Integration & Deployment (CI/CD):** Use of **GitHub Actions** (`.github/`) to automate build, testing and release rollback processes.
